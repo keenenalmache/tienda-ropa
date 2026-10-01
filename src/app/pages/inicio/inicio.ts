@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
+import { Producto } from '../../models/producto';
 
 @Component({
   selector: 'app-inicio',
@@ -10,5 +11,11 @@ import { Productos } from '../../services/productos';
 })
 export class Inicio {
   private servicio = inject(Productos);
-  destacados = this.servicio.obtenerTodos().slice(0, 3);
+  destacados = signal<Producto[]>([]);
+
+  constructor() {
+    this.servicio
+      .obtenerTodos()
+      .then((lista) => this.destacados.set(lista.slice(0, 3)));
+  }
 }

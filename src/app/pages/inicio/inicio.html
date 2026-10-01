@@ -16,7 +16,7 @@
 <section class="seccion">
   <h2>Productos destacados</h2>
   <div class="destacados">
-    @for (p of destacados; track p.id) {
+    @for (p of destacados(); track p.id) {
       <a [routerLink]="['/producto', p.id]" class="tarjeta">
         <img [src]="p.imagen" [alt]="p.nombre" />
         <h3>{{ p.nombre }}</h3>

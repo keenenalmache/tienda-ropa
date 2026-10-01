@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
@@ -13,15 +13,19 @@ export class DetalleProducto {
   private ruta = inject(ActivatedRoute);
   private servicio = inject(Productos);
 
-  producto?: Producto;
+  producto = signal<Producto | undefined>(undefined);
+  cargando = signal(true);
 
   constructor() {
     const id = Number(this.ruta.snapshot.paramMap.get('id'));
-    this.producto = this.servicio.obtenerPorId(id);
+    this.servicio.obtenerPorId(id).then((p) => {
+      this.producto.set(p);
+      this.cargando.set(false);
+    });
   }
 
   enlaceWhatsapp(p: Producto): string {
     const mensaje = encodeURIComponent(`Hola, me interesa: ${p.nombre}`);
-    return `https://wa.me/+593978901839?text=${mensaje}`;
+    return `https://wa.me/593XXXXXXXXX?text=${mensaje}`;
   }
 }

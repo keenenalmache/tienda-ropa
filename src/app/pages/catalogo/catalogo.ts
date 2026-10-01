@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
+import { Producto } from '../../models/producto';
 
 @Component({
   selector: 'app-catalogo',
@@ -10,7 +11,8 @@ import { Productos } from '../../services/productos';
 })
 export class Catalogo {
   private servicio = inject(Productos);
-  private todos = this.servicio.obtenerTodos();
+  private todos = signal<Producto[]>([]);
+  cargando = signal(true);
 
   categorias = [
     { valor: 'todas', etiqueta: 'Todas' },
@@ -26,12 +28,19 @@ export class Catalogo {
     const cat = this.categoriaActiva();
     const texto = this.busqueda().toLowerCase().trim();
 
-    return this.todos.filter(
+    return this.todos().filter(
       (p) =>
         (cat === 'todas' || p.categoria === cat) &&
         p.nombre.toLowerCase().includes(texto),
     );
   });
+
+  constructor() {
+    this.servicio.obtenerTodos().then((lista) => {
+      this.todos.set(lista);
+      this.cargando.set(false);
+    });
+  }
 
   elegirCategoria(valor: string) {
     this.categoriaActiva.set(valor);

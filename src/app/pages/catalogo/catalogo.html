@@ -20,14 +20,18 @@
   />
 </div>
 
-<div class="cuadricula">
-  @for (p of productos(); track p.id) {
-    <a [routerLink]="['/producto', p.id]" class="tarjeta">
-      <img [src]="p.imagen" [alt]="p.nombre" />
-      <h2>{{ p.nombre }}</h2>
-      <p>${{ p.precio }}</p>
-    </a>
-  } @empty {
-    <p>No hay productos que coincidan con tu búsqueda.</p>
-  }
-</div>
+@if (cargando()) {
+  <p>Cargando productos...</p>
+} @else {
+  <div class="cuadricula">
+    @for (p of productos(); track p.id) {
+      <a [routerLink]="['/producto', p.id]" class="tarjeta">
+        <img [src]="p.imagen" [alt]="p.nombre" />
+        <h2>{{ p.nombre }}</h2>
+        <p>${{ p.precio }}</p>
+      </a>
+    } @empty {
+      <p>No hay productos que coincidan con tu búsqueda.</p>
+    }
+  </div>
+}

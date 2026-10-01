@@ -1,5 +1,6 @@
-@if (producto) {
-  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
+@if (cargando()) {
+  <p>Cargando...</p>
+} @else if (producto(); as producto) {
 
   <section class="detalle">
     <img [src]="producto.imagen" [alt]="producto.nombre" />

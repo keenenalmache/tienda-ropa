@@ -1,70 +1,50 @@
 import { Injectable } from '@angular/core';
+import { createClient } from '@supabase/supabase-js';
 import { Producto } from '../models/producto';
+import { SUPABASE_URL, SUPABASE_KEY } from '../supabase.config';
 
 @Injectable({ providedIn: 'root' })
 export class Productos {
-  private productos: Producto[] = [
-    {
-      id: 1,
-      nombre: 'Camiseta básica',
-      categoria: 'hombre',
-      precio: 12,
-      tallas: ['S', 'M', 'L'],
-      colores: ['blanco', 'negro'],
-      descripcion: 'Algodón 100%.',
-      imagen: 'camiseta.webp',
-    },
-    {
-      id: 2,
-      nombre: 'Vestido floral',
-      categoria: 'mujer',
-      precio: 25,
-      tallas: ['S', 'M'],
-      colores: ['azul'],
-      descripcion: 'Ligero, ideal para el clima cálido.',
-      imagen: 'vestido.webp',
-    },
-    {
-      id: 3,
-      nombre: 'Jean clásico',
-      categoria: 'hombre',
-      precio: 30,
-      tallas: ['30', '32', '34'],
-      colores: ['azul oscuro'],
-      descripcion: 'Corte recto, tela resistente.',
-      imagen: 'jean.webp',
-    },
-    {
-      id: 4,
-      nombre: 'Blusa de lino',
-      categoria: 'mujer',
-      precio: 18,
-      tallas: ['S', 'M', 'L'],
-      colores: ['beige', 'blanco'],
-      descripcion: 'Fresca y cómoda para el día a día.',
-      imagen: 'blusa.webp',
-    },
-    {
-      id: 5,
-      nombre: 'Conjunto deportivo infantil',
-      categoria: 'ninos',
-      precio: 20,
-      tallas: ['4', '6', '8'],
-      colores: ['rojo', 'gris'],
-      descripcion: 'Dos piezas, algodón suave.',
-      imagen: 'conjunto.webp',
-    },
-  ];
+  private supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  obtenerTodos(): Producto[] {
-    return this.productos;
+  private convertir(fila: any): Producto {
+    const variantes: any[] = fila.variantes ?? [];
+    const imagenes: any[] = [...(fila.imagenes ?? [])].sort(
+      (a, b) => a.orden - b.orden,
+    );
+
+    return {
+      id: fila.id,
+      nombre: fila.nombre,
+      categoria: fila.categorias?.slug as Producto['categoria'],
+      precio: Number(fila.precio),
+      tallas: [...new Set(variantes.map((v) => v.talla))],
+      colores: [...new Set(variantes.map((v) => v.color))],
+      descripcion: fila.descripcion ?? '',
+      imagen: imagenes[0]?.url ?? '',
+    };
   }
 
-  obtenerPorId(id: number): Producto | undefined {
-    return this.productos.find((p) => p.id === id);
+  private consulta() {
+    return this.supabase
+      .from('productos')
+      .select(
+        'id, nombre, descripcion, precio, categorias(slug), variantes(talla, color), imagenes(url, orden)',
+      );
   }
 
-  filtrarPorCategoria(cat: string): Producto[] {
-    return this.productos.filter((p) => p.categoria === cat);
+  async obtenerTodos(): Promise<Producto[]> {
+    const { data, error } = await this.consulta().order('id');
+    if (error) {
+      console.error('Error al cargar productos:', error.message);
+      return [];
+    }
+    return (data ?? []).map((f) => this.convertir(f));
+  }
+
+  async obtenerPorId(id: number): Promise<Producto | undefined> {
+    const { data, error } = await this.consulta().eq('id', id).maybeSingle();
+    if (error || !data) return undefined;
+    return this.convertir(data);
   }
 }
