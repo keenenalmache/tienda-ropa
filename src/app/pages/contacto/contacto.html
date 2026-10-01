@@ -1,0 +1,21 @@
+<section class="contacto">
+  <h1>Contacto</h1>
+
+  <dl>
+    <dt>Dirección</dt>
+    <dd>{{ negocio.direccion }}</dd>
+
+    <dt>Horario</dt>
+    <dd>{{ negocio.horario }}</dd>
+
+    <dt>Teléfono</dt>
+    <dd>{{ negocio.telefono }}</dd>
+
+    <dt>Instagram</dt>
+    <dd>{{ negocio.instagram }}</dd>
+  </dl>
+
+  <a [href]="enlaceWhatsapp" target="_blank" class="btn-whatsapp">
+    Escribir por WhatsApp
+  </a>
+</section>

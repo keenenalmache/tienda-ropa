@@ -1,0 +1,38 @@
+.volver {
+  display: inline-block;
+  margin: 1rem 2rem;
+}
+.detalle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 0 2rem 2rem;
+}
+.detalle img {
+  width: 100%;
+  border-radius: 8px;
+}
+.precio {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.opciones {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+.opciones li {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.3rem 0.8rem;
+}
+.btn-whatsapp {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #25d366;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+}

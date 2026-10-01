@@ -1,0 +1,27 @@
+<section class="portada">
+  <h1>Nombre del negocio</h1>
+  <p>Ropa cómoda y con estilo para toda la familia.</p>
+  <a routerLink="/catalogo" class="boton">Ver catálogo</a>
+</section>
+
+<section class="seccion">
+  <h2>Categorías</h2>
+  <div class="categorias">
+    <a routerLink="/catalogo">Hombre</a>
+    <a routerLink="/catalogo">Mujer</a>
+    <a routerLink="/catalogo">Niños</a>
+  </div>
+</section>
+
+<section class="seccion">
+  <h2>Productos destacados</h2>
+  <div class="destacados">
+    @for (p of destacados; track p.id) {
+      <a [routerLink]="['/producto', p.id]" class="tarjeta">
+        <img [src]="p.imagen" [alt]="p.nombre" />
+        <h3>{{ p.nombre }}</h3>
+        <p>${{ p.precio }}</p>
+      </a>
+    }
+  </div>
+</section>

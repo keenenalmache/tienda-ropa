@@ -1,0 +1,33 @@
+<h1>Catálogo</h1>
+
+<div class="filtros">
+  <div class="categorias">
+    @for (c of categorias; track c.valor) {
+      <button
+        type="button"
+        [class.activo]="categoriaActiva() === c.valor"
+        (click)="elegirCategoria(c.valor)"
+      >
+        {{ c.etiqueta }}
+      </button>
+    }
+  </div>
+
+  <input
+    type="search"
+    placeholder="Buscar producto"
+    (input)="buscar($event)"
+  />
+</div>
+
+<div class="cuadricula">
+  @for (p of productos(); track p.id) {
+    <a [routerLink]="['/producto', p.id]" class="tarjeta">
+      <img [src]="p.imagen" [alt]="p.nombre" />
+      <h2>{{ p.nombre }}</h2>
+      <p>${{ p.precio }}</p>
+    </a>
+  } @empty {
+    <p>No hay productos que coincidan con tu búsqueda.</p>
+  }
+</div>

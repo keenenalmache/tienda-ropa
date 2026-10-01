@@ -1,0 +1,34 @@
+@if (producto) {
+  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
+
+  <section class="detalle">
+    <img [src]="producto.imagen" [alt]="producto.nombre" />
+
+    <div class="info">
+      <h1>{{ producto.nombre }}</h1>
+      <p class="precio">${{ producto.precio }}</p>
+      <p>{{ producto.descripcion }}</p>
+
+      <h3>Tallas</h3>
+      <ul class="opciones">
+        @for (t of producto.tallas; track t) {
+          <li>{{ t }}</li>
+        }
+      </ul>
+
+      <h3>Colores</h3>
+      <ul class="opciones">
+        @for (c of producto.colores; track c) {
+          <li>{{ c }}</li>
+        }
+      </ul>
+
+      <a [href]="enlaceWhatsapp(producto)" target="_blank" class="btn-whatsapp">
+        Preguntar por WhatsApp
+      </a>
+    </div>
+  </section>
+} @else {
+  <p>No encontramos este producto.</p>
+  <a routerLink="/catalogo">Volver al catálogo</a>
+}
