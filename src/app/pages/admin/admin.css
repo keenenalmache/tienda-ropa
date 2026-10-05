@@ -1,0 +1,99 @@
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+.barra h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.barra span {
+  margin-right: 0.8rem;
+}
+.aviso {
+  margin: 0 2rem 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+}
+.ok {
+  background: #e4f6e8;
+}
+.mal {
+  background: #fde7e9;
+  color: #b00020;
+}
+button {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+button.primario {
+  margin: 0 2rem 1rem;
+  background: #222;
+  color: white;
+  border-color: #222;
+}
+.panel {
+  margin: 0 2rem 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.panel form:not(.fila) {
+  display: grid;
+  gap: 1rem;
+  max-width: 480px;
+}
+label {
+  display: grid;
+  gap: 0.3rem;
+}
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+input,
+select,
+textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.stock {
+  width: 80px;
+}
+.tabla {
+  width: calc(100% - 4rem);
+  margin: 0 2rem 2rem;
+  border-collapse: collapse;
+}
+.panel .tabla {
+  width: 100%;
+  margin: 0 0 1rem;
+}
+.tabla th,
+.tabla td {
+  padding: 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.oculto {
+  color: #888;
+}
+.acciones {
+  display: flex;
+  gap: 0.4rem;
+}

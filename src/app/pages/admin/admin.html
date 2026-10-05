@@ -1,0 +1,124 @@
+<header class="barra">
+  <h1>Panel de administración</h1>
+  <div>
+    <span>{{ correo() }}</span>
+    <button type="button" (click)="salir()">Cerrar sesión</button>
+  </div>
+</header>
+
+@if (mensaje()) {
+  <p class="aviso ok">{{ mensaje() }}</p>
+}
+@if (error()) {
+  <p class="aviso mal">{{ error() }}</p>
+}
+
+<button type="button" class="primario" (click)="nuevo()">Nuevo producto</button>
+
+@if (mostrarForm()) {
+  <section class="panel">
+    <h2>{{ editandoId() === null ? 'Nuevo producto' : 'Editar producto' }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <label>
+        Nombre
+        <input formControlName="nombre" />
+      </label>
+      <label>
+        Descripción
+        <textarea formControlName="descripcion" rows="3"></textarea>
+      </label>
+      <label>
+        Precio
+        <input type="number" step="0.01" min="0" formControlName="precio" />
+      </label>
+      <label>
+        Categoría
+        <select formControlName="categoria_id">
+          @for (c of categorias(); track c.id) {
+            <option [ngValue]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" formControlName="activo" />
+        Visible en el catálogo
+      </label>
+
+      <div class="fila">
+        <button type="submit" class="primario">Guardar</button>
+        <button type="button" (click)="cerrar()">Cerrar</button>
+      </div>
+    </form>
+
+    <h3>Tallas, colores y stock</h3>
+
+    @if (productoEditado(); as p) {
+      <table class="tabla">
+        <thead>
+          <tr><th>Talla</th><th>Color</th><th>Stock</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (v of p.variantes; track v.id) {
+            <tr>
+              <td>{{ v.talla }}</td>
+              <td>{{ v.color }}</td>
+              <td>
+                <input
+                  type="number"
+                  min="0"
+                  class="stock"
+                  [value]="v.stock"
+                  (change)="cambiarStock(v, $event)"
+                />
+              </td>
+              <td><button type="button" (click)="quitarVariante(v)">Eliminar</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4">Este producto aún no tiene variantes.</td></tr>
+          }
+        </tbody>
+      </table>
+
+      <form [formGroup]="formVariante" (ngSubmit)="agregarVariante()" class="fila">
+        <input placeholder="Talla" formControlName="talla" />
+        <input placeholder="Color" formControlName="color" />
+        <input type="number" min="0" class="stock" formControlName="stock" />
+        <button type="submit">Agregar</button>
+      </form>
+    } @else {
+      <p>Guarda el producto para poder agregar tallas y colores.</p>
+    }
+  </section>
+}
+
+@if (cargando()) {
+  <p>Cargando...</p>
+} @else {
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of productos(); track p.id) {
+        <tr [class.oculto]="!p.activo">
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.categorias?.nombre }}</td>
+          <td>${{ p.precio }}</td>
+          <td>{{ stockTotal(p) }}</td>
+          <td>{{ p.activo ? 'Visible' : 'Oculto' }}</td>
+          <td class="acciones">
+            <button type="button" (click)="editar(p)">Editar</button>
+            <button type="button" (click)="alternarActivo(p)">
+              {{ p.activo ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6">Todavía no hay productos.</td></tr>
+      }
+    </tbody>
+  </table>
+}

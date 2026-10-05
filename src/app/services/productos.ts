@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
 import { Producto } from '../models/producto';
-import { SUPABASE_URL, SUPABASE_KEY } from '../supabase.config';
+import { supabase } from '../supabase.client';
 
 @Injectable({ providedIn: 'root' })
 export class Productos {
-  private supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  private supabase = supabase;
 
   private convertir(fila: any): Producto {
     const variantes: any[] = fila.variantes ?? [];
