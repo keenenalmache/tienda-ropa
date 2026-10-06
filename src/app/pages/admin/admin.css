@@ -97,3 +97,25 @@ textarea {
   display: flex;
   gap: 0.4rem;
 }
+.fotos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.fotos figure {
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: center;
+}
+.fotos img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+.subir {
+  max-width: 320px;
+}

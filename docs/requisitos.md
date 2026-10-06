@@ -58,7 +58,7 @@ Desarrollo iterativo e incremental, con entregas pequeñas que el cliente revisa
 | Seguridad | Registro de usuarios cerrado. Lectura pública y escritura solo con sesión (RLS). Claves privadas fuera del código. Sitio con HTTPS. | Intentar escribir sin sesión y comprobar que se rechaza. |
 | Mantenibilidad | Código versionado en Git con commits descriptivos. Datos del negocio centralizados. | Revisión del historial y del archivo `negocio.config.ts`. |
 | Compatibilidad | Funciona en versiones recientes de Chrome, Edge, Firefox y Safari. | Prueba manual en cada navegador. |
-| Portabilidad | La base de datos usa PostgreSQL estándar. | El esquema SQL se ejecuta también en pgAdmin. |
+| Portabilidad | Las tablas usan PostgreSQL estándar. Las políticas de seguridad y el almacenamiento de fotos son específicos de Supabase. | La Parte 1 de `database/esquema.sql` se ejecuta también en pgAdmin. |
 | Fiabilidad | Despliegue automático desde Git y esquema SQL guardado en el repositorio. | Revisión de la configuración de Netlify y de la carpeta `database/`. |
 
 ## 6. Restricciones y supuestos

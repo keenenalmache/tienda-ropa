@@ -8,6 +8,12 @@ export interface VarianteAdmin {
   stock: number;
 }
 
+export interface ImagenAdmin {
+  id: number;
+  url: string;
+  orden: number;
+}
+
 export interface ProductoAdmin {
   id: number;
   nombre: string;
@@ -17,6 +23,7 @@ export interface ProductoAdmin {
   categoria_id: number;
   categorias: { nombre: string } | null;
   variantes: VarianteAdmin[];
+  imagenes: ImagenAdmin[];
 }
 
 export interface Categoria {
@@ -38,7 +45,7 @@ export class AdminProductos {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, activo, categoria_id, categorias(nombre), variantes(id, talla, color, stock)',
+        'id, nombre, descripcion, precio, activo, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
       )
       .order('id', { ascending: false });
     if (error) throw error;
@@ -88,6 +95,31 @@ export class AdminProductos {
 
   async eliminarVariante(id: number) {
     const { error } = await supabase.from('variantes').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  async subirImagen(productoId: number, archivo: File, orden: number) {
+    const extension = archivo.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const ruta = `${productoId}/${Date.now()}.${extension}`;
+
+    const { error } = await supabase.storage
+      .from('productos')
+      .upload(ruta, archivo, { contentType: archivo.type });
+    if (error) throw error;
+
+    const { data } = supabase.storage.from('productos').getPublicUrl(ruta);
+    const { error: errorTabla } = await supabase
+      .from('imagenes')
+      .insert({ producto_id: productoId, url: data.publicUrl, orden });
+    if (errorTabla) throw errorTabla;
+  }
+
+  async eliminarImagen(id: number, url: string) {
+    const marca = '/productos/';
+    const ruta = decodeURIComponent(url.substring(url.indexOf(marca) + marca.length));
+    await supabase.storage.from('productos').remove([ruta]);
+
+    const { error } = await supabase.from('imagenes').delete().eq('id', id);
     if (error) throw error;
   }
 }

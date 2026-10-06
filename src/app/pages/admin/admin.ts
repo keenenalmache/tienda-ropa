@@ -5,6 +5,7 @@ import { Auth } from '../../services/auth';
 import {
   AdminProductos,
   Categoria,
+  ImagenAdmin,
   ProductoAdmin,
   VarianteAdmin,
 } from '../../services/admin-productos';
@@ -29,6 +30,7 @@ export class Admin {
   error = signal('');
   mostrarForm = signal(false);
   editandoId = signal<number | null>(null);
+  subiendo = signal(false);
 
   productoEditado = computed(() =>
     this.productos().find((p) => p.id === this.editandoId()),
@@ -171,6 +173,41 @@ export class Admin {
       await this.api.eliminarVariante(v.id);
       await this.recargar();
     }, 'Variante eliminada.');
+  }
+
+  async subirFoto(evento: Event) {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    const p = this.productoEditado();
+    if (!archivo || !p) return;
+
+    if (!archivo.type.startsWith('image/')) {
+      this.error.set('El archivo debe ser una imagen.');
+      input.value = '';
+      return;
+    }
+    if (archivo.size > 2 * 1024 * 1024) {
+      this.error.set('La imagen pesa más de 2 MB. Usa una más liviana.');
+      input.value = '';
+      return;
+    }
+
+    const orden = Math.max(0, ...p.imagenes.map((i) => i.orden)) + 1;
+    this.subiendo.set(true);
+    await this.ejecutar(async () => {
+      await this.api.subirImagen(p.id, archivo, orden);
+      await this.recargar();
+    }, 'Foto subida.');
+    this.subiendo.set(false);
+    input.value = '';
+  }
+
+  async quitarFoto(img: ImagenAdmin) {
+    if (!confirm('¿Eliminar esta foto?')) return;
+    await this.ejecutar(async () => {
+      await this.api.eliminarImagen(img.id, img.url);
+      await this.recargar();
+    }, 'Foto eliminada.');
   }
 
   async salir() {

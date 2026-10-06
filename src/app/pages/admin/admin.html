@@ -54,6 +54,28 @@
     <h3>Tallas, colores y stock</h3>
 
     @if (productoEditado(); as p) {
+            <h3>Fotos</h3>
+
+      <div class="fotos">
+        @for (img of p.imagenes; track img.id) {
+          <figure>
+            <img [src]="img.url" alt="Foto del producto" />
+            <button type="button" (click)="quitarFoto(img)">Eliminar</button>
+          </figure>
+        } @empty {
+          <p>Este producto aún no tiene fotos.</p>
+        }
+      </div>
+
+      <label class="subir">
+        Agregar foto (máximo 2 MB)
+        <input
+          type="file"
+          accept="image/*"
+          [disabled]="subiendo()"
+          (change)="subirFoto($event)"
+        />
+      </label>
       <table class="tabla">
         <thead>
           <tr><th>Talla</th><th>Color</th><th>Stock</th><th></th></tr>
