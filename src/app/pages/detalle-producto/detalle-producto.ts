@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
+import { NEGOCIO } from '../../negocio.config';
 
 @Component({
   selector: 'app-detalle-producto',
@@ -24,8 +25,8 @@ export class DetalleProducto {
     });
   }
 
-  enlaceWhatsapp(p: Producto): string {
+    enlaceWhatsapp(p: Producto): string {
     const mensaje = encodeURIComponent(`Hola, me interesa: ${p.nombre}`);
-    return `https://wa.me/593XXXXXXXXX?text=${mensaje}`;
+    return `https://wa.me/${NEGOCIO.whatsapp}?text=${mensaje}`;
   }
 }

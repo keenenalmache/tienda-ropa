@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
-
+import { NEGOCIO } from '../../negocio.config';
 @Component({
   selector: 'app-inicio',
   imports: [RouterLink],
@@ -10,6 +10,7 @@ import { Producto } from '../../models/producto';
   styleUrl: './inicio.css',
 })
 export class Inicio {
+  nombre = NEGOCIO.nombre;
   private servicio = inject(Productos);
   destacados = signal<Producto[]>([]);
 
