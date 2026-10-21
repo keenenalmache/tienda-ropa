@@ -40,6 +40,9 @@ export class Admin {
     nombre: ['', Validators.required],
     descripcion: [''],
     precio: [0, [Validators.required, Validators.min(0)]],
+        precio_oferta: [null as number | null, [Validators.min(0)]],
+    destacado: [false],
+    nuevo: [false],
     categoria_id: [0, [Validators.required, Validators.min(1)]],
     activo: [true],
   });
@@ -90,24 +93,30 @@ export class Admin {
 
   nuevo() {
     this.editandoId.set(null);
-    this.form.reset({
+        this.form.reset({
       nombre: '',
       descripcion: '',
       precio: 0,
+      precio_oferta: null,
       categoria_id: this.categorias()[0]?.id ?? 0,
       activo: true,
+      destacado: false,
+      nuevo: false,
     });
     this.mostrarForm.set(true);
   }
 
   editar(p: ProductoAdmin) {
     this.editandoId.set(p.id);
-    this.form.reset({
+        this.form.reset({
       nombre: p.nombre,
       descripcion: p.descripcion ?? '',
       precio: Number(p.precio),
+      precio_oferta: p.precio_oferta == null ? null : Number(p.precio_oferta),
       categoria_id: p.categoria_id,
       activo: p.activo,
+      destacado: p.destacado,
+      nuevo: p.nuevo,
     });
     this.mostrarForm.set(true);
   }
@@ -122,7 +131,11 @@ export class Admin {
       this.form.markAllAsTouched();
       return;
     }
-    const datos = this.form.getRawValue();
+        const datos = this.form.getRawValue();
+    if (datos.precio_oferta !== null && datos.precio_oferta >= datos.precio) {
+      this.error.set('El precio de oferta debe ser menor que el precio normal.');
+      return;
+    }
     await this.ejecutar(async () => {
       const id = this.editandoId();
       if (id === null) {

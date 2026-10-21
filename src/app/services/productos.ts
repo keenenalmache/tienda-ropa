@@ -11,12 +11,18 @@ export class Productos {
     const imagenes: any[] = [...(fila.imagenes ?? [])].sort(
       (a, b) => a.orden - b.orden,
     );
+    const precio = Number(fila.precio);
+    const oferta = fila.precio_oferta == null ? null : Number(fila.precio_oferta);
 
     return {
       id: fila.id,
       nombre: fila.nombre,
-      categoria: fila.categorias?.slug as Producto['categoria'],
-      precio: Number(fila.precio),
+      categoria: fila.categorias?.slug ?? '',
+      precio,
+      precioOferta: oferta,
+      descuento: oferta === null ? 0 : Math.round((1 - oferta / precio) * 100),
+      destacado: !!fila.destacado,
+      nuevo: !!fila.nuevo,
       tallas: [...new Set(variantes.map((v) => v.talla))],
       colores: [...new Set(variantes.map((v) => v.color))],
       descripcion: fila.descripcion ?? '',
@@ -28,7 +34,7 @@ export class Productos {
     return this.supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, categorias(slug), variantes(talla, color), imagenes(url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, categorias(slug), variantes(talla, color), imagenes(url, orden)',
       );
   }
 

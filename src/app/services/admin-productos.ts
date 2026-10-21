@@ -20,6 +20,9 @@ export interface ProductoAdmin {
   descripcion: string | null;
   precio: number;
   activo: boolean;
+    precio_oferta: number | null;
+  destacado: boolean;
+  nuevo: boolean;
   categoria_id: number;
   categorias: { nombre: string } | null;
   variantes: VarianteAdmin[];
@@ -37,6 +40,9 @@ export interface DatosProducto {
   precio: number;
   categoria_id: number;
   activo: boolean;
+    precio_oferta: number | null;
+  destacado: boolean;
+  nuevo: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,7 +51,7 @@ export class AdminProductos {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, activo, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, activo, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
       )
       .order('id', { ascending: false });
     if (error) throw error;

@@ -7,7 +7,23 @@
 
     <div class="info">
       <h1>{{ producto.nombre }}</h1>
-      <p class="precio">${{ producto.precio }}</p>
+        <div class="etiquetas-fila">
+  @if (producto.nuevo) {
+    <span class="etiqueta etiqueta-nuevo">Nuevo</span>
+  }
+  @if (producto.precioOferta !== null) {
+    <span class="etiqueta etiqueta-oferta">-{{ producto.descuento }}%</span>
+  }
+</div>
+
+@if (producto.precioOferta !== null) {
+  <p class="precio">
+    <span class="precio-viejo">${{ producto.precio }}</span>
+    <span class="precio-oferta">${{ producto.precioOferta }}</span>
+  </p>
+} @else {
+  <p class="precio">${{ producto.precio }}</p>
+}
       <p>{{ producto.descripcion }}</p>
 
       <h3>Tallas</h3>

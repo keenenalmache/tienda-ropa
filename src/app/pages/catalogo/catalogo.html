@@ -26,9 +26,26 @@
   <div class="cuadricula">
     @for (p of productos(); track p.id) {
       <a [routerLink]="['/producto', p.id]" class="tarjeta">
-        <img [src]="p.imagen" [alt]="p.nombre" />
+        <div class="foto">
+          <img [src]="p.imagen" [alt]="p.nombre" />
+          <div class="etiquetas">
+            @if (p.nuevo) {
+              <span class="etiqueta etiqueta-nuevo">Nuevo</span>
+            }
+            @if (p.precioOferta !== null) {
+              <span class="etiqueta etiqueta-oferta">-{{ p.descuento }}%</span>
+            }
+          </div>
+        </div>
         <h2>{{ p.nombre }}</h2>
-        <p>${{ p.precio }}</p>
+        @if (p.precioOferta !== null) {
+          <p>
+            <span class="precio-viejo">${{ p.precio }}</span>
+            <span class="precio-oferta">${{ p.precioOferta }}</span>
+          </p>
+        } @else {
+          <p>${{ p.precio }}</p>
+        }
       </a>
     } @empty {
       <p>No hay productos que coincidan con tu búsqueda.</p>

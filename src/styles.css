@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+.foto {
+  position: relative;
+}
+.etiquetas {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+.etiquetas-fila {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.etiqueta {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+}
+.etiqueta-nuevo {
+  background: #1a7f4b;
+}
+.etiqueta-oferta {
+  background: #c62828;
+}
+.precio-viejo {
+  text-decoration: line-through;
+  color: #777;
+  margin-right: 0.4rem;
+}
+.precio-oferta {
+  color: #c62828;
+  font-weight: bold;
+}

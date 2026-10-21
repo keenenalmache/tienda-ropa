@@ -18,7 +18,7 @@ export class Catalogo {
     { valor: 'todas', etiqueta: 'Todas' },
     { valor: 'hombre', etiqueta: 'Hombre' },
     { valor: 'mujer', etiqueta: 'Mujer' },
-    { valor: 'ninos', etiqueta: 'Niños' },
+    { valor: 'ofertas', etiqueta: 'Ofertas' },
   ];
 
   categoriaActiva = signal('todas');
@@ -28,11 +28,17 @@ export class Catalogo {
     const cat = this.categoriaActiva();
     const texto = this.busqueda().toLowerCase().trim();
 
-    return this.todos().filter(
-      (p) =>
-        (cat === 'todas' || p.categoria === cat) &&
-        p.nombre.toLowerCase().includes(texto),
-    );
+    return this.todos()
+      .filter((p) => {
+        const coincideCategoria =
+          cat === 'todas'
+            ? true
+            : cat === 'ofertas'
+              ? p.precioOferta !== null
+              : p.categoria === cat;
+        return coincideCategoria && p.nombre.toLowerCase().includes(texto);
+      })
+      .sort((a, b) => Number(b.destacado) - Number(a.destacado));
   });
 
   constructor() {
