@@ -1,35 +1,45 @@
 @if (cargando()) {
-  <p>Cargando...</p>
+  <p class="estado">Cargando...</p>
 } @else if (producto(); as producto) {
+  <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
 
   <section class="detalle">
-    <img [src]="producto.imagen" [alt]="producto.nombre" />
+    <div class="visor">
+      @if (producto.imagen) {
+        <img class="fondo" [src]="producto.imagen" alt="" aria-hidden="true" />
+        <img class="principal" [src]="producto.imagen" [alt]="producto.nombre" />
+      }
+    </div>
 
     <div class="info">
       <h1>{{ producto.nombre }}</h1>
-        <div class="etiquetas-fila">
-  @if (producto.nuevo) {
-    <span class="etiqueta etiqueta-nuevo">Nuevo</span>
-  }
-  @if (producto.precioOferta !== null) {
-    <span class="etiqueta etiqueta-oferta">-{{ producto.descuento }}%</span>
-  }
-</div>
 
-@if (producto.precioOferta !== null) {
-  <p class="precio">
-    <span class="precio-viejo">${{ producto.precio }}</span>
-    <span class="precio-oferta">${{ producto.precioOferta }}</span>
-  </p>
-} @else {
-  <p class="precio">${{ producto.precio }}</p>
-}
+      <div class="etiquetas-fila">
+        @if (producto.nuevo) {
+          <span class="etiqueta etiqueta-nuevo">Nuevo</span>
+        }
+        @if (producto.precioOferta !== null) {
+          <span class="etiqueta etiqueta-oferta">-{{ producto.descuento }}%</span>
+        }
+      </div>
+
+      @if (producto.precioOferta !== null) {
+        <p class="precio">
+          <span class="precio-viejo">${{ producto.precio }}</span>
+          <span class="precio-oferta">${{ producto.precioOferta }}</span>
+        </p>
+      } @else {
+        <p class="precio">${{ producto.precio }}</p>
+      }
+
       <p>{{ producto.descripcion }}</p>
 
       <h3>Tallas</h3>
       <ul class="opciones">
         @for (t of producto.tallas; track t) {
           <li>{{ t }}</li>
+        } @empty {
+          <li class="vacio">Consulta la disponibilidad</li>
         }
       </ul>
 
@@ -37,15 +47,17 @@
       <ul class="opciones">
         @for (c of producto.colores; track c) {
           <li>{{ c }}</li>
+        } @empty {
+          <li class="vacio">Consulta la disponibilidad</li>
         }
       </ul>
 
-      <a [href]="enlaceWhatsapp(producto)" target="_blank" class="btn-whatsapp">
+      <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
         Preguntar por WhatsApp
       </a>
     </div>
   </section>
 } @else {
-  <p>No encontramos este producto.</p>
-  <a routerLink="/catalogo">Volver al catálogo</a>
+  <p class="estado">No encontramos este producto.</p>
+  <a routerLink="/catalogo" class="volver">Volver al catálogo</a>
 }

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NEGOCIO } from '../../negocio.config';
+import { Component, computed, inject } from '@angular/core';
+import { Negocio } from '../../services/negocio';
 
 @Component({
   selector: 'app-contacto',
@@ -8,10 +8,10 @@ import { NEGOCIO } from '../../negocio.config';
   styleUrl: './contacto.css',
 })
 export class Contacto {
-  negocio = NEGOCIO;
+  negocio = inject(Negocio).datos;
 
-  get enlaceWhatsapp(): string {
+  enlaceWhatsapp = computed(() => {
     const mensaje = encodeURIComponent('Hola, quisiera más información.');
-    return `https://wa.me/${NEGOCIO.whatsapp}?text=${mensaje}`;
-  }
+    return `https://wa.me/${this.negocio().whatsapp}?text=${mensaje}`;
+  });
 }

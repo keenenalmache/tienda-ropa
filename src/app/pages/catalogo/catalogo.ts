@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
 
@@ -11,6 +12,8 @@ import { Producto } from '../../models/producto';
 })
 export class Catalogo {
   private servicio = inject(Productos);
+  private ruta = inject(ActivatedRoute);
+  private router = inject(Router);
   private todos = signal<Producto[]>([]);
   cargando = signal(true);
 
@@ -30,18 +33,21 @@ export class Catalogo {
 
     return this.todos()
       .filter((p) => {
-        const coincideCategoria =
-          cat === 'todas'
-            ? true
-            : cat === 'ofertas'
-              ? p.precioOferta !== null
-              : p.categoria === cat;
-        return coincideCategoria && p.nombre.toLowerCase().includes(texto);
+        let coincide = true;
+        if (cat === 'ofertas') coincide = p.precioOferta !== null;
+        else if (cat !== 'todas') coincide = p.categoria === cat;
+        return coincide && p.nombre.toLowerCase().includes(texto);
       })
       .sort((a, b) => Number(b.destacado) - Number(a.destacado));
   });
 
   constructor() {
+    this.ruta.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const filtro = params.get('filtro');
+      const validos = this.categorias.map((c) => c.valor);
+      this.categoriaActiva.set(filtro && validos.includes(filtro) ? filtro : 'todas');
+    });
+
     this.servicio.obtenerTodos().then((lista) => {
       this.todos.set(lista);
       this.cargando.set(false);
@@ -49,7 +55,10 @@ export class Catalogo {
   }
 
   elegirCategoria(valor: string) {
-    this.categoriaActiva.set(valor);
+    this.router.navigate([], {
+      relativeTo: this.ruta,
+      queryParams: { filtro: valor === 'todas' ? null : valor },
+    });
   }
 
   buscar(evento: Event) {

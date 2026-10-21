@@ -13,11 +13,7 @@
     }
   </div>
 
-  <input
-    type="search"
-    placeholder="Buscar producto"
-    (input)="buscar($event)"
-  />
+  <input type="search" placeholder="Buscar producto" (input)="buscar($event)" />
 </div>
 
 @if (cargando()) {
@@ -27,7 +23,9 @@
     @for (p of productos(); track p.id) {
       <a [routerLink]="['/producto', p.id]" class="tarjeta">
         <div class="foto">
-          <img [src]="p.imagen" [alt]="p.nombre" />
+          @if (p.imagen) {
+            <img [src]="p.imagen" [alt]="p.nombre" />
+          }
           <div class="etiquetas">
             @if (p.nuevo) {
               <span class="etiqueta etiqueta-nuevo">Nuevo</span>

@@ -55,7 +55,7 @@ select,
 textarea {
   padding: 0.5rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 2px;
   font: inherit;
 }
 .fila {
@@ -110,4 +110,19 @@ textarea {
 }
 .subir {
   max-width: 320px;
+}
+.aviso {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.acciones-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 2rem 1rem;
+}
+button.primario {
+  margin: 0;
 }

@@ -13,7 +13,52 @@
   <p class="aviso mal">{{ error() }}</p>
 }
 
-<button type="button" class="primario" (click)="nuevo()">Nuevo producto</button>
+<div class="acciones-top">
+  <button type="button" class="primario" (click)="nuevo()">Nuevo producto</button>
+  <button type="button" (click)="abrirNegocio()">Datos del negocio</button>
+</div>
+
+@if (mostrarNegocio()) {
+  <section class="panel">
+    <h2>Datos del negocio</h2>
+
+    <form [formGroup]="formNegocio" (ngSubmit)="guardarNegocio()">
+      <label>
+        Nombre del negocio
+        <input formControlName="nombre" />
+      </label>
+      <label>
+        Frase de la portada
+        <input formControlName="lema" />
+      </label>
+      <label>
+        WhatsApp (solo números, con código de país)
+        <input formControlName="whatsapp" placeholder="593991234567" inputmode="numeric" />
+      </label>
+      <label>
+        Teléfono que se muestra
+        <input formControlName="telefono" />
+      </label>
+      <label>
+        Dirección
+        <input formControlName="direccion" />
+      </label>
+      <label>
+        Horario
+        <input formControlName="horario" />
+      </label>
+      <label>
+        Instagram
+        <input formControlName="instagram" />
+      </label>
+
+      <div class="fila">
+        <button type="submit" class="primario">Guardar</button>
+        <button type="button" (click)="mostrarNegocio.set(false)">Cerrar</button>
+      </div>
+    </form>
+  </section>
+}
 
 @if (mostrarForm()) {
   <section class="panel">

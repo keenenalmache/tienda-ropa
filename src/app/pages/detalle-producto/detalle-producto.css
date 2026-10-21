@@ -7,20 +7,58 @@
 .volver:hover {
   color: var(--brasa);
 }
+.estado {
+  padding: 2rem clamp(1.5rem, 6vw, 5rem);
+}
+
 .detalle {
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
   gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+  max-width: 1240px;
+  margin: 0 auto;
   padding: 0 clamp(1.5rem, 6vw, 5rem) 4rem;
 }
-.detalle img {
-  display: block;
+
+/* Visor: se adapta a cualquier foto (vertical, horizontal o cuadrada) */
+.visor {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 4 / 5;
-  object-fit: cover;
+  max-height: min(78vh, 640px);
   background: linear-gradient(160deg, #e6e0da, #d8cfc7);
-  color: transparent;
+  box-shadow:
+    0 0 0 1px var(--linea),
+    10px 10px 0 -1px var(--ceniza);
 }
+.visor .fondo {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.15) brightness(0.88);
+}
+.visor .principal {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.visor::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
 .info h1 {
   font-size: clamp(2.2rem, 5vw, 3.6rem);
 }
@@ -47,6 +85,19 @@
   border: 1px solid var(--tinta);
   border-radius: 2px;
 }
+.opciones li.vacio {
+  color: var(--suave);
+  border: 1px dashed var(--linea);
+}
 .btn-whatsapp {
   margin-top: 2rem;
+}
+
+@media (max-width: 760px) {
+  .detalle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .visor {
+    max-height: 72vh;
+  }
 }

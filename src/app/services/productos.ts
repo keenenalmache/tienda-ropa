@@ -35,7 +35,8 @@ export class Productos {
       .from('productos')
       .select(
         'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, categorias(slug), variantes(talla, color), imagenes(url, orden)',
-      );
+      )
+      .eq('activo', true);
   }
 
   async obtenerTodos(): Promise<Producto[]> {

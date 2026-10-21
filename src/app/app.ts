@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterOutlet, RouterLink } from '@angular/router';
-import { NEGOCIO } from './negocio.config';
+import { Negocio } from './services/negocio';
 
 @Component({
   imports: [RouterOutlet, RouterLink],
@@ -9,6 +10,11 @@ import { NEGOCIO } from './negocio.config';
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('tienda-ropa');
-  nombre = NEGOCIO.nombre;
+  private negocio = inject(Negocio);
+  private titulo = inject(Title);
+  nombre = computed(() => this.negocio.datos().nombre);
+
+  constructor() {
+    effect(() => this.titulo.setTitle(this.nombre()));
+  }
 }

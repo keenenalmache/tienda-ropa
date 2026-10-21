@@ -1,8 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
-import { NEGOCIO } from '../../negocio.config';
+import { Negocio } from '../../services/negocio';
 
 @Component({
   selector: 'app-inicio',
@@ -12,14 +12,27 @@ import { NEGOCIO } from '../../negocio.config';
 })
 export class Inicio {
   private servicio = inject(Productos);
-  nombre = NEGOCIO.nombre;
-  destacados = signal<Producto[]>([]);
+  private negocio = inject(Negocio);
+
+  datos = this.negocio.datos;
+  productos = signal<Producto[]>([]);
+
+  destacados = computed(() => this.productos().filter((p) => p.destacado).slice(0, 10));
+  fotoHombre = computed(() => this.fotoDe('hombre'));
+  fotoMujer = computed(() => this.fotoDe('mujer'));
+
+  enlaceWhatsapp = computed(() => {
+    const mensaje = encodeURIComponent('Hola, quisiera más información.');
+    return `https://wa.me/${this.datos().whatsapp}?text=${mensaje}`;
+  });
 
   constructor() {
-    this.servicio
-      .obtenerTodos()
-      .then((lista) =>
-        this.destacados.set(lista.filter((p) => p.destacado).slice(0, 6)),
-      );
+    this.servicio.obtenerTodos().then((lista) => this.productos.set(lista));
+  }
+
+  // Usa la foto de un producto destacado de la categoría; si no hay, la del primero con foto
+  private fotoDe(categoria: string): string {
+    const lista = this.productos().filter((p) => p.categoria === categoria && p.imagen);
+    return (lista.find((p) => p.destacado) ?? lista[0])?.imagen ?? '';
   }
 }

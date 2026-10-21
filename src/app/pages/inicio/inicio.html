@@ -1,25 +1,64 @@
 <section class="portada">
-  <h1>{{ nombre }}</h1>
-  <p>Ropa cómoda y con estilo.</p>
-  <a routerLink="/catalogo" class="boton">Ver catálogo</a>
+  <h1>{{ datos().nombre }}</h1>
+  @if (datos().lema) {
+    <p>{{ datos().lema }}</p>
+  }
+  <div class="botones">
+    <a routerLink="/catalogo" class="boton">Ver catálogo</a>
+    <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="boton-linea">Escríbenos</a>
+  </div>
 </section>
 
+<div class="franja">
+  @if (datos().horario) {
+    <p><strong>Horario</strong> {{ datos().horario }}</p>
+  }
+  @if (datos().direccion) {
+    <p><strong>Dónde estamos</strong> {{ datos().direccion }}</p>
+  }
+  @if (datos().telefono) {
+    <p><strong>WhatsApp</strong> {{ datos().telefono }}</p>
+  }
+</div>
+
 <section class="seccion">
-  <h2>Categorías</h2>
+  <h2>Elige tu estilo</h2>
   <div class="categorias">
-    <a routerLink="/catalogo">Hombre</a>
-    <a routerLink="/catalogo">Mujer</a>
+    <a routerLink="/catalogo" [queryParams]="{ filtro: 'hombre' }" class="categoria">
+      @if (fotoHombre()) {
+        <img [src]="fotoHombre()" alt="" />
+      } @else {
+        <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 8 8 15l4 10 6-3v34h28V22l6 3 4-10-14-7c-1 4-5 7-10 7s-9-3-10-7Z" />
+        </svg>
+      }
+      <span class="nombre">Hombre</span>
+    </a>
+
+    <a routerLink="/catalogo" [queryParams]="{ filtro: 'mujer' }" class="categoria">
+      @if (fotoMujer()) {
+        <img [src]="fotoMujer()" alt="" />
+      } @else {
+        <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+          <path d="M26 6 32 18 38 6 40 24 50 58H14l10-34Z" />
+          <path d="M24 24h16" />
+        </svg>
+      }
+      <span class="nombre">Mujer</span>
+    </a>
   </div>
 </section>
 
 @if (destacados().length > 0) {
   <section class="seccion">
-    <h2>Productos destacados</h2>
-    <div class="destacados">
+    <h2>Destacados</h2>
+    <div class="carrusel">
       @for (p of destacados(); track p.id) {
         <a [routerLink]="['/producto', p.id]" class="tarjeta">
           <div class="foto">
-            <img [src]="p.imagen" [alt]="p.nombre" />
+            @if (p.imagen) {
+              <img [src]="p.imagen" [alt]="p.nombre" />
+            }
             <div class="etiquetas">
               @if (p.nuevo) {
                 <span class="etiqueta etiqueta-nuevo">Nuevo</span>
@@ -43,3 +82,9 @@
     </div>
   </section>
 }
+
+<section class="cierre">
+  <h2>¿Dudas con la talla?</h2>
+  <p>Escríbenos por WhatsApp y te ayudamos a elegir.</p>
+  <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="btn-whatsapp">Hablar por WhatsApp</a>
+</section>
