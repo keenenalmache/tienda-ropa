@@ -1,0 +1,22 @@
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.75rem;
+  padding: 1rem 2rem;
+  background: var(--carbon);
+  border-bottom: 1px solid rgba(224, 123, 46, 0.35);
+}
+nav a {
+  padding-bottom: 3px;
+  color: #efe9e2;
+  text-decoration: none;
+  background: linear-gradient(var(--ascua-clara), var(--ascua-clara)) left bottom / 0% 2px no-repeat;
+  transition:
+    background-size 250ms ease,
+    color 250ms ease;
+}
+nav a:hover {
+  color: #fff;
+  background-size: 100% 2px;
+}

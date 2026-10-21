@@ -25,19 +25,11 @@
   background: #fde7e9;
   color: #b00020;
 }
-button {
-  padding: 0.45rem 0.9rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-}
+
 button.primario {
   margin: 0 2rem 1rem;
-  background: #222;
-  color: white;
-  border-color: #222;
 }
+ 
 .panel {
   margin: 0 2rem 2rem;
   padding: 1.5rem;

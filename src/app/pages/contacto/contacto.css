@@ -3,18 +3,13 @@
   padding: 2rem;
 }
 dt {
-  font-weight: bold;
   margin-top: 1rem;
+  font-weight: 600;
 }
 dd {
   margin: 0.2rem 0 0;
+  color: var(--texto-suave);
 }
 .btn-whatsapp {
-  display: inline-block;
   margin-top: 1.5rem;
-  padding: 0.8rem 1.5rem;
-  background: #25d366;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
 }

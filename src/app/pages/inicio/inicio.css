@@ -1,52 +1,49 @@
 .portada {
-  padding: 4rem 2rem;
+  padding: 5rem 2rem 4.5rem;
   text-align: center;
-  background: #f2efe9;
+  background:
+    radial-gradient(70% 90% at 50% 130%, rgba(224, 123, 46, 0.22), transparent 70%),
+    linear-gradient(180deg, #f1e9df, var(--fondo));
 }
 .portada h1 {
-  font-size: 2.5rem;
   margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 600;
 }
-.boton {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.8rem 1.6rem;
-  background: #222;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
+.portada p {
+  margin: 0 0 1.5rem;
+  color: var(--texto-suave);
 }
 .seccion {
   padding: 2rem;
 }
 .categorias {
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 .categorias a {
   flex: 1;
   min-width: 140px;
   padding: 1.5rem;
   text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 8px;
   color: inherit;
   text-decoration: none;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  transition:
+    transform var(--suave),
+    border-color var(--suave),
+    color var(--suave);
+}
+.categorias a:hover {
+  transform: translateY(-1px);
+  border-color: var(--ascua-clara);
+  color: var(--ascua);
 }
 .destacados {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
-}
-.tarjeta {
-  display: block;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  color: inherit;
-  text-decoration: none;
-}
-.tarjeta img {
-  width: 100%;
 }

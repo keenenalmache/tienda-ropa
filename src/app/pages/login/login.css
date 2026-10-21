@@ -13,21 +13,11 @@ label {
 }
 input {
   padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-button {
-  padding: 0.7rem;
-  background: #222;
-  color: white;
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:disabled {
-  opacity: 0.6;
+  font: inherit;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
 }
 .error {
-  color: #b00020;
   margin: 0;
+  color: var(--oferta);
 }
