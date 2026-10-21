@@ -1,39 +1,52 @@
 .volver {
   display: inline-block;
-  margin: 1rem 2rem;
-  color: var(--texto-suave);
+  margin: 1.5rem clamp(1.5rem, 6vw, 5rem) 1rem;
+  color: var(--suave);
   text-decoration: none;
 }
 .volver:hover {
-  color: var(--ascua);
+  color: var(--brasa);
 }
 .detalle {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 0 2rem 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding: 0 clamp(1.5rem, 6vw, 5rem) 4rem;
 }
 .detalle img {
+  display: block;
   width: 100%;
-  border-radius: var(--radio);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: linear-gradient(160deg, #e6e0da, #d8cfc7);
+  color: transparent;
+}
+.info h1 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
 }
 .precio {
-  font-size: 1.5rem;
+  margin: 0 0 1.2rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+.info h3 {
+  margin: 1.6rem 0 0.5rem;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 .opciones {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 .opciones li {
-  padding: 0.3rem 0.8rem;
-  background: #fff;
-  border: 1px solid var(--borde);
-  border-radius: 6px;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--tinta);
+  border-radius: 2px;
 }
 .btn-whatsapp {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }

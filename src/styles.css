@@ -1,165 +1,199 @@
 :root {
-  --fondo: #faf8f5;
-  --superficie: #ffffff;
-  --texto: #221e1b;
-  --texto-suave: #6b625b;
-  --borde: #e6dfd7;
-  --carbon: #1f1b18;
-  --ascua: #c2410c;
-  --ascua-clara: #e07b2e;
-  --resplandor: rgba(224, 123, 46, 0.32);
-  --oferta: #b3261e;
-  --nuevo: #1a7f4b;
-  --wa: #1f9d55;
-  --radio: 8px;
-  --suave: 220ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  --tinta: #1c1311;
+  --brasa: #d9461f;
+  --brasa-viva: #e4552b;
+  --llama: #f08a3c;
+  --papel: #f4f2ef;
+  --ceniza: #e4ded8;
+  --linea: #d6cfc8;
+  --texto: #1c1311;
+  --suave: #6f6560;
+  --verde-wa: #1f9d55;
+  --ritmo: 240ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
 body {
   margin: 0;
-  background: var(--fondo);
+  background: var(--papel);
   color: var(--texto);
-  font-family: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  line-height: 1.5;
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-stretch: 100%;
+  line-height: 1.55;
 }
 
 h1,
-h2,
-h3 {
-  letter-spacing: -0.01em;
+h2 {
+  margin: 0 0 1rem;
+  font-weight: 800;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
 }
 
 a {
-  color: var(--ascua);
+  color: var(--brasa);
+}
+
+::selection {
+  background: var(--brasa);
+  color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--ascua-clara);
-  outline-offset: 2px;
+  outline: 2px solid var(--llama);
+  outline-offset: 3px;
 }
 
-/* ---------- Botones ---------- */
-button,
-.boton,
-.btn-whatsapp {
+/* ---------- Botones secundarios: se rellenan de abajo hacia arriba ---------- */
+:where(button) {
   font: inherit;
-  display: inline-block;
   padding: 0.6rem 1.2rem;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  background-color: var(--superficie);
-  color: var(--texto);
-  text-decoration: none;
+  border: 1px solid var(--tinta);
+  border-radius: 2px;
+  color: var(--tinta);
+  background-color: transparent;
+  background-image: linear-gradient(var(--tinta), var(--tinta));
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100% 0%;
   cursor: pointer;
   transition:
-    transform var(--suave),
-    box-shadow var(--suave),
-    border-color var(--suave),
-    color var(--suave),
-    background-position 450ms ease,
-    background-color var(--suave);
+    background-size 320ms ease,
+    color 200ms ease,
+    transform var(--ritmo);
 }
-
-/* Secundario (el estilo por defecto de todo <button>) */
-button:hover:not(:disabled) {
-  border-color: var(--ascua-clara);
-  color: var(--ascua);
-  box-shadow: 0 4px 14px rgba(194, 65, 12, 0.1);
-  transform: translateY(-1px);
+:where(button:hover:not(:disabled)) {
+  background-size: 100% 100%;
+  color: #fff;
 }
-button:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: none;
+:where(button:active:not(:disabled)) {
+  transform: translateY(1px);
 }
-button:disabled {
-  opacity: 0.55;
+:where(button:disabled) {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Principal: degradado brasa */
+/* ---------- Botones principales: brasa con un brillo que cruza ---------- */
 .boton,
-.primario {
-  border-color: transparent;
+.primario,
+.btn-whatsapp {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: inline-block;
+  padding: 0.8rem 1.7rem;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
   color: #fff;
-  background-image: linear-gradient(120deg, var(--ascua), var(--ascua-clara), var(--ascua));
-  background-size: 200% 100%;
-  background-position: 0% 0;
+  border: 0;
+  border-radius: 2px;
+  background-color: var(--brasa);
+  background-image: none;
+  cursor: pointer;
+  transition:
+    transform var(--ritmo),
+    box-shadow var(--ritmo),
+    background-color var(--ritmo);
+}
+.boton::after,
+.primario::after,
+.btn-whatsapp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.3) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 700ms ease;
 }
 .boton:hover,
-.primario:hover:not(:disabled) {
-  color: #fff;
-  border-color: transparent;
-  background-position: 100% 0;
-  box-shadow: 0 6px 20px var(--resplandor);
-  transform: translateY(-1px);
-}
-.boton:active,
-.primario:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px var(--resplandor);
-}
-
-/* WhatsApp: se mantiene verde porque se reconoce al instante */
-.btn-whatsapp {
-  border-color: transparent;
-  background-color: var(--wa);
-  color: #fff;
-}
+.primario:hover:not(:disabled),
 .btn-whatsapp:hover {
   color: #fff;
-  background-color: #1a8a4c;
-  box-shadow: 0 6px 18px rgba(31, 157, 85, 0.28);
+  background-color: var(--brasa-viva);
+  box-shadow: 0 10px 26px rgba(217, 70, 31, 0.3);
   transform: translateY(-1px);
 }
+.boton:hover::after,
+.primario:hover:not(:disabled)::after,
+.btn-whatsapp:hover::after {
+  transform: translateX(120%);
+}
+.boton:active,
+.primario:active:not(:disabled),
 .btn-whatsapp:active {
   transform: translateY(0);
   box-shadow: none;
 }
+.primario:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
-/* ---------- Tarjetas de producto ---------- */
+/* WhatsApp conserva su verde porque se reconoce al instante */
+.btn-whatsapp {
+  background-color: var(--verde-wa);
+}
+.btn-whatsapp:hover {
+  background-color: #1a8a4c;
+  box-shadow: 0 10px 24px rgba(31, 157, 85, 0.28);
+}
+
+/* ---------- Productos: fotos sueltas, sin cajas ---------- */
 .tarjeta {
   display: block;
-  padding: 1rem;
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
   color: inherit;
   text-decoration: none;
-  transition:
-    transform var(--suave),
-    box-shadow var(--suave),
-    border-color var(--suave);
 }
-.tarjeta:hover {
-  transform: translateY(-2px);
-  border-color: var(--ascua-clara);
-  box-shadow: 0 10px 24px rgba(34, 30, 27, 0.08);
+.foto {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(160deg, #e6e0da, #d8cfc7);
 }
-.tarjeta img {
+.foto img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   object-fit: cover;
-  border-radius: 6px;
+  color: transparent;
+  transition: transform 700ms cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.tarjeta:hover .foto img {
+  transform: scale(1.04);
 }
 .tarjeta h2,
 .tarjeta h3 {
-  margin: 0.7rem 0 0.2rem;
+  display: inline;
+  margin: 0;
   font-size: 1rem;
   font-weight: 500;
+  font-stretch: 100%;
+  text-transform: none;
+  line-height: 1.6;
+  background: linear-gradient(var(--brasa), var(--brasa)) left bottom / 0% 2px no-repeat;
+  transition: background-size 350ms ease;
+}
+.tarjeta:hover h2,
+.tarjeta:hover h3 {
+  background-size: 100% 2px;
+}
+.tarjeta .foto + h2,
+.tarjeta .foto + h3 {
+  margin-top: 0.8rem;
 }
 .tarjeta p {
-  margin: 0;
+  margin: 0.2rem 0 0;
 }
 
 /* ---------- Etiquetas y precios ---------- */
-.foto {
-  position: relative;
-}
 .etiquetas {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 0.6rem;
+  left: 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -168,44 +202,44 @@ button:disabled {
 .etiquetas-fila {
   display: flex;
   gap: 0.4rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 .etiqueta {
   display: inline-block;
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: #fff;
 }
 .etiqueta-nuevo {
-  background: var(--nuevo);
+  background: var(--tinta);
 }
 .etiqueta-oferta {
-  background: var(--oferta);
+  background: var(--brasa);
 }
 .precio-viejo {
-  text-decoration: line-through;
-  color: var(--texto-suave);
   margin-right: 0.4rem;
+  color: var(--suave);
+  text-decoration: line-through;
 }
 .precio-oferta {
-  color: var(--oferta);
-  font-weight: 600;
+  color: var(--brasa);
+  font-weight: 700;
 }
 
-/* ---------- Quien prefiere menos movimiento ---------- */
+/* ---------- Si la persona prefiere menos movimiento ---------- */
 @media (prefers-reduced-motion: reduce) {
-  button,
-  .boton,
-  .btn-whatsapp,
-  .tarjeta {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
-  button:hover,
   .boton:hover,
+  .primario:hover,
   .btn-whatsapp:hover,
-  .tarjeta:hover {
+  .tarjeta:hover .foto img {
     transform: none;
   }
 }
