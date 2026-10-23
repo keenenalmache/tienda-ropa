@@ -34,7 +34,7 @@ h1 {
   color: var(--brasa);
 }
 .categorias button.activo {
-  color: var(--tinta);
+  color: var(--texto);
   border-bottom-color: var(--brasa);
 }
 .filtros input {
@@ -43,7 +43,7 @@ h1 {
   font: inherit;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--tinta);
+  border-bottom: 1px solid var(--texto);
   border-radius: 0;
 }
 .filtros input:focus {

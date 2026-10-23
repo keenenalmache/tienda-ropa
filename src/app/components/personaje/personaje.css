@@ -6,15 +6,55 @@
   max-width: 400px;
   margin-inline: auto;
   padding-top: 6.5rem;
+  /* Rayos que giran detrás del personaje */
+.escena::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  z-index: -1;
+  width: 135%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(240, 138, 60, 0.28) 0 9deg, transparent 9deg 18deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent 72%);
+  mask-image: radial-gradient(closest-side, #000 40%, transparent 72%);
+  animation: gira 50s linear infinite;
+}
+@keyframes gira { to { rotate: 360deg; } }
+
+/* Pegatinas flotantes */
+.pegatina {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+  animation: flota 3.6s ease-in-out infinite alternate;
+}
+.p1 { top: 34%; left: -2%; background: var(--brasa); --giro: -12deg; }
+.p2 { top: 28%; right: -3%; background: var(--llama); color: var(--tinta); --giro: 10deg; animation-delay: -1.2s; }
+.p3 { bottom: 14%; left: 2%; background: #fff; color: var(--brasa); border-color: var(--tinta); --giro: 8deg; animation-delay: -2.4s; }
+@keyframes flota {
+  from { transform: translateY(0) rotate(var(--giro)); }
+  to { transform: translateY(-12px) rotate(calc(var(--giro) * -1)); }
+}
 }
 .base {
   display: block;
   width: auto;
-  height: clamp(340px, 70vw, 540px);
+  height: clamp(240px, 50vw, 380px);   /* ← este valor */
   margin-inline: auto;
   filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
 }
-
 .globo {
   position: absolute;
   left: 0;

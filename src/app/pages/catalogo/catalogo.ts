@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
-
+import { Favoritos } from '../../services/favoritos';
 @Component({
   selector: 'app-catalogo',
   imports: [RouterLink],
@@ -14,6 +14,7 @@ export class Catalogo {
   private servicio = inject(Productos);
   private ruta = inject(ActivatedRoute);
   private router = inject(Router);
+  private favs = inject(Favoritos);
   private todos = signal<Producto[]>([]);
   cargando = signal(true);
 
@@ -22,6 +23,7 @@ export class Catalogo {
     { valor: 'hombre', etiqueta: 'Hombre' },
     { valor: 'mujer', etiqueta: 'Mujer' },
     { valor: 'ofertas', etiqueta: 'Ofertas' },
+    { valor: 'favoritos', etiqueta: 'Favoritos ♥' },
   ];
 
   categoriaActiva = signal('todas');
@@ -33,11 +35,12 @@ export class Catalogo {
 
     return this.todos()
       .filter((p) => {
-        let coincide = true;
-        if (cat === 'ofertas') coincide = p.precioOferta !== null;
-        else if (cat !== 'todas') coincide = p.categoria === cat;
-        return coincide && p.nombre.toLowerCase().includes(texto);
-      })
+  let coincide = true;
+  if (cat === 'ofertas') coincide = p.precioOferta !== null;
+  else if (cat === 'favoritos') coincide = this.favs.esFavorito(p.id);
+  else if (cat !== 'todas') coincide = p.categoria === cat;
+  return coincide && p.nombre.toLowerCase().includes(texto);
+    })
       .sort((a, b) => Number(b.destacado) - Number(a.destacado));
   });
 

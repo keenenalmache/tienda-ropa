@@ -11,6 +11,25 @@
   --verde-wa: #1f9d55;
   --ritmo: 240ms cubic-bezier(0.2, 0.6, 0.2, 1);
 }
+/* ---------- Modo oscuro ---------- */
+:root[data-tema='oscuro'] :where(button:not(.tema, .corazon)) {
+  border-color: var(--texto);
+  color: var(--texto);
+  background-image: linear-gradient(var(--texto), var(--texto));
+}
+:root[data-tema='oscuro'] :where(button:not(.tema, .corazon):hover:not(:disabled)) {
+  color: var(--papel);
+}
+
+/* Los botones usaban --tinta (oscuro): en modo oscuro pasan a color claro */
+:root[data-tema='oscuro'] :where(button) {
+  border-color: var(--texto);
+  color: var(--texto);
+  background-image: linear-gradient(var(--texto), var(--texto));
+}
+:root[data-tema='oscuro'] :where(button:hover:not(:disabled)) {
+  color: var(--papel);
+}
 
 body {
   margin: 0;
@@ -294,17 +313,90 @@ a {
 }
 
 /* ---------- Menos movimiento ---------- */
+/* Solo se quitan los saltos bruscos; cinta, chispas y franja son lentos y suaves */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
   .boton:hover,
   .primario:hover,
   .btn-whatsapp:hover,
   .tarjeta:hover .foto img {
     transform: none;
   }
+}
+
+/* En pantallas táctiles no existe "hover": el brillo de los botones corre solo */
+@media (hover: none) {
+  .boton::after,
+  .primario::after,
+  .btn-whatsapp::after {
+    animation: brillo 4.5s ease-in-out infinite;
+  }
+  .tarjeta:active .foto img {
+    transform: scale(1.04);
+  }
+}
+@keyframes brillo {
+  0%, 60% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+:root {
+  --trama-color: #d9461f;
+  --trama-op: 0.16;
+  --trama-forma: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 30 26 26 34 22Q42 32 50 22L66 30 59 46 52 42V74H32V42L25 46Z'/%3E%3Cpath d='M140 22 146 36 161 37 150 47 153 62 140 54 127 62 130 47 119 37 134 36Z'/%3E%3Cpath d='M70 112a6 6 0 1 1 6 6v6L102 139a4 4 0 0 1-2 7.5H50a4 4 0 0 1-2-7.5L76 124'/%3E%3Cpath d='M158 112 140 138H152L146 158 166 130H153Z'/%3E%3Ccircle cx='110' cy='60' r='2.5'/%3E%3Ccircle cx='182' cy='92' r='3'/%3E%3Ccircle cx='30' cy='182' r='2.5'/%3E%3Cpath d='M20 120v10M15 125h10M100 178q6-8 12 0t12 0 12 0'/%3E%3C/svg%3E");
+}
+/* dentro de :root[data-tema='oscuro'] { ... } agrega: */
+/*   --trama-color: #f08a3c;  --trama-op: 0.18; */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--trama-color);
+  opacity: var(--trama-op);
+  -webkit-mask-image: var(--trama-forma);
+  mask-image: var(--trama-forma);
+  -webkit-mask-size: 200px 200px;
+  mask-size: 200px 200px;
+}
+.corazon {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  background-image: none;
+  color: #1c1311;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.corazon svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 2; }
+.corazon.activo { color: var(--brasa); }
+.corazon.activo svg { fill: currentColor; animation: latido 380ms ease; }
+@keyframes latido { 40% { transform: scale(1.35); } }
+
+/* ---------- Modo oscuro (va al final del archivo) ---------- */
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+  --papel: #15100e;
+  --ceniza: #2b211d;
+  --linea: #3d312b;
+  --texto: #efe7e0;
+  --suave: #a99d95;
+  --trama-color: #f08a3c;
+  --trama-op: 0.18;
+}
+:root[data-tema='oscuro'] :where(button:not(.tema, .corazon)) {
+  border-color: var(--texto);
+  color: var(--texto);
+  background-image: linear-gradient(var(--texto), var(--texto));
+}
+:root[data-tema='oscuro'] :where(button:not(.tema, .corazon):hover:not(:disabled)) {
+  color: var(--papel);
 }

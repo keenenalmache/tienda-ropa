@@ -14,7 +14,7 @@ label {
 input {
   padding: 0.6rem;
   font: inherit;
-  background: #fff;
+  background: var(--ceniza);
   border: 1px solid var(--linea);
   border-radius: 2px;
 }

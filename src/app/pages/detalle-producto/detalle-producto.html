@@ -12,7 +12,14 @@
     </div>
 
     <div class="info">
-      <h1>{{ producto.nombre }}</h1>
+      <div class="titulo-fila">
+        <h1>{{ producto.nombre }}</h1>
+        <button type="button" class="corazon corazon-fijo" [class.activo]="favs.esFavorito(producto.id)"
+          [attr.aria-pressed]="favs.esFavorito(producto.id)" aria-label="Guardar en favoritos"
+          (click)="favs.alternar(producto.id)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+      </div>
 
       <div class="etiquetas-fila">
         @if (producto.nuevo) {
@@ -52,9 +59,18 @@
         }
       </ul>
 
-      <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
-        Preguntar por WhatsApp
-      </a>
+      <div class="acciones">
+        <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
+          Preguntar por WhatsApp
+        </a>
+        <a [href]="enlaceCompartir(producto)" target="_blank" rel="noopener"
+           class="boton-compartir" aria-label="Compartir por WhatsApp" data-tip="Compartir">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15V3M12 3 8 7M12 3l4 4" />
+            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+          </svg>
+        </a>
+      </div>
     </div>
   </section>
 } @else {

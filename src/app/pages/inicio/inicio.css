@@ -8,6 +8,10 @@
   padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 6vw, 5rem);
   background: var(--tinta);
   color: #f1e9e2;
+    background-image:
+    radial-gradient(rgba(240, 138, 60, 0.2) 1.5px, transparent 1.8px),
+    linear-gradient(115deg, transparent 58%, rgba(217, 70, 31, 0.3) 58%);
+  background-size: 20px 20px, auto;
 }
 @media (max-width: 800px) {
   .portada {
@@ -171,8 +175,9 @@
 /* Categorías con foto */
 .categorias {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));  /* antes 260px */
+  gap: 1rem;
+  max-width: 720px;                                             /* nuevo: no se estira tanto */
 }
 .categoria {
   position: relative;
@@ -180,9 +185,9 @@
   isolation: isolate;
   display: flex;
   align-items: flex-end;
-  min-height: 300px;
-  aspect-ratio: 4 / 3;
-  padding: 1.5rem;
+  min-height: 200px;     /* antes 300px */
+  aspect-ratio: 14 / 8;  /* antes 4 / 3 */
+  padding: 1.1rem;       /* antes 1.5rem */
   background: linear-gradient(160deg, #2a1d19, #140d0b);
   color: #fff;
   text-decoration: none;
@@ -225,7 +230,7 @@
   color: rgba(255, 255, 255, 0.3);
 }
 .categoria .nombre {
-  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-size: clamp(2.0rem, 5vw, 3rem);  /* antes clamp(2.4rem, 6vw, 3.6rem) */
   font-weight: 800;
   font-stretch: 62%;
   text-transform: uppercase;
