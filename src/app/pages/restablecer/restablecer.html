@@ -1,0 +1,36 @@
+<section class="login">
+  <h1>Nueva contraseña</h1>
+
+  @switch (estado()) {
+    @case ('verificando') {
+      <p>Verificando el enlace...</p>
+    }
+    @case ('vencido') {
+      <p>El enlace venció o no es válido. Pide uno nuevo.</p>
+      <a routerLink="/recuperar">Pedir otro enlace</a>
+    }
+    @case ('hecho') {
+      <p>Listo, tu contraseña cambió. Te llevamos al panel...</p>
+    }
+    @case ('listo') {
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <label>
+          Contraseña nueva (mínimo 8 caracteres)
+          <input type="password" formControlName="clave" autocomplete="new-password" />
+        </label>
+        <label>
+          Repite la contraseña
+          <input type="password" formControlName="repetir" autocomplete="new-password" />
+        </label>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <button type="submit" class="primario" [disabled]="enviando()">
+          {{ enviando() ? 'Guardando...' : 'Guardar contraseña' }}
+        </button>
+      </form>
+    }
+  }
+</section>

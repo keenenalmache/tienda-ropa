@@ -30,4 +30,15 @@ export class Auth {
     const { data } = await supabase.auth.getSession();
     return !!data.session;
   }
+    async enviarRecuperacion(correo: string): Promise<string | null> {
+    const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+      redirectTo: `${location.origin}/restablecer`,
+    });
+    return error ? error.message : null;
+  }
+
+  async cambiarClave(clave: string): Promise<string | null> {
+    const { error } = await supabase.auth.updateUser({ password: clave });
+    return error ? error.message : null;
+  }
 }

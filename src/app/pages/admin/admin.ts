@@ -11,6 +11,13 @@ import {
   VarianteAdmin,
 } from '../../services/admin-productos';
 
+type Vista = 'lista' | 'producto' | 'negocio';
+type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
+type EstadoStock = 'agotado' | 'bajo' | 'ok';
+
+// Con este stock total o menos se muestra "Últimas unidades"
+const STOCK_BAJO = 3;
+
 @Component({
   selector: 'app-admin',
   imports: [ReactiveFormsModule],
@@ -31,14 +38,51 @@ export class Admin {
   cargando = signal(true);
   mensaje = signal('');
   error = signal('');
-  mostrarForm = signal(false);
-  mostrarNegocio = signal(false);
+  vista = signal<Vista>('lista');
   editandoId = signal<number | null>(null);
   subiendo = signal(false);
 
-  productoEditado = computed(() =>
-    this.productos().find((p) => p.id === this.editandoId()),
-  );
+  busqueda = signal('');
+  filtro = signal<Filtro>('todos');
+  filtros: { valor: Filtro; etiqueta: string }[] = [
+    { valor: 'todos', etiqueta: 'Todos' },
+    { valor: 'visibles', etiqueta: 'Visibles' },
+    { valor: 'ocultos', etiqueta: 'Ocultos' },
+    { valor: 'stock-bajo', etiqueta: 'Stock bajo o agotado' },
+    { valor: 'sin-fotos', etiqueta: 'Sin fotos' },
+  ];
+
+  productoEditado = computed(() => this.productos().find((p) => p.id === this.editandoId()));
+
+  resumen = computed(() => {
+    const l = this.productos();
+    return {
+      total: l.length,
+      ocultos: l.filter((p) => !p.activo).length,
+      bajo: l.filter((p) => this.estadoStock(p) !== 'ok').length,
+      sinFotos: l.filter((p) => p.imagenes.length === 0).length,
+    };
+  });
+
+  listaFiltrada = computed(() => {
+    const texto = this.busqueda().toLowerCase().trim();
+    const f = this.filtro();
+    return this.productos().filter((p) => {
+      if (texto && !p.nombre.toLowerCase().includes(texto)) return false;
+      switch (f) {
+        case 'visibles':
+          return p.activo;
+        case 'ocultos':
+          return !p.activo;
+        case 'stock-bajo':
+          return this.estadoStock(p) !== 'ok';
+        case 'sin-fotos':
+          return p.imagenes.length === 0;
+        default:
+          return true;
+      }
+    });
+  });
 
   form = this.fb.nonNullable.group({
     nombre: ['', Validators.required],
@@ -74,10 +118,7 @@ export class Admin {
 
   private async cargar() {
     try {
-      const [productos, categorias] = await Promise.all([
-        this.api.listar(),
-        this.api.categorias(),
-      ]);
+      const [productos, categorias] = await Promise.all([this.api.listar(), this.api.categorias()]);
       this.productos.set(productos);
       this.categorias.set(categorias);
     } catch (e: any) {
@@ -108,11 +149,45 @@ export class Admin {
     }
   }
 
+  // ---------- Stock ----------
   stockTotal(p: ProductoAdmin): number {
     return p.variantes.reduce((suma, v) => suma + v.stock, 0);
   }
 
+  estadoStock(p: ProductoAdmin): EstadoStock {
+    const total = this.stockTotal(p);
+    if (total === 0) return 'agotado';
+    return total <= STOCK_BAJO ? 'bajo' : 'ok';
+  }
+
+  fotosOrdenadas(p: ProductoAdmin): ImagenAdmin[] {
+    return [...p.imagenes].sort((a, b) => a.orden - b.orden);
+  }
+
+  // ---------- Navegación entre vistas ----------
+  private confirmarSalida(): boolean {
+    const sucio =
+      (this.vista() === 'producto' && this.form.dirty) ||
+      (this.vista() === 'negocio' && this.formNegocio.dirty);
+    return !sucio || confirm('Tienes cambios sin guardar. ¿Salir sin guardar?');
+  }
+
+  private abrir(vista: Vista) {
+    this.error.set('');
+    this.mensaje.set('');
+    this.vista.set(vista);
+    this.irArriba();
+  }
+
+  irA(vista: Vista) {
+    if (!this.confirmarSalida()) return;
+    if (vista === 'negocio') this.formNegocio.reset(this.negocio.datos());
+    if (vista !== 'producto') this.editandoId.set(null);
+    this.abrir(vista);
+  }
+
   nuevo() {
+    if (!this.confirmarSalida()) return;
     this.editandoId.set(null);
     this.form.reset({
       nombre: '',
@@ -124,10 +199,11 @@ export class Admin {
       destacado: false,
       nuevo: false,
     });
-    this.mostrarForm.set(true);
+    this.abrir('producto');
   }
 
   editar(p: ProductoAdmin) {
+    if (!this.confirmarSalida()) return;
     this.editandoId.set(p.id);
     this.form.reset({
       nombre: p.nombre,
@@ -139,14 +215,10 @@ export class Admin {
       destacado: p.destacado,
       nuevo: p.nuevo,
     });
-    this.mostrarForm.set(true);
+    this.abrir('producto');
   }
 
-  cerrar() {
-    this.mostrarForm.set(false);
-    this.editandoId.set(null);
-  }
-
+  // ---------- Productos ----------
   async guardar() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -172,9 +244,10 @@ export class Admin {
         await this.recargar();
       },
       esNuevo
-        ? 'Producto creado. Baja para agregar tallas, colores y fotos.'
+        ? 'Producto creado. Ahora agrega tallas, colores y fotos.'
         : 'Cambios guardados correctamente.',
     );
+    if (!this.error()) this.form.markAsPristine();
     this.irArriba();
   }
 
@@ -188,6 +261,65 @@ export class Admin {
     );
   }
 
+  async alternarMarca(p: ProductoAdmin, campo: 'destacado' | 'nuevo') {
+    const cambio = campo === 'destacado' ? { destacado: !p.destacado } : { nuevo: !p.nuevo };
+    await this.ejecutar(
+      async () => {
+        await this.api.actualizarParcial(p.id, cambio);
+        await this.recargar();
+      },
+      'Etiqueta actualizada.',
+    );
+  }
+
+  // Crea una copia oculta, con las mismas tallas y colores pero stock 0, y la abre para editarla
+  async duplicar(p: ProductoAdmin) {
+    await this.ejecutar(
+      async () => {
+        const id = await this.api.crear({
+          nombre: `${p.nombre} (copia)`,
+          descripcion: p.descripcion ?? '',
+          precio: Number(p.precio),
+          precio_oferta: p.precio_oferta == null ? null : Number(p.precio_oferta),
+          categoria_id: p.categoria_id,
+          activo: false,
+          destacado: false,
+          nuevo: false,
+        });
+        for (const v of p.variantes) {
+          await this.api.agregarVariante(id, v.talla, v.color, 0);
+        }
+        await this.recargar();
+        const copia = this.productos().find((x) => x.id === id);
+        if (copia) this.editar(copia);
+      },
+      'Copia creada: está oculta y con stock 0. Cambia lo que haga falta y agrega las fotos.',
+    );
+  }
+
+  exportar() {
+    const limpio = (t: string) => (/^[=+\-@]/.test(t) ? `'${t}` : t);
+    const filas: string[][] = [['Producto', 'Categoría', 'Precio', 'Oferta', 'Stock', 'Estado']];
+    for (const p of this.productos()) {
+      filas.push([
+        limpio(p.nombre),
+        p.categorias?.nombre ?? '',
+        String(p.precio),
+        p.precio_oferta == null ? '' : String(p.precio_oferta),
+        String(this.stockTotal(p)),
+        p.activo ? 'Visible' : 'Oculto',
+      ]);
+    }
+    const csv = filas.map((f) => f.map((c) => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'productos.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  // ---------- Variantes ----------
   async agregarVariante() {
     const id = this.editandoId();
     if (id === null || this.formVariante.invalid) {
@@ -222,6 +354,7 @@ export class Admin {
     }, 'Variante eliminada.');
   }
 
+  // ---------- Fotos ----------
   // Reduce a 1600 px como máximo y convierte a WebP antes de subir
   private optimizarImagen(archivo: File): Promise<File> {
     return new Promise((resolve, reject) => {
@@ -291,6 +424,20 @@ export class Admin {
     input.value = '';
   }
 
+  async moverFoto(p: ProductoAdmin, img: ImagenAdmin, direccion: -1 | 1) {
+    const lista = this.fotosOrdenadas(p);
+    const i = lista.findIndex((x) => x.id === img.id);
+    const j = i + direccion;
+    if (i < 0 || j < 0 || j >= lista.length) return;
+    [lista[i], lista[j]] = [lista[j], lista[i]];
+    await this.ejecutar(async () => {
+      for (let k = 0; k < lista.length; k++) {
+        if (lista[k].orden !== k + 1) await this.api.cambiarOrdenImagen(lista[k].id, k + 1);
+      }
+      await this.recargar();
+    }, 'Orden de las fotos actualizado.');
+  }
+
   async quitarFoto(img: ImagenAdmin) {
     if (!confirm('¿Eliminar esta foto?')) return;
     await this.ejecutar(async () => {
@@ -299,11 +446,7 @@ export class Admin {
     }, 'Foto eliminada.');
   }
 
-  abrirNegocio() {
-    this.formNegocio.reset(this.negocio.datos());
-    this.mostrarNegocio.set(true);
-  }
-
+  // ---------- Datos del negocio ----------
   async guardarNegocio() {
     if (this.formNegocio.invalid) {
       this.formNegocio.markAllAsTouched();
@@ -321,6 +464,7 @@ export class Admin {
     await this.ejecutar(async () => {
       await this.negocio.guardar({ ...v, nombre: v.nombre.trim(), whatsapp });
     }, 'Datos del negocio guardados correctamente.');
+    if (!this.error()) this.formNegocio.markAsPristine();
     this.irArriba();
   }
 

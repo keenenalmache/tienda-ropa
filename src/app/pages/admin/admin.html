@@ -1,10 +1,16 @@
 <header class="barra">
   <h1>Panel de administración</h1>
-  <div>
+  <div class="usuario">
     <span>{{ correo() }}</span>
     <button type="button" (click)="salir()">Cerrar sesión</button>
   </div>
 </header>
+
+<nav class="pestanas" aria-label="Secciones del panel">
+  <button type="button" [class.activa]="vista() !== 'negocio'" (click)="irA('lista')">Productos</button>
+  <button type="button" [class.activa]="vista() === 'negocio'" (click)="irA('negocio')">Datos del negocio</button>
+  <button type="button" class="primario nuevo" (click)="nuevo()">+ Nuevo producto</button>
+</nav>
 
 @if (mensaje()) {
   <p class="aviso ok">{{ mensaje() }}</p>
@@ -13,195 +19,235 @@
   <p class="aviso mal">{{ error() }}</p>
 }
 
-<div class="acciones-top">
-  <button type="button" class="primario" (click)="nuevo()">Nuevo producto</button>
-  <button type="button" (click)="abrirNegocio()">Datos del negocio</button>
-</div>
+@switch (vista()) {
+  <!-- ================= LISTA ================= -->
+  @case ('lista') {
+    <section class="resumen">
+      <button type="button" class="dato" (click)="filtro.set('todos')">
+        <strong>{{ resumen().total }}</strong><span>Productos</span>
+      </button>
+      <button type="button" class="dato" (click)="filtro.set('ocultos')">
+        <strong>{{ resumen().ocultos }}</strong><span>Ocultos</span>
+      </button>
+      <button type="button" class="dato" (click)="filtro.set('stock-bajo')">
+        <strong>{{ resumen().bajo }}</strong><span>Stock bajo</span>
+      </button>
+      <button type="button" class="dato" (click)="filtro.set('sin-fotos')">
+        <strong>{{ resumen().sinFotos }}</strong><span>Sin fotos</span>
+      </button>
+    </section>
 
-@if (mostrarNegocio()) {
-  <section class="panel">
-    <h2>Datos del negocio</h2>
-
-    <form [formGroup]="formNegocio" (ngSubmit)="guardarNegocio()">
-      <label>
-        Nombre del negocio
-        <input formControlName="nombre" />
-      </label>
-      <label>
-        Frase de la portada
-        <input formControlName="lema" />
-      </label>
-      <label>
-        WhatsApp (solo números, con código de país)
-        <input formControlName="whatsapp" placeholder="593991234567" inputmode="numeric" />
-      </label>
-      <label>
-        Teléfono que se muestra
-        <input formControlName="telefono" />
-      </label>
-      <label>
-        Dirección
-        <input formControlName="direccion" />
-      </label>
-      <label>
-        Horario
-        <input formControlName="horario" />
-      </label>
-      <label>
-        Instagram
-        <input formControlName="instagram" />
-      </label>
-       <label>
-        Frases del globo de la portada (una por línea)
-        <textarea formControlName="frases" rows="4"></textarea>
-      </label>
-
-      <div class="fila">
-        <button type="submit" class="primario">Guardar</button>
-        <button type="button" (click)="mostrarNegocio.set(false)">Cerrar</button>
-      </div>
-    </form>
-  </section>
-}
-
-@if (mostrarForm()) {
-  <section class="panel">
-    <h2>{{ editandoId() === null ? 'Nuevo producto' : 'Editar producto' }}</h2>
-
-    <form [formGroup]="form" (ngSubmit)="guardar()">
-      <label>
-        Nombre
-        <input formControlName="nombre" />
-      </label>
-      <label>
-        Descripción
-        <textarea formControlName="descripcion" rows="3"></textarea>
-      </label>
-      <label>
-        Precio
-        <input type="number" step="0.01" min="0" formControlName="precio" />
-      </label>
-      Precio de oferta (déjalo vacío si no hay descuento)
-        <input type="number" step="0.01" min="0" formControlName="precio_oferta" />
-      <label>
-        Categoría
-        <select formControlName="categoria_id">
-          @for (c of categorias(); track c.id) {
-            <option [ngValue]="c.id">{{ c.nombre }}</option>
-          }
-        </select>
-      </label>
-      <label class="check">
-         <input type="checkbox" formControlName="destacado" />
-        Destacado (aparece en el inicio y primero en el catálogo)
-      </label>
-      <label class="check">
-        <input type="checkbox" formControlName="nuevo" />
-        Mostrar la etiqueta "Nuevo"
-      </label>
-
-      <div class="fila">
-        <button type="submit" class="primario">Guardar</button>
-        <button type="button" (click)="cerrar()">Cerrar</button>
-      </div>
-    </form>
-
-    <h3>Tallas, colores y stock</h3>
-
-    @if (productoEditado(); as p) {
-            <h3>Fotos</h3>
-
-      <div class="fotos">
-        @for (img of p.imagenes; track img.id) {
-          <figure>
-            <img [src]="img.url" alt="Foto del producto" />
-            <button type="button" (click)="quitarFoto(img)">Eliminar</button>
-          </figure>
-        } @empty {
-          <p>Este producto aún no tiene fotos.</p>
+    <div class="herramientas">
+      <input type="search" placeholder="Buscar producto" (input)="busqueda.set($any($event.target).value)" />
+      <select aria-label="Filtrar productos" (change)="filtro.set($any($event.target).value)">
+        @for (f of filtros; track f.valor) {
+          <option [value]="f.valor" [selected]="filtro() === f.valor">{{ f.etiqueta }}</option>
         }
-      </div>
+      </select>
+      <button type="button" (click)="exportar()">Exportar a CSV</button>
+    </div>
 
-      <label class="subir">
-        Agregar foto (máximo 2 MB)
-        <input
-          type="file"
-          accept="image/*"
-          [disabled]="subiendo()"
-          (change)="subirFoto($event)"
-        />
-      </label>
-      <table class="tabla">
-        <thead>
-          <tr><th>Talla</th><th>Color</th><th>Stock</th><th></th></tr>
-        </thead>
-        <tbody>
-          @for (v of p.variantes; track v.id) {
-            <tr>
-              <td>{{ v.talla }}</td>
-              <td>{{ v.color }}</td>
-              <td>
-                <input
-                  type="number"
-                  min="0"
-                  class="stock"
-                  [value]="v.stock"
-                  (change)="cambiarStock(v, $event)"
-                />
-              </td>
-              <td><button type="button" (click)="quitarVariante(v)">Eliminar</button></td>
-            </tr>
-          } @empty {
-            <tr><td colspan="4">Este producto aún no tiene variantes.</td></tr>
-          }
-        </tbody>
-      </table>
-
-      <form [formGroup]="formVariante" (ngSubmit)="agregarVariante()" class="fila">
-        <input placeholder="Talla" formControlName="talla" />
-        <input placeholder="Color" formControlName="color" />
-        <input type="number" min="0" class="stock" formControlName="stock" />
-        <button type="submit">Agregar</button>
-      </form>
+    @if (cargando()) {
+      <p class="pad">Cargando...</p>
     } @else {
-      <p>Guarda el producto para poder agregar tallas y colores.</p>
-    }
-  </section>
-}
-
-@if (cargando()) {
-  <p>Cargando...</p>
-} @else {
-  <table class="tabla">
-    <thead>
-      <tr>
-        <th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (p of productos(); track p.id) {
-        <tr [class.oculto]="!p.activo">
-          <td>{{ p.nombre }}</td>
-          <td>{{ p.categorias?.nombre }}</td>
-          <td>
-            @if (p.precio_oferta !== null) {
-              <s>${{ p.precio }}</s> ${{ p.precio_oferta }}
-            } @else {
-              ${{ p.precio }}
+      <div class="tabla-caja">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Etiquetas</th><th>Estado</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of listaFiltrada(); track p.id) {
+              <tr [class.oculto]="!p.activo">
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.categorias?.nombre }}</td>
+                <td>
+                  @if (p.precio_oferta !== null) {
+                    <s>${{ p.precio }}</s> ${{ p.precio_oferta }}
+                  } @else {
+                    ${{ p.precio }}
+                  }
+                </td>
+                <td>
+                  {{ stockTotal(p) }}
+                  @switch (estadoStock(p)) {
+                    @case ('agotado') { <span class="badge rojo">Sin stock</span> }
+                    @case ('bajo') { <span class="badge ambar">Últimas unidades</span> }
+                  }
+                </td>
+                <td class="etiquetas-celda">
+                  <button type="button" class="chip" [class.on]="p.destacado" (click)="alternarMarca(p, 'destacado')">Destacado</button>
+                  <button type="button" class="chip" [class.on]="p.nuevo" (click)="alternarMarca(p, 'nuevo')">Nuevo</button>
+                </td>
+                <td>{{ p.activo ? 'Visible' : 'Oculto' }}</td>
+                <td class="acciones">
+                  <button type="button" (click)="editar(p)">Editar</button>
+                  <button type="button" (click)="duplicar(p)">Duplicar</button>
+                  <button type="button" (click)="alternarActivo(p)">{{ p.activo ? 'Ocultar' : 'Mostrar' }}</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7">No hay productos que coincidan.</td></tr>
             }
-          </td>
-          <td>{{ stockTotal(p) }}</td>
-          <td>{{ p.activo ? 'Visible' : 'Oculto' }}</td>
-          <td class="acciones">
-            <button type="button" (click)="editar(p)">Editar</button>
-            <button type="button" (click)="alternarActivo(p)">
-              {{ p.activo ? 'Ocultar' : 'Mostrar' }}
-            </button>
-          </td>
-        </tr>
-      } @empty {
-        <tr><td colspan="6">Todavía no hay productos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- ================= PRODUCTO ================= -->
+  @case ('producto') {
+    <section class="panel">
+      <button type="button" class="volver" (click)="irA('lista')">← Volver a productos</button>
+      <h2>{{ editandoId() === null ? 'Nuevo producto' : 'Editar producto' }}</h2>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <label>
+          Nombre
+          <input formControlName="nombre" />
+        </label>
+        <label>
+          Descripción
+          <textarea formControlName="descripcion" rows="3"></textarea>
+        </label>
+        <label>
+          Precio
+          <input type="number" step="0.01" min="0" formControlName="precio" />
+        </label>
+        <label>
+          Precio de oferta (déjalo vacío si no hay descuento)
+          <input type="number" step="0.01" min="0" formControlName="precio_oferta" />
+        </label>
+        <label>
+          Categoría
+          <select formControlName="categoria_id">
+            @for (c of categorias(); track c.id) {
+              <option [ngValue]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+        </label>
+        <label class="check">
+          <input type="checkbox" formControlName="destacado" />
+          Destacado (aparece en el inicio y primero en el catálogo)
+        </label>
+        <label class="check">
+          <input type="checkbox" formControlName="nuevo" />
+          Mostrar la etiqueta "Nuevo"
+        </label>
+
+        <div class="fila">
+          <button type="submit" class="primario">Guardar</button>
+          <button type="button" (click)="irA('lista')">Volver</button>
+        </div>
+      </form>
+
+      @if (productoEditado(); as p) {
+        <h3>Fotos</h3>
+        <p class="nota">La primera foto es la portada del producto. Usa las flechas para cambiar el orden.</p>
+        <div class="fotos">
+          @for (img of fotosOrdenadas(p); track img.id; let primera = $first, ultima = $last) {
+            <figure>
+              <img [src]="img.url" alt="Foto del producto" />
+              @if (primera) {
+                <span class="portada-tag">Portada</span>
+              }
+              <div class="fila-mini">
+                <button type="button" [disabled]="primera" (click)="moverFoto(p, img, -1)" aria-label="Mover a la izquierda">←</button>
+                <button type="button" [disabled]="ultima" (click)="moverFoto(p, img, 1)" aria-label="Mover a la derecha">→</button>
+                <button type="button" (click)="quitarFoto(img)">Eliminar</button>
+              </div>
+            </figure>
+          } @empty {
+            <p>Este producto aún no tiene fotos.</p>
+          }
+        </div>
+
+        <label class="subir">
+          Agregar foto (se reduce y optimiza sola)
+          <input type="file" accept="image/*" [disabled]="subiendo()" (change)="subirFoto($event)" />
+        </label>
+
+        <h3>Tallas, colores y stock</h3>
+        <div class="tabla-caja">
+          <table class="tabla">
+            <thead>
+              <tr><th>Talla</th><th>Color</th><th>Stock</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (v of p.variantes; track v.id) {
+                <tr>
+                  <td>{{ v.talla }}</td>
+                  <td>{{ v.color }}</td>
+                  <td>
+                    <input type="number" min="0" class="stock" [value]="v.stock" (change)="cambiarStock(v, $event)" />
+                  </td>
+                  <td><button type="button" (click)="quitarVariante(v)">Eliminar</button></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4">Este producto aún no tiene variantes.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <form [formGroup]="formVariante" (ngSubmit)="agregarVariante()" class="fila">
+          <input placeholder="Talla" formControlName="talla" />
+          <input placeholder="Color" formControlName="color" />
+          <input type="number" min="0" class="stock" formControlName="stock" />
+          <button type="submit">Agregar</button>
+        </form>
+      } @else {
+        <p class="nota">Guarda el producto para poder agregar fotos, tallas y colores.</p>
       }
-    </tbody>
-  </table>
+    </section>
+  }
+
+  <!-- ================= NEGOCIO ================= -->
+  @case ('negocio') {
+    <section class="panel">
+      <button type="button" class="volver" (click)="irA('lista')">← Volver a productos</button>
+      <h2>Datos del negocio</h2>
+
+      <form [formGroup]="formNegocio" (ngSubmit)="guardarNegocio()">
+        <label>
+          Nombre del negocio
+          <input formControlName="nombre" />
+        </label>
+        <label>
+          Frase de la portada
+          <input formControlName="lema" />
+        </label>
+        <label>
+          WhatsApp (solo números, con código de país)
+          <input formControlName="whatsapp" placeholder="593991234567" inputmode="numeric" />
+        </label>
+        <label>
+          Teléfono que se muestra
+          <input formControlName="telefono" />
+        </label>
+        <label>
+          Dirección
+          <input formControlName="direccion" />
+        </label>
+        <label>
+          Horario
+          <input formControlName="horario" />
+        </label>
+        <label>
+          Instagram
+          <input formControlName="instagram" />
+        </label>
+        <label>
+          Frases del globo de la portada (una por línea)
+          <textarea formControlName="frases" rows="4"></textarea>
+        </label>
+
+        <div class="fila">
+          <button type="submit" class="primario">Guardar</button>
+          <button type="button" (click)="irA('lista')">Volver</button>
+        </div>
+      </form>
+    </section>
+  }
 }

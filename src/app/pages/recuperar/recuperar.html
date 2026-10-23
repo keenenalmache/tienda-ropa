@@ -1,0 +1,25 @@
+<section class="login">
+  <h1>Recuperar contraseña</h1>
+
+  @if (enviado()) {
+    <p>Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también la carpeta de spam.</p>
+    <a routerLink="/login">Volver al acceso</a>
+  } @else {
+    <p>Escribe el correo del administrador y te enviaremos un enlace.</p>
+    <form [formGroup]="form" (ngSubmit)="enviar()">
+      <label>
+        Correo
+        <input type="email" formControlName="correo" autocomplete="username" />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" class="primario" [disabled]="enviando()">
+        {{ enviando() ? 'Enviando...' : 'Enviar enlace' }}
+      </button>
+      <a routerLink="/login">Volver al acceso</a>
+    </form>
+  }
+</section>

@@ -128,4 +128,14 @@ export class AdminProductos {
     const { error } = await supabase.from('imagenes').delete().eq('id', id);
     if (error) throw error;
   }
+    async actualizarParcial(id: number, campos: Partial<DatosProducto>) {
+    const { error } = await supabase.from('productos').update(campos).eq('id', id);
+    if (error) throw error;
+  }
+
+  async cambiarOrdenImagen(id: number, orden: number) {
+    const { error } = await supabase.from('imagenes').update({ orden }).eq('id', id);
+    if (error) throw error;
+  }
 }
+
