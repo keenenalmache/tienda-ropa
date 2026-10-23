@@ -10,7 +10,10 @@ export interface DatosNegocio {
   direccion: string;
   horario: string;
   instagram: string;
+  frases: string;
 }
+
+const FRASES = '¡Nueva colección!\nMira las ofertas de la semana\nPregúntanos por tu talla';
 
 const BASE: DatosNegocio = {
   nombre: NEGOCIO.nombre,
@@ -20,6 +23,7 @@ const BASE: DatosNegocio = {
   direccion: NEGOCIO.direccion,
   horario: NEGOCIO.horario,
   instagram: NEGOCIO.instagram,
+  frases: FRASES,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -33,7 +37,7 @@ export class Negocio {
   async cargar() {
     const { data, error } = await supabase
       .from('negocio')
-      .select('nombre, lema, whatsapp, telefono, direccion, horario, instagram')
+      .select('nombre, lema, whatsapp, telefono, direccion, horario, instagram, frases')
       .eq('id', 1)
       .maybeSingle();
     if (error || !data) return;
@@ -45,6 +49,7 @@ export class Negocio {
       direccion: data.direccion || '',
       horario: data.horario || '',
       instagram: data.instagram || '',
+      frases: data.frases ?? FRASES,
     });
   }
 

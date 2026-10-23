@@ -1,12 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink} from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
 import { Negocio } from '../../services/negocio';
+import { Personaje } from '../../components/personaje/personaje';
 
 @Component({
   selector: 'app-inicio',
-  imports: [RouterLink],
+  imports: [RouterLink, Personaje],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })
@@ -15,6 +16,9 @@ export class Inicio {
   private negocio = inject(Negocio);
 
   datos = this.negocio.datos;
+    listaFrases = computed(() =>
+    this.datos().frases.split('\n').map((f) => f.trim()).filter(Boolean),
+  );
   productos = signal<Producto[]>([]);
 
   destacados = computed(() => this.productos().filter((p) => p.destacado).slice(0, 10));

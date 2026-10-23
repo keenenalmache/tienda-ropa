@@ -1,13 +1,30 @@
 <section class="portada">
-  <h1>{{ datos().nombre }}</h1>
-  @if (datos().lema) {
-    <p>{{ datos().lema }}</p>
-  }
-  <div class="botones">
-    <a routerLink="/catalogo" class="boton">Ver catálogo</a>
-    <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="boton-linea">Escríbenos</a>
+  <div class="portada-texto">
+    <h1>{{ datos().nombre }}</h1>
+    @if (datos().lema) {
+      <p>{{ datos().lema }}</p>
+    }
+    <div class="botones">
+      <a routerLink="/catalogo" class="boton">Ver catálogo</a>
+      <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="boton-linea">Escríbenos</a>
+    </div>
   </div>
+
+  <app-personaje src="personaje-grande.png" [frases]="listaFrases()" />
 </section>
+
+<div class="cinta" aria-hidden="true">
+  <div class="cinta-pista">
+    @for (vuelta of [1, 2]; track vuelta) {
+      <span>Novedades</span>
+      <span>Ofertas</span>
+      <span>Pregunta por tu talla</span>
+      <span>Novedades</span>
+      <span>Ofertas</span>
+      <span>Pregunta por tu talla</span>
+    }
+  </div>
+</div>
 
 <div class="franja">
   @if (datos().horario) {

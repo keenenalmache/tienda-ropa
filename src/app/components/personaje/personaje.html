@@ -1,0 +1,10 @@
+<div class="escena">
+  @if (frase()) {
+    <div class="globo" role="status">
+      @for (f of [frase()]; track f) {
+        <span>{{ f }}</span>
+      }
+    </div>
+  }
+  <img class="base" [src]="src()" alt="" />
+</div>

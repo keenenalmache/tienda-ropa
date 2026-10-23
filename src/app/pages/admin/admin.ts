@@ -65,6 +65,7 @@ export class Admin {
     direccion: [''],
     horario: [''],
     instagram: [''],
+    frases: [''],
   });
 
   constructor() {

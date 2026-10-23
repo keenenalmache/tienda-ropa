@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+.escena {
+  position: relative;
+  max-width: 400px;
+  margin-inline: auto;
+  padding-top: 6.5rem;
+}
+.base {
+  display: block;
+  width: auto;
+  height: clamp(340px, 70vw, 540px);
+  margin-inline: auto;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+}
+
+.globo {
+  position: absolute;
+  left: 0;
+  right: 6%;
+  bottom: calc(100% - 6rem);
+  padding: 0.8rem 1.1rem;
+  background: #fff;
+  color: #1c1311;
+  border: 2px solid #1c1311;
+  border-radius: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  box-shadow: 5px 5px 0 var(--brasa);
+}
+.globo::after {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 62%;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-right: 2px solid #1c1311;
+  border-bottom: 2px solid #1c1311;
+  transform: rotate(45deg);
+}
+.globo span {
+  display: block;
+  animation: entra 400ms ease both;
+}
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
