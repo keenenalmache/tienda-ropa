@@ -1,0 +1,17 @@
+<div class="fondo" aria-hidden="true">
+  @for (p of piezas(); track seccion() + $index) {
+    <div
+      class="pz"
+      [class.mancha]="p.img.startsWith('mancha')"
+      [class.no-movil]="p.movil === false"
+      [style.left.vw]="p.x"
+      [style.top.%]="p.y"
+      [style.width.vw]="p.w"
+      [style.--r]="p.r"
+      [style.--v]="p.v"
+      [style.--o]="p.o ?? 0.85"
+    >
+      <img [src]="'/fondo/' + p.img + '.png'" alt="" [style.animation-delay.s]="p.d ?? 0" />
+    </div>
+  }
+</div>

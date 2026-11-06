@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Producto } from '../models/producto';
 import { supabase } from '../supabase.client';
-
+// Categorías que tienen al menos un producto visible (no hace falta otra consulta)
+export function categoriasDe(lista: Producto[]): { slug: string; nombre: string }[] {
+  const mapa = new Map<string, string>();
+  for (const p of lista) {
+    if (p.categoria && !mapa.has(p.categoria)) mapa.set(p.categoria, p.categoriaNombre);
+  }
+  return [...mapa]
+    .map(([slug, nombre]) => ({ slug, nombre }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+}
 @Injectable({ providedIn: 'root' })
 export class Productos {
   private supabase = supabase;
@@ -18,6 +27,8 @@ export class Productos {
       id: fila.id,
       nombre: fila.nombre,
       categoria: fila.categorias?.slug ?? '',
+      categoriaNombre: fila.categorias?.nombre ?? '',
+      genero: fila.genero ?? 'unisex',
       precio,
       precioOferta: oferta,
       descuento: oferta === null ? 0 : Math.round((1 - oferta / precio) * 100),
@@ -27,6 +38,8 @@ export class Productos {
       colores: [...new Set(variantes.map((v) => v.color))],
       descripcion: fila.descripcion ?? '',
       imagen: imagenes[0]?.url ?? '',
+      variantes: variantes.map((v) => ({ talla: v.talla, color: v.color, stock: Number(v.stock) })),
+      imagenes: imagenes.map((i) => i.url),
     };
   }
 
@@ -34,7 +47,7 @@ export class Productos {
     return this.supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, categorias(slug), variantes(talla, color), imagenes(url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, genero, categorias(slug, nombre), variantes(talla, color, stock), imagenes(url, orden)',
       )
       .eq('activo', true);
   }

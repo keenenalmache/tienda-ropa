@@ -131,3 +131,50 @@ textarea {
 .fila-mini { display: flex; gap: 0.3rem; }
 .fila-mini button { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
 .subir { max-width: 320px; }
+
+/* Variantes: columnas fijas y bien alineadas */
+.tabla-variantes { table-layout: fixed; min-width: 520px; }
+.tabla-variantes .c-talla { width: 20%; }
+.tabla-variantes .c-color { width: 30%; }
+.tabla-variantes .c-stock { width: 110px; }
+.tabla-variantes .c-acc { width: 210px; }
+.tabla-variantes td,
+.tabla-variantes th { vertical-align: middle; }
+.tabla-variantes input { width: 100%; box-sizing: border-box; }
+
+.form-variante {
+  display: grid;
+  grid-template-columns: 1fr 1fr 110px auto;
+  gap: 0.8rem;
+  align-items: end;
+  margin-top: 1rem;
+}
+.form-variante input { width: 100%; box-sizing: border-box; }
+@media (max-width: 640px) {
+  .form-variante { grid-template-columns: 1fr 1fr; }
+  .form-variante button { grid-column: 1 / -1; }
+}
+
+/* Barra fija de abajo: Guardar y Volver siempre a la mano */
+.barra-acciones {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.5rem -1.5rem -1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: var(--papel);
+  border-top: 1px solid var(--linea);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.12);
+}
+.para { margin-left: 0.4rem; color: var(--suave); text-transform: capitalize; }
+.panel form.form-categoria {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  max-width: 520px;
+  margin-bottom: 1.2rem;
+}
+.tabla-categorias input { width: 100%; box-sizing: border-box; }

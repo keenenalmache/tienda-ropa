@@ -11,4 +11,8 @@ export interface Producto {
   colores: string[];
   descripcion: string;
   imagen: string;
+  categoriaNombre: string;
+  genero: string;
+  variantes: { talla: string; color: string; stock: number }[];
+  imagenes: string[];
 }

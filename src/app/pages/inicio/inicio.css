@@ -301,3 +301,15 @@
   max-width: 40ch;
   margin: 0 0 1.6rem;
 }
+.portada > img.marca-agua {
+  position: absolute;
+  left: -6%;
+  bottom: -28%;
+  z-index: 0;
+  width: clamp(280px, 42vw, 560px);
+  opacity: 0.1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: girar-marca 90s linear infinite;
+}
+@keyframes girar-marca { to { transform: rotate(360deg); } }

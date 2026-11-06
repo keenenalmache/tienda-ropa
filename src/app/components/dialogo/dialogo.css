@@ -1,0 +1,23 @@
+.fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+}
+.caja {
+  width: min(440px, 100%);
+  padding: 1.5rem;
+  background: var(--papel);
+  color: var(--texto);
+  border: 1px solid var(--linea);
+  border-top: 4px solid var(--brasa);
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+.caja h2 { margin: 0 0 0.6rem; font-size: 1.6rem; }
+.caja p { margin: 0 0 0.8rem; }
+.caja ul { margin: 0 0 1rem; padding-left: 1.2rem; color: var(--brasa); font-weight: 600; }
+.botones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.6rem; margin-top: 1rem; }

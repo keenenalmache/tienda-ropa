@@ -10,25 +10,7 @@
   --suave: #6f6560;
   --verde-wa: #1f9d55;
   --ritmo: 240ms cubic-bezier(0.2, 0.6, 0.2, 1);
-}
-/* ---------- Modo oscuro ---------- */
-:root[data-tema='oscuro'] :where(button:not(.tema, .corazon)) {
-  border-color: var(--texto);
-  color: var(--texto);
-  background-image: linear-gradient(var(--texto), var(--texto));
-}
-:root[data-tema='oscuro'] :where(button:not(.tema, .corazon):hover:not(:disabled)) {
-  color: var(--papel);
-}
-
-/* Los botones usaban --tinta (oscuro): en modo oscuro pasan a color claro */
-:root[data-tema='oscuro'] :where(button) {
-  border-color: var(--texto);
-  color: var(--texto);
-  background-image: linear-gradient(var(--texto), var(--texto));
-}
-:root[data-tema='oscuro'] :where(button:hover:not(:disabled)) {
-  color: var(--papel);
+  --fondo-base: #b9a89d;
 }
 
 body {
@@ -38,11 +20,26 @@ body {
   font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-stretch: 100%;
   line-height: 1.55;
-  background-color: var(--papel);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .11 0 0 0 0 .07 0 0 0 0 .06 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse 620px 420px at 100% 0%, rgba(240, 138, 60, 0.11), transparent 70%),
-    radial-gradient(ellipse 560px 440px at 0% 100%, rgba(217, 70, 31, 0.08), transparent 70%);
+  background-color: var(--fondo-base);
+  background-image: url('/fondo/ladrillos-claro.png');
+  background-size: 300px auto;
+  background-attachment: fixed;
+}
+/* Velo para que el texto se lea sobre el ladrillo */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: rgba(244, 242, 239, 0.5);
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
 }
 
 h1,
@@ -69,7 +66,7 @@ a {
   outline-offset: 3px;
 }
 
-/* ---------- Botones secundarios: se rellenan de abajo hacia arriba ---------- */
+/* ---------- Botones secundarios ---------- */
 :where(button) {
   font: inherit;
   padding: 0.6rem 1.2rem;
@@ -99,7 +96,7 @@ a {
   cursor: not-allowed;
 }
 
-/* ---------- Botones principales: brasa con un brillo que cruza ---------- */
+/* ---------- Botones principales ---------- */
 .boton,
 .primario,
 .btn-whatsapp {
@@ -165,7 +162,6 @@ a {
   box-shadow: 0 10px 24px rgba(31, 157, 85, 0.28);
 }
 
-/* Botón de contorno para fondos oscuros */
 .boton-linea {
   display: inline-block;
   padding: 0.8rem 1.7rem;
@@ -195,7 +191,6 @@ a {
   text-decoration: none;
 }
 
-/* Marco: línea interior, sombra desplazada tipo impresión y viñeta */
 .foto {
   position: relative;
   overflow: hidden;
@@ -312,8 +307,48 @@ a {
   font-weight: 700;
 }
 
+/* ---------- Corazón de favoritos ---------- */
+.corazon {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  background-image: none;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+  cursor: pointer;
+  transition: transform 160ms ease;
+}
+.corazon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+  fill: #fff;
+  stroke: #1c1311;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.corazon:hover {
+  transform: scale(1.12);
+}
+.corazon.activo svg {
+  fill: var(--brasa);
+  animation: latido 380ms ease;
+}
+@keyframes latido {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
 /* ---------- Menos movimiento ---------- */
-/* Solo se quitan los saltos bruscos; cinta, chispas y franja son lentos y suaves */
 @media (prefers-reduced-motion: reduce) {
   .boton:hover,
   .primario:hover,
@@ -323,7 +358,7 @@ a {
   }
 }
 
-/* En pantallas táctiles no existe "hover": el brillo de los botones corre solo */
+/* En pantallas táctiles el brillo de los botones corre solo */
 @media (hover: none) {
   .boton::after,
   .primario::after,
@@ -338,50 +373,8 @@ a {
   0%, 60% { transform: translateX(-120%); }
   100% { transform: translateX(120%); }
 }
-:root {
-  --trama-color: #d9461f;
-  --trama-op: 0.16;
-  --trama-forma: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 30 26 26 34 22Q42 32 50 22L66 30 59 46 52 42V74H32V42L25 46Z'/%3E%3Cpath d='M140 22 146 36 161 37 150 47 153 62 140 54 127 62 130 47 119 37 134 36Z'/%3E%3Cpath d='M70 112a6 6 0 1 1 6 6v6L102 139a4 4 0 0 1-2 7.5H50a4 4 0 0 1-2-7.5L76 124'/%3E%3Cpath d='M158 112 140 138H152L146 158 166 130H153Z'/%3E%3Ccircle cx='110' cy='60' r='2.5'/%3E%3Ccircle cx='182' cy='92' r='3'/%3E%3Ccircle cx='30' cy='182' r='2.5'/%3E%3Cpath d='M20 120v10M15 125h10M100 178q6-8 12 0t12 0 12 0'/%3E%3C/svg%3E");
-}
-/* dentro de :root[data-tema='oscuro'] { ... } agrega: */
-/*   --trama-color: #f08a3c;  --trama-op: 0.18; */
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: var(--trama-color);
-  opacity: var(--trama-op);
-  -webkit-mask-image: var(--trama-forma);
-  mask-image: var(--trama-forma);
-  -webkit-mask-size: 200px 200px;
-  mask-size: 200px 200px;
-}
-.corazon {
-  position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  background-image: none;
-  color: #1c1311;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-.corazon svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 2; }
-.corazon.activo { color: var(--brasa); }
-.corazon.activo svg { fill: currentColor; animation: latido 380ms ease; }
-@keyframes latido { 40% { transform: scale(1.35); } }
-
-/* ---------- Modo oscuro (va al final del archivo) ---------- */
+/* ---------- Modo oscuro (siempre al final) ---------- */
 :root[data-tema='oscuro'] {
   color-scheme: dark;
   --papel: #15100e;
@@ -389,8 +382,13 @@ body::before {
   --linea: #3d312b;
   --texto: #efe7e0;
   --suave: #a99d95;
-  --trama-color: #f08a3c;
-  --trama-op: 0.18;
+  --fondo-base: #1a1412;
+}
+:root[data-tema='oscuro'] body {
+  background-image: url('/fondo/ladrillos-oscuro.png');
+}
+:root[data-tema='oscuro'] body::before {
+  background: rgba(15, 10, 8, 0.5);
 }
 :root[data-tema='oscuro'] :where(button:not(.tema, .corazon)) {
   border-color: var(--texto);

@@ -9,9 +9,10 @@ import {
   ImagenAdmin,
   ProductoAdmin,
   VarianteAdmin,
+  crearSlug 
 } from '../../services/admin-productos';
-
-type Vista = 'lista' | 'producto' | 'negocio';
+import { Dialogos } from '../../services/dialogos';
+type Vista = 'lista' | 'producto' | 'negocio' | 'categorias';
 type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
 type EstadoStock = 'agotado' | 'bajo' | 'ok';
 
@@ -31,6 +32,7 @@ export class Admin {
   private router = inject(Router);
   private negocio = inject(Negocio);
   private temporizador?: ReturnType<typeof setTimeout>;
+  private dialogos = inject(Dialogos);
 
   correo = this.auth.usuario;
   productos = signal<ProductoAdmin[]>([]);
@@ -93,12 +95,15 @@ export class Admin {
     activo: [true],
     destacado: [false],
     nuevo: [false],
+    genero: ['unisex']
   });
-
+  editandoVarianteId = signal<number | null>(null);
+  formEditVariante = this.fb.nonNullable.group({ talla: [''], color: [''], stock: [0] });
   formVariante = this.fb.nonNullable.group({
     talla: ['', Validators.required],
     color: ['', Validators.required],
     stock: [0, [Validators.required, Validators.min(0)]],
+    
   });
 
   formNegocio = this.fb.nonNullable.group({
@@ -144,10 +149,30 @@ export class Admin {
       await accion();
       this.mensaje.set(ok);
       this.temporizador = setTimeout(() => this.mensaje.set(''), 6000);
-    } catch (e: any) {
-      this.error.set(e?.message ?? 'Ocurrió un error.');
+        } catch (e: any) {
+      this.error.set(
+        e?.code === '23505'
+          ? 'Ya existe una variante con esa talla y color.'
+          : (e?.message ?? 'Ocurrió un error.'),
+      );
     }
   }
+    generos = [
+    { valor: 'unisex', etiqueta: 'Unisex' },
+    { valor: 'hombre', etiqueta: 'Hombre' },
+    { valor: 'mujer', etiqueta: 'Mujer' },
+  ];
+
+  formCategoria = this.fb.nonNullable.group({ nombre: [''] });
+  formEditCategoria = this.fb.nonNullable.group({ nombre: [''] });
+  editandoCategoriaId = signal<number | null>(null);
+
+  categoriasConConteo = computed(() =>
+    this.categorias().map((c) => ({
+      ...c,
+      total: this.productos().filter((p) => p.categoria_id === c.id).length,
+    })),
+  );
 
   // ---------- Stock ----------
   stockTotal(p: ProductoAdmin): number {
@@ -165,11 +190,17 @@ export class Admin {
   }
 
   // ---------- Navegación entre vistas ----------
-  private confirmarSalida(): boolean {
+ private async confirmarSalida(): Promise<boolean> {
     const sucio =
       (this.vista() === 'producto' && this.form.dirty) ||
       (this.vista() === 'negocio' && this.formNegocio.dirty);
-    return !sucio || confirm('Tienes cambios sin guardar. ¿Salir sin guardar?');
+    if (!sucio) return true;
+    return this.dialogos.preguntar({
+      titulo: 'Cambios sin guardar',
+      mensaje: 'Si sales ahora, perderás lo que cambiaste. ¿Quieres salir sin guardar?',
+      confirmar: 'Salir sin guardar',
+      cancelar: 'Seguir editando',
+    });
   }
 
   private abrir(vista: Vista) {
@@ -179,15 +210,15 @@ export class Admin {
     this.irArriba();
   }
 
-  irA(vista: Vista) {
-    if (!this.confirmarSalida()) return;
+    async irA(vista: Vista) {
+    if (!(await this.confirmarSalida())) return;
     if (vista === 'negocio') this.formNegocio.reset(this.negocio.datos());
     if (vista !== 'producto') this.editandoId.set(null);
     this.abrir(vista);
   }
 
-  nuevo() {
-    if (!this.confirmarSalida()) return;
+  async nuevo() {
+    if (!(await this.confirmarSalida())) return;
     this.editandoId.set(null);
     this.form.reset({
       nombre: '',
@@ -198,12 +229,13 @@ export class Admin {
       activo: true,
       destacado: false,
       nuevo: false,
+      genero: 'unisex'
     });
     this.abrir('producto');
   }
 
-  editar(p: ProductoAdmin) {
-    if (!this.confirmarSalida()) return;
+  async editar(p: ProductoAdmin) {
+    if (!(await this.confirmarSalida())) return;
     this.editandoId.set(p.id);
     this.form.reset({
       nombre: p.nombre,
@@ -214,24 +246,20 @@ export class Admin {
       activo: p.activo,
       destacado: p.destacado,
       nuevo: p.nuevo,
+      genero: p.genero ?? 'unisex',
     });
     this.abrir('producto');
   }
 
   // ---------- Productos ----------
-  async guardar() {
-    if (this.form.invalid) {
+   async guardar() {
+    const faltan = this.faltantes();
+    if (faltan.length) {
       this.form.markAllAsTouched();
-      this.error.set('Completa el nombre y elige una categoría.');
-      this.irArriba();
+      await this.dialogos.avisar('Falta completar', 'Revisa lo siguiente antes de guardar:', faltan);
       return;
     }
     const datos = this.form.getRawValue();
-    if (datos.precio_oferta !== null && datos.precio_oferta >= datos.precio) {
-      this.error.set('El precio de oferta debe ser menor que el precio normal.');
-      this.irArriba();
-      return;
-    }
     const esNuevo = this.editandoId() === null;
     await this.ejecutar(
       async () => {
@@ -250,7 +278,19 @@ export class Admin {
     if (!this.error()) this.form.markAsPristine();
     this.irArriba();
   }
-
+  private faltantes(): string[] {
+    const f = this.form.controls;
+    const lista: string[] = [];
+    if (!f.nombre.value.trim()) lista.push('El nombre del producto');
+        if (!(f.categoria_id.value >= 1)) lista.push('La categoría (si no hay ninguna, créala en la pestaña Categorías)');
+    const precio = f.precio.value;
+    if (!Number.isFinite(precio) || precio < 0) lista.push('El precio (un número desde 0)');
+    const oferta = f.precio_oferta.value;
+    if (oferta !== null && Number.isFinite(precio) && oferta >= precio) {
+      lista.push('El precio de oferta debe ser menor que el precio normal');
+    }
+    return lista;
+  }
   async alternarActivo(p: ProductoAdmin) {
     await this.ejecutar(
       async () => {
@@ -271,7 +311,69 @@ export class Admin {
       'Etiqueta actualizada.',
     );
   }
+  private async nombreCategoriaValido(nombre: string, idActual: number | null): Promise<boolean> {
+    const n = nombre.trim();
+    const faltan: string[] = [];
+    if (!n) faltan.push('El nombre de la categoría');
+    else if (!crearSlug(n)) faltan.push('El nombre debe tener letras o números');
+    else if (this.categorias().some((c) => c.id !== idActual && crearSlug(c.nombre) === crearSlug(n))) {
+      faltan.push('Ya existe una categoría con ese nombre');
+    }
+    if (!faltan.length) return true;
+    await this.dialogos.avisar('Revisa el nombre', 'No se puede guardar todavía:', faltan);
+    return false;
+  }
 
+  async agregarCategoria() {
+    const nombre = this.formCategoria.getRawValue().nombre;
+    if (!(await this.nombreCategoriaValido(nombre, null))) return;
+    await this.ejecutar(async () => {
+      await this.api.crearCategoria(nombre.trim());
+      this.formCategoria.reset({ nombre: '' });
+      this.categorias.set(await this.api.categorias());
+    }, 'Categoría agregada.');
+  }
+
+  editarCategoria(c: Categoria) {
+    this.formEditCategoria.reset({ nombre: c.nombre });
+    this.editandoCategoriaId.set(c.id);
+  }
+
+  cancelarEdicionCategoria() {
+    this.editandoCategoriaId.set(null);
+  }
+
+  async guardarCategoria(c: Categoria) {
+    const nombre = this.formEditCategoria.getRawValue().nombre;
+    if (!(await this.nombreCategoriaValido(nombre, c.id))) return;
+    await this.ejecutar(async () => {
+      await this.api.renombrarCategoria(c.id, nombre.trim());
+      this.editandoCategoriaId.set(null);
+      this.categorias.set(await this.api.categorias());
+      await this.recargar();
+    }, 'Categoría actualizada.');
+  }
+
+  async quitarCategoria(c: Categoria & { total: number }) {
+    if (c.total > 0) {
+      await this.dialogos.avisar(
+        'No se puede eliminar',
+        `La categoría "${c.nombre}" tiene ${c.total} producto(s).`,
+        ['Cambia esos productos a otra categoría y vuelve a intentarlo.'],
+      );
+      return;
+    }
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar categoría',
+      mensaje: `¿Eliminar la categoría "${c.nombre}"?`,
+      confirmar: 'Eliminar',
+    });
+    if (!ok) return;
+    await this.ejecutar(async () => {
+      await this.api.eliminarCategoria(c.id);
+      this.categorias.set(await this.api.categorias());
+    }, 'Categoría eliminada.');
+  }
   // Crea una copia oculta, con las mismas tallas y colores pero stock 0, y la abre para editarla
   async duplicar(p: ProductoAdmin) {
     await this.ejecutar(
@@ -285,13 +387,14 @@ export class Admin {
           activo: false,
           destacado: false,
           nuevo: false,
+          genero: p.genero,
         });
         for (const v of p.variantes) {
           await this.api.agregarVariante(id, v.talla, v.color, 0);
         }
         await this.recargar();
         const copia = this.productos().find((x) => x.id === id);
-        if (copia) this.editar(copia);
+        if (copia) await this.editar(copia);
       },
       'Copia creada: está oculta y con stock 0. Cambia lo que haga falta y agrega las fotos.',
     );
@@ -322,37 +425,67 @@ export class Admin {
   // ---------- Variantes ----------
   async agregarVariante() {
     const id = this.editandoId();
-    if (id === null || this.formVariante.invalid) {
-      this.formVariante.markAllAsTouched();
-      return;
-    }
+    if (id === null) return;
     const { talla, color, stock } = this.formVariante.getRawValue();
+    if (!(await this.validarVariante(talla, color, stock))) return;
     await this.ejecutar(async () => {
       await this.api.agregarVariante(id, talla.trim(), color.trim(), stock);
       this.formVariante.reset({ talla: '', color: '', stock: 0 });
       await this.recargar();
     }, 'Variante agregada.');
   }
-
-  async cambiarStock(v: VarianteAdmin, evento: Event) {
-    const valor = Number((evento.target as HTMLInputElement).value);
-    if (!Number.isInteger(valor) || valor < 0) {
-      this.error.set('El stock debe ser un número entero mayor o igual a 0.');
-      return;
-    }
-    await this.ejecutar(async () => {
-      await this.api.cambiarStock(v.id, valor);
-      await this.recargar();
-    }, 'Stock actualizado.');
+  editarVariante(v: VarianteAdmin) {
+    this.formEditVariante.reset({ talla: v.talla, color: v.color, stock: v.stock });
+    this.editandoVarianteId.set(v.id);
   }
-
+   cancelarEdicionVariante() {
+    this.editandoVarianteId.set(null);
+  }
+  async guardarVariante(v: VarianteAdmin) {
+    const { talla, color, stock } = this.formEditVariante.getRawValue();
+    if (!(await this.validarVariante(talla, color, stock))) return;
+    await this.ejecutar(async () => {
+      await this.api.actualizarVariante(v.id, talla.trim(), color.trim(), stock);
+      this.editandoVarianteId.set(null);
+      await this.recargar();
+    }, 'Variante actualizada.');
+  }
+  private async validarVariante(talla: string, color: string, stock: number): Promise<boolean> {
+    const faltan: string[] = [];
+    if (!talla.trim()) faltan.push('La talla');
+    if (!color.trim()) faltan.push('El color');
+    if (!Number.isInteger(stock) || stock < 0) faltan.push('El stock (un número entero desde 0)');
+    if (!faltan.length) return true;
+    await this.dialogos.avisar('Falta completar', 'Revisa lo siguiente:', faltan);
+    return false;
+  }
   async quitarVariante(v: VarianteAdmin) {
-    if (!confirm(`¿Eliminar la variante ${v.talla} / ${v.color}?`)) return;
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar variante',
+      mensaje: `¿Eliminar la variante ${v.talla} / ${v.color}?`,
+      confirmar: 'Eliminar',
+    });
+    if (!ok) return;
     await this.ejecutar(async () => {
       await this.api.eliminarVariante(v.id);
       await this.recargar();
     }, 'Variante eliminada.');
   }
+
+  async quitarFoto(img: ImagenAdmin) {
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar foto',
+      mensaje: '¿Eliminar esta foto? No se puede deshacer.',
+      confirmar: 'Eliminar',
+    });
+    if (!ok) return;
+    await this.ejecutar(async () => {
+      await this.api.eliminarImagen(img.id, img.url);
+      await this.recargar();
+    }, 'Foto eliminada.');
+  }
+
+ 
 
   // ---------- Fotos ----------
   // Reduce a 1600 px como máximo y convierte a WebP antes de subir
@@ -438,27 +571,16 @@ export class Admin {
     }, 'Orden de las fotos actualizado.');
   }
 
-  async quitarFoto(img: ImagenAdmin) {
-    if (!confirm('¿Eliminar esta foto?')) return;
-    await this.ejecutar(async () => {
-      await this.api.eliminarImagen(img.id, img.url);
-      await this.recargar();
-    }, 'Foto eliminada.');
-  }
-
   // ---------- Datos del negocio ----------
   async guardarNegocio() {
-    if (this.formNegocio.invalid) {
-      this.formNegocio.markAllAsTouched();
-      this.error.set('El nombre del negocio es obligatorio.');
-      this.irArriba();
-      return;
-    }
+    
     const v = this.formNegocio.getRawValue();
     const whatsapp = v.whatsapp.replace(/\D/g, '');
-    if (whatsapp.length < 8) {
-      this.error.set('El WhatsApp debe llevar solo números y el código de país. Ejemplo: 593991234567');
-      this.irArriba();
+        const faltan: string[] = [];
+    if (!v.nombre.trim()) faltan.push('El nombre del negocio');
+    if (whatsapp.length < 8) faltan.push('El WhatsApp (solo números y con código de país, ej. 593991234567)');
+    if (faltan.length) {
+      await this.dialogos.avisar('Falta completar', 'Revisa lo siguiente antes de guardar:', faltan);
       return;
     }
     await this.ejecutar(async () => {

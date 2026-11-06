@@ -1,0 +1,46 @@
+:host {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fondo {
+  position: absolute;
+  inset: 0;
+}
+.pz {
+  position: absolute;
+  transform: translate3d(0, calc(var(--sy, 0) * var(--v) * 1px), 0) rotate(calc(var(--r) * 1deg));
+  will-change: transform;
+}
+.pz img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+}
+.pz.visto img {
+  animation: pintar 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+/* En modo claro las manchas se "funden" con el ladrillo */
+.mancha img {
+  mix-blend-mode: multiply;
+}
+:host-context(:root[data-tema='oscuro']) .mancha img {
+  mix-blend-mode: normal;
+}
+
+@keyframes pintar {
+  from { opacity: 0; transform: scale(0.55); filter: blur(12px); }
+  60%  { opacity: var(--o); filter: blur(3px); }
+  to   { opacity: var(--o); transform: scale(1); filter: blur(0); }
+}
+
+@media (max-width: 700px) {
+  .no-movil { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pz img { opacity: var(--o); animation: none !important; }
+  .pz { transform: rotate(calc(var(--r) * 1deg)); }
+}

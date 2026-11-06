@@ -1,4 +1,5 @@
 <section class="portada">
+    <img class="marca-agua" src="logo.png" alt="" aria-hidden="true" (error)="$any($event.target).style.display = 'none'" />
   <div class="portada-texto">
     <h1>{{ datos().nombre }}</h1>
     @if (datos().lema) {
@@ -41,28 +42,18 @@
 <section class="seccion">
   <h2>Elige tu estilo</h2>
   <div class="categorias">
-    <a routerLink="/catalogo" [queryParams]="{ filtro: 'hombre' }" class="categoria">
-      @if (fotoHombre()) {
-        <img [src]="fotoHombre()" alt="" />
-      } @else {
-        <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-          <path d="M22 8 8 15l4 10 6-3v34h28V22l6 3 4-10-14-7c-1 4-5 7-10 7s-9-3-10-7Z" />
-        </svg>
-      }
-      <span class="nombre">Hombre</span>
-    </a>
-
-    <a routerLink="/catalogo" [queryParams]="{ filtro: 'mujer' }" class="categoria">
-      @if (fotoMujer()) {
-        <img [src]="fotoMujer()" alt="" />
-      } @else {
-        <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-          <path d="M26 6 32 18 38 6 40 24 50 58H14l10-34Z" />
-          <path d="M24 24h16" />
-        </svg>
-      }
-      <span class="nombre">Mujer</span>
-    </a>
+        @for (c of categorias(); track c.slug) {
+      <a routerLink="/catalogo" [queryParams]="{ filtro: c.slug }" class="categoria">
+        @if (fotoDe(c.slug); as foto) {
+          <img [src]="foto" alt="" />
+        } @else {
+          <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 8 8 15l4 10 6-3v34h28V22l6 3 4-10-14-7c-1 4-5 7-10 7s-9-3-10-7Z" />
+          </svg>
+        }
+        <span class="nombre">{{ c.nombre }}</span>
+      </a>
+    }
   </div>
 </section>
 

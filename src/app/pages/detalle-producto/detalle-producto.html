@@ -4,10 +4,22 @@
   <a routerLink="/catalogo" class="volver">← Volver al catálogo</a>
 
   <section class="detalle">
-    <div class="visor">
-      @if (producto.imagen) {
-        <img class="fondo" [src]="producto.imagen" alt="" aria-hidden="true" />
-        <img class="principal" [src]="producto.imagen" [alt]="producto.nombre" />
+    <div class="galeria">
+      <div class="visor">
+        @if (fotoPrincipal()) {
+          <img class="fondo" [src]="fotoPrincipal()" alt="" aria-hidden="true" />
+          <img class="principal" [src]="fotoPrincipal()" [alt]="producto.nombre" />
+        }
+      </div>
+      @if (fotos().length > 1) {
+        <div class="miniaturas">
+          @for (f of fotos(); track f; let i = $index) {
+            <button type="button" class="mini" [class.activa]="fotoActiva() === i"
+              [attr.aria-label]="'Ver foto ' + (i + 1)" (click)="fotoActiva.set(i)">
+              <img [src]="f" alt="" />
+            </button>
+          }
+        </div>
       }
     </div>
 
@@ -30,47 +42,84 @@
         }
       </div>
 
-      @if (producto.precioOferta !== null) {
-        <p class="precio">
-          <span class="precio-viejo">${{ producto.precio }}</span>
-          <span class="precio-oferta">${{ producto.precioOferta }}</span>
-        </p>
-      } @else {
-        <p class="precio">${{ producto.precio }}</p>
-      }
+      <div class="ficha">
+        <div class="bloque">
+          <p class="etq">Precio</p>
+          <div class="precio-grande">
+            @if (producto.precioOferta !== null) {
+              <span class="precio-actual">${{ producto.precioOferta }}</span>
+              <span class="precio-viejo">${{ producto.precio }}</span>
+              <span class="ahorro">Ahorras ${{ dinero(ahorro(producto)) }}</span>
+            } @else {
+              <span class="precio-actual">${{ producto.precio }}</span>
+            }
+          </div>
+        </div>
 
-      <p>{{ producto.descripcion }}</p>
+        <div class="bloque">
+          <p class="etq">Descripción</p>
+          <p class="descripcion">{{ producto.descripcion || 'Sin descripción por ahora.' }}</p>
+        </div>
 
-      <h3>Tallas</h3>
-      <ul class="opciones">
-        @for (t of producto.tallas; track t) {
-          <li>{{ t }}</li>
-        } @empty {
-          <li class="vacio">Consulta la disponibilidad</li>
-        }
-      </ul>
+        <div class="bloque">
+          <p class="etq">Talla</p>
+          <div class="opciones">
+            @for (t of tallas(); track t) {
+              <button type="button" class="opcion" [class.elegida]="tallaElegida() === t"
+                [attr.aria-pressed]="tallaElegida() === t" [disabled]="tallaAgotada(t)" (click)="elegirTalla(t)">
+                {{ t }}
+              </button>
+            } @empty {
+              <span class="vacio">Consulta la disponibilidad</span>
+            }
+          </div>
+        </div>
 
-      <h3>Colores</h3>
-      <ul class="opciones">
-        @for (c of producto.colores; track c) {
-          <li>{{ c }}</li>
-        } @empty {
-          <li class="vacio">Consulta la disponibilidad</li>
-        }
-      </ul>
+        <div class="bloque">
+          <p class="etq">Color</p>
+          <div class="opciones">
+            @for (c of colores(); track c) {
+              <button type="button" class="opcion" [class.elegida]="colorElegido() === c"
+                [attr.aria-pressed]="colorElegido() === c" [disabled]="colorAgotado(c)" (click)="elegirColor(c)">
+                @if (colorCss(c); as hex) {
+                  <span class="punto" [style.background]="hex"></span>
+                }
+                {{ c }}
+              </button>
+            } @empty {
+              <span class="vacio">Consulta la disponibilidad</span>
+            }
+          </div>
+          <p class="stock-msg" [class.ok]="mensajeStock().tono === 'ok'"
+            [class.poco]="mensajeStock().tono === 'poco'" [class.cero]="mensajeStock().tono === 'cero'">
+            {{ mensajeStock().texto }}
+          </p>
+        </div>
 
-      <div class="acciones">
-        <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
-          Preguntar por WhatsApp
-        </a>
-        <a [href]="enlaceCompartir(producto)" target="_blank" rel="noopener"
-           class="boton-compartir" aria-label="Compartir por WhatsApp" data-tip="Compartir">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 15V3M12 3 8 7M12 3l4 4" />
-            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
-          </svg>
-        </a>
+        <div class="acciones">
+          <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
+            Preguntar por WhatsApp
+          </a>
+          <a [href]="enlaceCompartir(producto)" target="_blank" rel="noopener"
+             class="boton-compartir" aria-label="Compartir por WhatsApp" data-tip="Compartir">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15V3M12 3 8 7M12 3l4 4" />
+              <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+            </svg>
+          </a>
+        </div>
       </div>
+    </div>
+
+    <!-- Barra fija solo en el celular -->
+    <div class="barra-movil">
+      <div class="precio-mov">
+        <span>Precio</span>
+        <strong>${{ precioFinal(producto) }}</strong>
+      </div>
+      <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
+        Preguntar por WhatsApp
+      </a>
     </div>
   </section>
 } @else {

@@ -1,0 +1,21 @@
+@if (d.estado(); as e) {
+  <div class="fondo" (click)="d.responder(false)">
+    <div class="caja" role="alertdialog" aria-modal="true" aria-labelledby="dlg-titulo" (click)="$event.stopPropagation()">
+      <h2 id="dlg-titulo">{{ e.titulo }}</h2>
+      <p>{{ e.mensaje }}</p>
+      @if (e.lista?.length) {
+        <ul>
+          @for (x of e.lista; track x) {
+            <li>{{ x }}</li>
+          }
+        </ul>
+      }
+      <div class="botones">
+        @if (e.cancelar !== null) {
+          <button type="button" (click)="d.responder(false)">{{ e.cancelar ?? 'Cancelar' }}</button>
+        }
+        <button type="button" class="primario" (click)="d.responder(true)">{{ e.confirmar ?? 'Aceptar' }}</button>
+      </div>
+    </div>
+  </div>
+}

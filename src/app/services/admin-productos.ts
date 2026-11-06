@@ -21,6 +21,7 @@ export interface ProductoAdmin {
   precio: number;
   activo: boolean;
     precio_oferta: number | null;
+  genero: string;
   destacado: boolean;
   nuevo: boolean;
   categoria_id: number;
@@ -32,6 +33,7 @@ export interface ProductoAdmin {
 export interface Categoria {
   id: number;
   nombre: string;
+  slug: string;
 }
 
 export interface DatosProducto {
@@ -41,17 +43,26 @@ export interface DatosProducto {
   categoria_id: number;
   activo: boolean;
     precio_oferta: number | null;
+  genero: string;
   destacado: boolean;
   nuevo: boolean;
 }
 
+export function crearSlug(texto: string): string {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 @Injectable({ providedIn: 'root' })
 export class AdminProductos {
   async listar(): Promise<ProductoAdmin[]> {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, activo, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
       )
       .order('id', { ascending: false });
     if (error) throw error;
@@ -61,7 +72,7 @@ export class AdminProductos {
   async categorias(): Promise<Categoria[]> {
     const { data, error } = await supabase
       .from('categorias')
-      .select('id, nombre')
+      .select('id, nombre, slug')
       .order('id');
     if (error) throw error;
     return data ?? [];
@@ -135,6 +146,25 @@ export class AdminProductos {
 
   async cambiarOrdenImagen(id: number, orden: number) {
     const { error } = await supabase.from('imagenes').update({ orden }).eq('id', id);
+    if (error) throw error;
+  }
+
+    async actualizarVariante(id: number, talla: string, color: string, stock: number) {
+    const { error } = await supabase.from('variantes').update({ talla, color, stock }).eq('id', id);
+    if (error) throw error;
+  }
+    async crearCategoria(nombre: string) {
+    const { error } = await supabase.from('categorias').insert({ nombre, slug: crearSlug(nombre) });
+    if (error) throw error;
+  }
+
+  async renombrarCategoria(id: number, nombre: string) {
+    const { error } = await supabase.from('categorias').update({ nombre }).eq('id', id);
+    if (error) throw error;
+  }
+
+  async eliminarCategoria(id: number) {
+    const { error } = await supabase.from('categorias').delete().eq('id', id);
     if (error) throw error;
   }
 }

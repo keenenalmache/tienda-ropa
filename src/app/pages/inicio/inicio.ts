@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink} from '@angular/router';
-import { Productos } from '../../services/productos';
+import { Productos, categoriasDe } from '../../services/productos';
 import { Producto } from '../../models/producto';
 import { Negocio } from '../../services/negocio';
 import { Personaje } from '../../components/personaje/personaje';
@@ -23,8 +23,7 @@ export class Inicio {
   productos = signal<Producto[]>([]);
 
   destacados = computed(() => this.productos().filter((p) => p.destacado).slice(0, 10));
-  fotoHombre = computed(() => this.fotoDe('hombre'));
-  fotoMujer = computed(() => this.fotoDe('mujer'));
+  categorias = computed(() => categoriasDe(this.productos()));
 
   enlaceWhatsapp = computed(() => {
     const mensaje = encodeURIComponent('Hola, quisiera más información.');
@@ -36,7 +35,7 @@ export class Inicio {
   }
 
   // Usa la foto de un producto destacado de la categoría; si no hay, la del primero con foto
-  private fotoDe(categoria: string): string {
+   fotoDe(categoria: string): string {
     const lista = this.productos().filter((p) => p.categoria === categoria && p.imagen);
     return (lista.find((p) => p.destacado) ?? lista[0])?.imagen ?? '';
   }

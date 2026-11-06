@@ -1,0 +1,46 @@
+@if (visible()) {
+  <footer class="pie">
+    <div class="pie-cuerpo">
+      <div>
+        <img src="logo.png" alt="" class="pie-logo" (error)="$any($event.target).style.display = 'none'" />
+        <strong class="pie-nombre">{{ datos().nombre }}</strong>
+        @if (datos().lema) {
+          <p>{{ datos().lema }}</p>
+        }
+      </div>
+
+      <div>
+        <h3>Visítanos</h3>
+        @if (datos().direccion) {
+          <p>{{ datos().direccion }}</p>
+        }
+        @if (datos().horario) {
+          <p>{{ datos().horario }}</p>
+        }
+      </div>
+
+      <div>
+        <h3>Contacto</h3>
+        <ul>
+          @if (datos().telefono) {
+            <li>{{ datos().telefono }}</li>
+          }
+          <li><a [href]="enlaceWhatsapp()" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></li>
+          @if (enlaceInstagram()) {
+            <li><a [href]="enlaceInstagram()" target="_blank" rel="noopener">Instagram {{ datos().instagram }}</a></li>
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h3>Navega</h3>
+        <ul>
+          <li><a routerLink="/">Inicio</a></li>
+          <li><a routerLink="/catalogo">Catálogo</a></li>
+          <li><a routerLink="/contacto">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="pie-copy">© {{ anio }} {{ datos().nombre }}. Todos los derechos reservados.</p>
+  </footer>
+}

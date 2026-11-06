@@ -1,0 +1,18 @@
+:host { display: block; margin-top: auto; padding-top: 3rem; }
+.pie { background: var(--ceniza); color: var(--texto); border-top: 3px solid var(--brasa); }
+.pie-cuerpo {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 2rem;
+  padding: 2.2rem clamp(1.5rem, 6vw, 5rem);
+}
+@media (max-width: 800px) { .pie-cuerpo { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .pie-cuerpo { grid-template-columns: 1fr; } }
+.pie-logo { display: block; width: 56px; height: 56px; margin-bottom: 0.6rem; border-radius: 50%; object-fit: contain; }
+.pie-nombre { font-size: 1.3rem; }
+.pie p { margin: 0.2rem 0; color: var(--suave); }
+.pie h3 { margin: 0 0 0.6rem; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brasa); }
+.pie ul { display: grid; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.pie a { color: var(--texto); text-decoration: none; }
+.pie a:hover { color: var(--brasa); }
+.pie-copy { margin: 0; padding: 1rem clamp(1.5rem, 6vw, 5rem); border-top: 1px solid var(--linea); font-size: 0.85rem; color: var(--suave); }

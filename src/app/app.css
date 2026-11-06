@@ -68,3 +68,5 @@ nav .tema svg {
   from { background-position: 20px 0; }
   to { background-position: 0 0; }
 }
+nav a.marca { display: inline-flex; align-items: center; gap: 0.6rem; }
+.logo { width: 2.4rem; height: 2.4rem; border-radius: 50%; object-fit: contain; }

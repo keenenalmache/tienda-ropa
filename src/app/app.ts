@@ -2,12 +2,13 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { Negocio } from './services/negocio';
-
+import { Dialogo } from './components/dialogo/dialogo';
+import { Pie } from './components/pie/pie';
+import { Fondo } from './components/fondo/fondo';
 type Tema = 'claro' | 'oscuro';
 
 @Component({
-  imports: [RouterOutlet, RouterLink],
-  selector: 'app-root',
+ imports: [RouterOutlet, RouterLink, Fondo, Dialogo, Pie],  selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
