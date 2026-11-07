@@ -19,14 +19,14 @@ type Seccion = 'inicio' | 'catalogo' | 'detalle' | 'otro' | 'admin';
 // ====== AQUÍ AJUSTAS LA COMPOSICIÓN DE CADA SECCIÓN ======
 const COMPOSICION: Record<Seccion, Pieza[]> = {
   inicio: [
-    { img: 'mancha-fuxia', x: -5, y: 2, w: 28, r: -10, v: 0.06, d: 0.2 },
+    { img: 'mancha-fuxiagit add .', x: -5, y: 2, w: 28, r: -10, v: 0.06, d: 0.2 },
     { img: 'mancha-amarilla', x: 72, y: 4, w: 26, r: 15, v: 0.1, d: 0.5 },
     { img: 'letras-graffiti-1', x: 1, y: 12, w: 26, r: -6, v: 0.08, d: 0.9 },
     { img: 'dibujo-lata-spray', x: 88, y: 16, w: 9, r: 18, v: 0.12, d: 1.2 },
     { img: 'mancha-roja', x: 45, y: 22, w: 11, r: 0, v: 0.05, d: 1.4, movil: false },
-    { img: 'mancha-rosada', x: 78, y: 30, w: 26, r: 20, v: 0.07 },
-    { img: 'dibujo-spray-con-boca', x: 4, y: 40, w: 15, r: -8, v: 0.1 },
-    { img: 'letras-graffiti-2', x: 68, y: 50, w: 27, r: 5, v: 0.08 },
+    { img: 'mancha-rosada', x: 78, y: 29, w: 26, r: 20, v: 0.07 },
+    { img: 'dibujo-spray-con-boca', x: 67, y: 37, w: 15, r: -8, v: 0.1 },
+    { img: 'letras-graffiti-2', x: 40, y: 28, w: 27, r: 5, v: 0.08 },
     { img: 'cartel-alto-manchado', x: 42, y: 58, w: 11, r: -5, v: 0.12, movil: false },
     { img: 'frases-coloridas', x: 3, y: 66, w: 22, r: 4, v: 0.06 },
     { img: 'garabatos', x: 70, y: 74, w: 22, r: -4, v: 0.1 },
@@ -38,7 +38,7 @@ const COMPOSICION: Record<Seccion, Pieza[]> = {
     { img: 'mancha-fuxia', x: -8, y: 3, w: 22, r: -10, v: 0.06, o: 0.7 },
     { img: 'mancha-amarilla', x: 88, y: 10, w: 20, r: 15, v: 0.08, o: 0.7 },
     { img: 'dibujo-lata-spray', x: 93, y: 30, w: 8, r: 18, v: 0.1, o: 0.7 },
-    { img: 'letras-graffiti-1', x: -6, y: 45, w: 20, r: -6, v: 0.07, o: 0.7, movil: false },
+    { img: 'letras-graffiti-1', x: 0, y: 50, w: 20, r: -6, v: 0.07, o: 0.7, movil: false },
     { img: 'mancha-rosada', x: 90, y: 60, w: 20, r: 20, v: 0.06, o: 0.7 },
     { img: 'dibujo-spray-con-boca', x: -3, y: 78, w: 12, r: -8, v: 0.08, o: 0.7 },
     { img: 'mancha-roja', x: 92, y: 88, w: 9, r: 0, v: 0.05, o: 0.7 },

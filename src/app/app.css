@@ -70,3 +70,94 @@ nav .tema svg {
 }
 nav a.marca { display: inline-flex; align-items: center; gap: 0.6rem; }
 .logo { width: 2.4rem; height: 2.4rem; border-radius: 50%; object-fit: contain; }
+/* ---------- Barra de navegación en modo claro ---------- */
+:host-context(:root:not([data-tema='oscuro'])) nav {
+  background: #fff7ef;
+  box-shadow: 0 1px 0 rgba(217, 70, 31, 0.35);
+}
+:host-context(:root:not([data-tema='oscuro'])) nav a {
+  color: #3a2d28;
+}
+:host-context(:root:not([data-tema='oscuro'])) nav a:hover {
+  color: var(--brasa);
+}
+:host-context(:root:not([data-tema='oscuro'])) nav a.marca {
+  color: #1c1311;
+}
+:host-context(:root:not([data-tema='oscuro'])) nav .tema {
+  color: #3a2d28;
+  border-color: rgba(28, 19, 17, 0.3);
+}
+
+/* ---------- Celular: barra superior compacta + barra inferior tipo app ---------- */
+.barra-inferior {
+  display: none;
+}
+@media (max-width: 800px) {
+  nav {
+    flex-wrap: nowrap;
+    gap: 0.4rem 1rem;
+    padding: 0.7rem 1rem;
+  }
+  nav a.marca {
+    font-size: 1.25rem;
+  }
+  nav .solo-pc {
+    display: none;
+  }
+  .barra-inferior {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--tinta);
+    border-top: 1px solid rgba(240, 138, 60, 0.35);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+  }
+  .barra-inferior a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
+    color: #cfc4bb;
+    font-size: 0.72rem;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 200ms ease,
+      transform 120ms ease;
+  }
+  .barra-inferior a:active {
+    transform: scale(0.9);
+  }
+  .barra-inferior a.activo {
+    color: var(--llama);
+  }
+  .barra-inferior a.wa {
+    color: #5ee08f;
+  }
+  .barra-inferior svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  :host-context(html[data-tema='claro']) .barra-inferior {
+    background: #fff7ef;
+    border-top-color: rgba(217, 70, 31, 0.35);
+  }
+  :host-context(html[data-tema='claro']) .barra-inferior a {
+    color: #3a2d28;
+  }
+  :host-context(html[data-tema='claro']) .barra-inferior a.activo {
+    color: var(--brasa);
+  }
+  :host-context(html[data-tema='claro']) .barra-inferior a.wa {
+    color: #1f9d55;
+  }
+}

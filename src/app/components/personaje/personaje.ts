@@ -6,9 +6,8 @@ import { Component, computed, effect, input, signal } from '@angular/core';
   styleUrl: './personaje.css',
 })
 export class Personaje {
-  private reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  src = input('personaje-grande.png');
+  src = input('personaje-grande.png'); // modo oscuro (noche)
+  srcDia = input('personaje-grande-dia.png'); // modo claro (día)
   frases = input<string[]>([]);
 
   indice = signal(0);
@@ -20,7 +19,7 @@ export class Personaje {
   constructor() {
     effect((limpiar) => {
       const n = this.frases().length;
-      if (n < 2) return
+      if (n < 2) return;
       const t = setInterval(() => this.indice.update((i) => (i + 1) % n), 4500);
       limpiar(() => clearInterval(t));
     });

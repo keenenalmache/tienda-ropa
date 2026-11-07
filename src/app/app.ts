@@ -1,6 +1,8 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { Negocio } from './services/negocio';
 import { Dialogo } from './components/dialogo/dialogo';
 import { Pie } from './components/pie/pie';
@@ -16,6 +18,26 @@ export class App {
   private negocio = inject(Negocio);
   private titulo = inject(Title);
   nombre = computed(() => this.negocio.datos().nombre);
+    private router = inject(Router);
+  private url = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map((e) => (e as NavigationEnd).urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  barraVisible = computed(() => !/^\/(admin|login|recuperar|restablecer|producto)/.test(this.url()));
+  activa = computed(() => {
+    const u = this.url();
+    if (u === '/' || u === '') return 'inicio';
+    if (u.startsWith('/catalogo')) return u.includes('filtro=favoritos') ? 'favoritos' : 'catalogo';
+    return '';
+  });
+  enlaceWhatsapp = computed(
+    () =>
+      `https://wa.me/${this.negocio.datos().whatsapp}?text=${encodeURIComponent('Hola, quisiera más información.')}`,
+  );
   tema = signal<Tema>(this.temaInicial());
 
   constructor() {

@@ -1,13 +1,17 @@
 <div class="escena">
-  @if (frase()) {
-    <div class="globo" role="status">
-      @for (f of [frase()]; track f) {
-        <span>{{ f }}</span>
-      }
-    </div>
-  }
-  <span class="pegatina p1" aria-hidden="true">★</span>
-<span class="pegatina p2" aria-hidden="true">%</span>
-<span class="pegatina p3" aria-hidden="true">✦</span>
-  <img class="base" [src]="src()" alt="" />
+  <div class="pila">
+    @if (frase()) {
+      <div class="globo" role="status">
+        @for (f of [frase()]; track f) {
+          <span>{{ f }}</span>
+        }
+      </div>
+    }
+    <figure class="marco">
+      <div class="foto">
+        <img class="dia" [src]="srcDia()" alt="" />
+        <img class="noche" [src]="src()" alt="" />
+      </div>
+    </figure>
+  </div>
 </div>

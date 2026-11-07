@@ -2,66 +2,73 @@
   display: block;
 }
 .escena {
-  position: relative;
-  max-width: 400px;
+  max-width: 540px;
   margin-inline: auto;
-  padding-top: 6.5rem;
-  /* Rayos que giran detrás del personaje */
-.escena::before {
+  padding-top: 5.5rem;
+}
+.pila {
+  position: relative;
+}
+
+/* ---------- Marco polaroid ---------- */
+.marco {
+  position: relative;
+  margin: 0;
+  padding: 14px 14px 58px; /* borde más grueso abajo, como una polaroid */
+  background: #fffdf8;
+  border-radius: 3px;
+  box-shadow:
+    0 18px 40px rgba(60, 30, 10, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+  transform: rotate(2.5deg);
+  transition: transform 400ms ease;
+}
+.marco:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+/* Cinta adhesiva en la esquina */
+.marco::before {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 62%;
-  z-index: -1;
-  width: 135%;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: repeating-conic-gradient(rgba(240, 138, 60, 0.28) 0 9deg, transparent 9deg 18deg);
-  -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent 72%);
-  mask-image: radial-gradient(closest-side, #000 40%, transparent 72%);
-  animation: gira 50s linear infinite;
-}
-@keyframes gira { to { rotate: 360deg; } }
-
-/* Pegatinas flotantes */
-.pegatina {
-  position: absolute;
+  top: -10px;
+  right: -22px;
   z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #fff;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
-  animation: flota 3.6s ease-in-out infinite alternate;
+  width: 84px;
+  height: 26px;
+  background: rgba(240, 138, 60, 0.6);
+  transform: rotate(35deg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
-.p1 { top: 34%; left: -2%; background: var(--brasa); --giro: -12deg; }
-.p2 { top: 28%; right: -3%; background: var(--llama); color: var(--tinta); --giro: 10deg; animation-delay: -1.2s; }
-.p3 { bottom: 14%; left: 2%; background: #fff; color: var(--brasa); border-color: var(--tinta); --giro: 8deg; animation-delay: -2.4s; }
-@keyframes flota {
-  from { transform: translateY(0) rotate(var(--giro)); }
-  to { transform: translateY(-12px) rotate(calc(var(--giro) * -1)); }
+
+.foto {
+  position: relative;
+  aspect-ratio: 1376 / 768;
+  overflow: hidden;
+  background: #1c1311;
+  box-shadow: inset 0 0 28px rgba(120, 60, 20, 0.2);
 }
-}
-.base {
-  display: block;
-  width: auto;
-  height: clamp(240px, 50vw, 380px);   /* ← este valor */
-  margin-inline: auto;
-  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
-}
-.globo {
+.foto img {
   position: absolute;
-  left: 0;
-  right: 6%;
-  bottom: calc(100% - 6rem);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 600ms ease;
+}
+/* Modo claro (por defecto): se ve el de día */
+.dia { opacity: 1; }
+.noche { opacity: 0; }
+
+/* ---------- Globo (sale del borde superior del marco) ---------- */
+.globo {
+  --gb: #fff;
+  position: absolute;
+  left: -6%;
+  right: 14%;
+  bottom: calc(100% - 1.6rem); /* se monta 1.6rem sobre el marco */
+  z-index: 3;
   padding: 0.8rem 1.1rem;
-  background: #fff;
+  background: var(--gb);
   color: #1c1311;
   border: 2px solid #1c1311;
   border-radius: 18px;
@@ -69,14 +76,15 @@
   line-height: 1.25;
   box-shadow: 5px 5px 0 var(--brasa);
 }
+/* Cola del globo: apunta hacia la cabeza (mueve left para ajustarla) */
 .globo::after {
   content: '';
   position: absolute;
   bottom: -11px;
-  left: 62%;
+  left: 58%;
   width: 18px;
   height: 18px;
-  background: #fff;
+  background: var(--gb);
   border-right: 2px solid #1c1311;
   border-bottom: 2px solid #1c1311;
   transform: rotate(45deg);
@@ -86,8 +94,26 @@
   animation: entra 400ms ease both;
 }
 @keyframes entra {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
+  from { opacity: 0; transform: translateY(5px); }
+}
+
+/* ---------- Modo oscuro ---------- */
+:host-context(:root[data-tema='oscuro']) .marco {
+  background: #2b211d;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(240, 138, 60, 0.35);
+}
+:host-context(:root[data-tema='oscuro']) .foto {
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.6);
+}
+:host-context(:root[data-tema='oscuro']) .dia { opacity: 0; }
+:host-context(:root[data-tema='oscuro']) .noche { opacity: 1; }
+:host-context(:root[data-tema='oscuro']) .globo { --gb: #f08a3c; }
+
+@media (max-width: 800px) {
+  .escena { max-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marco, .foto img { transition: none; }
 }

@@ -21,7 +21,7 @@ body {
   font-stretch: 100%;
   line-height: 1.55;
   background-color: var(--fondo-base);
-  background-image: url('/fondo/ladrillos-claro.png');
+  background-image: url('/fondo/ladrillos-claro.webp');
   background-size: 300px auto;
   background-attachment: fixed;
 }
@@ -385,7 +385,7 @@ a {
   --fondo-base: #1a1412;
 }
 :root[data-tema='oscuro'] body {
-  background-image: url('/fondo/ladrillos-oscuro.png');
+  background-image: url('/fondo/ladrillos-oscuro.webp');
 }
 :root[data-tema='oscuro'] body::before {
   background: rgba(15, 10, 8, 0.5);
@@ -397,4 +397,81 @@ a {
 }
 :root[data-tema='oscuro'] :where(button:not(.tema, .corazon):hover:not(:disabled)) {
   color: var(--papel);
+}
+/* ---------- Recuadro de contenido sobre el ladrillo ---------- */
+app-admin,
+app-catalogo,
+app-detalle-producto,
+app-contacto,
+app-login {
+  display: block;
+  box-sizing: border-box;
+  width: min(1200px, calc(100% - 2rem));
+  margin: 1.2rem auto;
+  padding: 1.2rem;
+  background: color-mix(in srgb, var(--papel) 93%, transparent);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+}
+@media (max-width: 700px) {
+  app-admin,
+  app-catalogo,
+  app-detalle-producto,
+  app-contacto,
+  app-login {
+    width: calc(100% - 1rem);
+    margin: 0.5rem auto;
+    padding: 0.8rem;
+  }
+}
+
+/* ---------- Portada en modo claro ---------- */
+html[data-tema='claro'] app-inicio .portada {
+  background-color: #fff1e0;
+  background-image:
+    radial-gradient(rgba(217, 70, 31, 0.18) 1.5px, transparent 1.8px),
+    linear-gradient(115deg, transparent 58%, rgba(240, 138, 60, 0.3) 58%);
+  background-size: 20px 20px, auto;
+  color: #1c1311;
+}
+html[data-tema='claro'] app-inicio .portada::before {
+  background: radial-gradient(closest-side, rgba(255, 200, 120, 0.7), transparent 75%);
+}
+html[data-tema='claro'] app-inicio .portada::after {
+  display: none;
+}
+html[data-tema='claro'] app-inicio .portada h1 {
+  color: #1c1311 !important;
+  text-shadow: 3px 3px 0 rgba(240, 138, 60, 0.5) !important;
+}
+html[data-tema='claro'] app-inicio .portada p {
+  color: #4a3f3a !important;
+}
+html[data-tema='claro'] app-inicio .portada > img.marca-agua {
+  mix-blend-mode: multiply;
+  opacity: 0.08;
+}
+html[data-tema='claro'] app-inicio .portada .boton-linea {
+  color: #1c1311 !important;
+  border-color: #1c1311 !important;
+  background-image: linear-gradient(#1c1311, #1c1311) !important;
+}
+html[data-tema='claro'] app-inicio .portada .boton-linea:hover {
+  color: #fff !important;
+}
+html[data-tema='claro'] app-inicio .franja {
+  background: #f0e2d2 !important;
+  color: #4a3f3a !important;
+}
+html[data-tema='claro'] app-inicio .franja strong {
+  color: #1c1311 !important;
+}
+
+/* Que la barra inferior no tape el final de la página */
+@media (max-width: 800px) {
+  body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
 }

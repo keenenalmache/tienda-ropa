@@ -6,7 +6,7 @@
     <img src="logo.png" alt="" class="logo" (error)="$any($event.target).style.display = 'none'" />
     {{ nombre() }}
   </a>
-  <a routerLink="/catalogo">Catálogo</a>
+  <a routerLink="/catalogo" class="solo-pc">Catálogo</a>
   <a routerLink="/contacto">Contacto</a>
   <button
     type="button"
@@ -28,3 +28,23 @@
 <router-outlet />
 <app-pie />
 <app-dialogo />
+@if (barraVisible()) {
+  <div class="barra-inferior" role="navigation" aria-label="Navegación principal">
+    <a routerLink="/" [class.activo]="activa() === 'inicio'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg>
+      <span>Inicio</span>
+    </a>
+    <a routerLink="/catalogo" [class.activo]="activa() === 'catalogo'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 8 8 15l4 10 6-3v34h28V22l6 3 4-10-14-7" transform="translate(-1 -1) scale(.4)" /><path d="M8 4 3 7l1.5 4L7 10v10h10V10l2.5 1L21 7l-5-3c-.4 1.4-1.8 2.4-4 2.4S8.4 5.4 8 4z" /></svg>
+      <span>Catálogo</span>
+    </a>
+    <a routerLink="/catalogo" [queryParams]="{ filtro: 'favoritos' }" [class.activo]="activa() === 'favoritos'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" /></svg>
+      <span>Favoritos</span>
+    </a>
+    <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="wa">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5z" /></svg>
+      <span>WhatsApp</span>
+    </a>
+  </div>
+}

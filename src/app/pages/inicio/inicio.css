@@ -157,7 +157,21 @@
 }
 
 .seccion {
-  padding: clamp(2.2rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem) 0;
+  box-sizing: border-box;
+  width: min(1200px, calc(100% - 2rem));
+  margin: 1.5rem auto;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background: color-mix(in srgb, var(--papel) 93%, transparent);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+}
+@media (max-width: 700px) {
+  .seccion {
+    width: calc(100% - 1rem);
+    margin: 0.7rem auto;
+  }
 }
 .seccion h2 {
   display: flex;
@@ -312,4 +326,47 @@
   pointer-events: none;
   animation: girar-marca 90s linear infinite;
 }
-@keyframes girar-marca { to { transform: rotate(360deg); } }
+@keyframes girar-marca { to { transform: rotate(360deg); } 
+/* ---------- Portada en modo claro ---------- */
+:host-context(html[data-tema='claro']) .portada {
+  background-color: #fff1e0;
+  background-image:
+    radial-gradient(rgba(217, 70, 31, 0.18) 1.5px, transparent 1.8px),
+    linear-gradient(115deg, transparent 58%, rgba(240, 138, 60, 0.3) 58%);
+  background-size: 20px 20px, auto;
+  color: #1c1311;
+}
+:host-context(html[data-tema='claro']) .portada::before {
+  background: radial-gradient(closest-side, rgba(255, 200, 120, 0.7), transparent 75%);
+}
+:host-context(html[data-tema='claro']) .portada::after {
+  display: none;
+}
+:host-context(html[data-tema='claro']) .portada h1 {
+  color: #1c1311;
+  text-shadow: 3px 3px 0 rgba(240, 138, 60, 0.5);
+}
+:host-context(html[data-tema='claro']) .portada p {
+  color: #4a3f3a;
+}
+:host-context(html[data-tema='claro']) .portada > img.marca-agua {
+  mix-blend-mode: multiply;
+  opacity: 0.08;
+}
+:host-context(html[data-tema='claro']) .portada .boton-linea {
+  color: #1c1311;
+  border-color: #1c1311;
+  background-image: linear-gradient(#1c1311, #1c1311);
+}
+:host-context(html[data-tema='claro']) .portada .boton-linea:hover {
+  color: #fff;
+}
+:host-context(html[data-tema='claro']) .franja {
+  background: #f0e2d2;
+  color: #4a3f3a;
+}
+:host-context(html[data-tema='claro']) .franja strong {
+  color: #1c1311;
+}
+}
+
