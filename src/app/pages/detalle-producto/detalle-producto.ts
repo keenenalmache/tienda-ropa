@@ -40,6 +40,13 @@ export class DetalleProducto {
   });
   fotoPrincipal = computed(() => this.fotos()[this.fotoActiva()] ?? '');
 
+    // Galería deslizable (celular): marca qué foto está a la vista
+  alDeslizar(e: Event) {
+    const el = e.target as HTMLElement;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    if (i !== this.fotoActiva()) this.fotoActiva.set(i);
+  }
+
   tallas = computed(() => [...new Set((this.producto()?.variantes ?? []).map((v) => v.talla))]);
   colores = computed(() => [...new Set((this.producto()?.variantes ?? []).map((v) => v.color))]);
 

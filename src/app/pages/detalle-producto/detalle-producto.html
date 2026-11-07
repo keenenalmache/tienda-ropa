@@ -11,6 +11,20 @@
           <img class="principal" [src]="fotoPrincipal()" [alt]="producto.nombre" />
         }
       </div>
+            @if (fotos().length) {
+        <div class="deslizar" (scroll)="alDeslizar($event)">
+          @for (f of fotos(); track f) {
+            <div class="slide"><img [src]="f" [alt]="producto.nombre" loading="lazy" /></div>
+          }
+        </div>
+        @if (fotos().length > 1) {
+          <div class="puntos" aria-hidden="true">
+            @for (f of fotos(); track f; let i = $index) {
+              <span [class.activo]="fotoActiva() === i"></span>
+            }
+          </div>
+        }
+      }
       @if (fotos().length > 1) {
         <div class="miniaturas">
           @for (f of fotos(); track f; let i = $index) {

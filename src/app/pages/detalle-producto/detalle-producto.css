@@ -211,3 +211,100 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
   .precio-mov strong { font-size: 1.5rem; color: var(--brasa); }
   .barra-movil .btn-whatsapp { flex: 1; margin: 0; text-align: center; }
 }
+
+/* La galería deslizable y los puntos solo existen en celular */
+.deslizar,
+.puntos {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .volver {
+    margin: 0.2rem 0 0.4rem;
+    padding: 0.6rem 0;
+  }
+  .estado {
+    padding-inline: 0;
+  }
+  .detalle {
+    gap: 1rem;
+    padding: 0 0 0.5rem;
+  }
+
+  /* Galería: se desliza con el dedo */
+  .visor,
+  .miniaturas {
+    display: none;
+  }
+  .deslizar {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(160deg, #e6e0da, #d8cfc7);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px var(--linea),
+      6px 6px 0 -1px var(--ceniza);
+  }
+  .deslizar::-webkit-scrollbar {
+    display: none;
+  }
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    aspect-ratio: 4 / 5;
+    max-height: 70vh;
+  }
+  .slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .puntos {
+    display: flex;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+  .puntos span {
+    width: 8px;
+    height: 8px;
+    background: var(--linea);
+    border-radius: 999px;
+    transition:
+      width 200ms ease,
+      background 200ms ease;
+  }
+  .puntos span.activo {
+    width: 22px;
+    background: var(--brasa);
+  }
+
+  /* Información */
+  .info h1 {
+    font-size: clamp(1.9rem, 9vw, 2.6rem);
+  }
+  .opciones {
+    gap: 0.6rem;
+  }
+  button.opcion {
+    min-width: 48px;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Barra fija de compra: ocupa todo el ancho del recuadro */
+  .barra-movil {
+    margin: 0 -0.8rem -0.8rem;
+    padding: 0.8rem 0.8rem calc(0.8rem + env(safe-area-inset-bottom));
+    background: var(--papel);
+  }
+  .barra-movil .btn-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+  }
+}
