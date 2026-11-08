@@ -475,3 +475,18 @@ html[data-tema='claro'] app-inicio .franja strong {
     padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 }
+
+@media (max-width: 800px) {
+  /* El desenfoque de los recuadros es costoso: en celular no hace falta */
+  app-admin,
+  app-catalogo,
+  app-detalle-producto,
+  app-contacto,
+  app-login {
+    backdrop-filter: none;
+  }
+  /* El fondo fijo provoca tirones al desplazar en celular */
+  body {
+    background-attachment: scroll;
+  }
+}

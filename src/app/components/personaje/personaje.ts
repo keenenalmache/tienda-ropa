@@ -6,8 +6,8 @@ import { Component, computed, effect, input, signal } from '@angular/core';
   styleUrl: './personaje.css',
 })
 export class Personaje {
-  src = input('personaje-grande.png'); // modo oscuro (noche)
-  srcDia = input('personaje-grande-dia.png'); // modo claro (día)
+  src = input('personaje-grande.webp'); // modo oscuro (noche)
+  srcDia = input('personaje-grande-dia.webp'); // modo claro (día)
   frases = input<string[]>([]);
 
   indice = signal(0);

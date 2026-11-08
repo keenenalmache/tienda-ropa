@@ -29,8 +29,7 @@
       <a [routerLink]="['/producto', p.id]" class="tarjeta">
         <div class="foto">
           @if (p.imagen) {
-            <img [src]="p.imagen" [alt]="p.nombre" />
-          }
+         <img [src]="p.imagen" [alt]="p.nombre" loading="lazy" decoding="async" />          }
           <div class="etiquetas">
             @if (p.nuevo) {
               <span class="etiqueta etiqueta-nuevo">Nuevo</span>

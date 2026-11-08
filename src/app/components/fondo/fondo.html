@@ -11,7 +11,7 @@
       [style.--v]="p.v"
       [style.--o]="p.o ?? 0.85"
     >
-      <img [src]="'/fondo/' + p.img + '.png'" alt="" [style.animation-delay.s]="p.d ?? 0" />
+    <img [src]="'/fondo/' + p.img + '.webp'" alt="" loading="lazy" decoding="async" [style.animation-delay.s]="p.d ?? 0" />
     </div>
   }
 </div>
