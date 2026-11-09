@@ -19,8 +19,7 @@ type Seccion = 'inicio' | 'catalogo' | 'detalle' | 'otro' | 'admin';
 // ====== AQUÍ AJUSTAS LA COMPOSICIÓN DE CADA SECCIÓN ======
 const COMPOSICION: Record<Seccion, Pieza[]> = {
   inicio: [
-    { img: 'mancha-fuxiagit add .', x: -5, y: 2, w: 28, r: -10, v: 0.06, d: 0.2 },
-    { img: 'mancha-amarilla', x: 72, y: 4, w: 26, r: 15, v: 0.1, d: 0.5 },
+    { img: 'mancha-fuxia', x: -5, y: 2, w: 28, r: -10, v: 0.06, d: 0.2 },    { img: 'mancha-amarilla', x: 72, y: 4, w: 26, r: 15, v: 0.1, d: 0.5 },
     { img: 'letras-graffiti-1', x: 1, y: 12, w: 26, r: -6, v: 0.08, d: 0.9 },
     { img: 'dibujo-lata-spray', x: 88, y: 16, w: 9, r: 18, v: 0.12, d: 1.2 },
     { img: 'mancha-roja', x: 45, y: 22, w: 11, r: 0, v: 0.05, d: 1.4, movil: false },

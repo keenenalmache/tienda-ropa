@@ -10,7 +10,8 @@ import { Fondo } from './components/fondo/fondo';
 type Tema = 'claro' | 'oscuro';
 
 @Component({
- imports: [RouterOutlet, RouterLink, Fondo, Dialogo, Pie],  selector: 'app-root',
+  imports: [RouterOutlet, RouterLink, Fondo, Dialogo, Pie],
+  selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
