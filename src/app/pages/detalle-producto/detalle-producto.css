@@ -264,18 +264,38 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
     display: none;
     min-height: 220px;
   }
-    .slide {
+      .slide {
+    position: relative;
+    overflow: hidden;
     flex: 0 0 100%;
     min-width: 0;
     scroll-snap-align: center;
   }
-  .slide img {
+  .slide-fondo {
+    position: absolute;
+    inset: -10%;
+    width: 120%;
+    height: 120%;
+    object-fit: cover;
+    filter: blur(24px) saturate(1.15) brightness(0.88);
+  }
+  .slide-foto {
+    position: relative;
+    z-index: 1;
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 5;
     max-height: 70vh;
     object-fit: contain;
+  }
+  .slide::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    z-index: 2;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.55);
   }
   .puntos {
     display: flex;

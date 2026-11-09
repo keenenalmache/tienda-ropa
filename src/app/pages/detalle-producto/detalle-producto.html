@@ -15,7 +15,12 @@
         <div class="deslizar" (scroll)="alDeslizar($event)">
           @for (f of fotos(); track f) {
          <div class="slide"><img [src]="f" [alt]="producto.nombre" /></div>          }
-        </div>
+        </div>          @for (f of fotos(); track f) {
+            <div class="slide">
+              <img class="slide-fondo" [src]="f" alt="" aria-hidden="true" />
+              <img class="slide-foto" [src]="f" [alt]="producto.nombre" />
+            </div>
+          }
         @if (fotos().length > 1) {
           <div class="puntos" aria-hidden="true">
             @for (f of fotos(); track f; let i = $index) {
