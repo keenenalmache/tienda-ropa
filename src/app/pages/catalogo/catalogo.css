@@ -152,3 +152,64 @@ h1 {
     font-size: 0.9rem;
   }
 }
+
+/* Filtros: etiquetas de precio colgadas de un cordón */
+.categorias {
+  gap: 0.9rem 1rem;
+  padding-top: 0.6rem;
+}
+.categorias button {
+  position: relative;
+  padding: 0.45rem 1rem 0.45rem 1.7rem;
+  color: var(--texto);
+  background: var(--papel);
+  border: 2px solid var(--texto);
+  border-radius: 4px 14px 14px 4px;
+  font-weight: 700;
+  transform-origin: 0.7rem -0.5rem;
+  transition: transform 200ms ease, background-color 200ms ease, color 200ms ease;
+}
+.categorias button::before {
+  content: '';
+  position: absolute;
+  left: 0.55rem;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+.categorias button::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: -9px;
+  width: 2px;
+  height: 11px;
+  background: var(--texto);
+  transform: rotate(18deg);
+}
+.categorias button:hover:not(:disabled) {
+  color: var(--texto);
+  background: color-mix(in srgb, var(--llama) 22%, var(--papel));
+  animation: balanceo 700ms ease;
+}
+.categorias button.activo,
+.categorias button.activo:hover:not(:disabled) {
+  color: #fff;
+  background: var(--brasa);
+  border-color: var(--texto);
+  transform: translateY(4px);
+}
+@keyframes balanceo {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: 7deg; }
+  50% { rotate: -5deg; }
+  75% { rotate: 3deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .categorias button:hover:not(:disabled) {
+    animation: none;
+  }
+}

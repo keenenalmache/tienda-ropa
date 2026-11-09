@@ -161,3 +161,99 @@ nav a.marca { display: inline-flex; align-items: center; gap: 0.6rem; }
     color: #1f9d55;
   }
 }
+
+/* ---------- Botón de tema: círculo naranja con pulso ---------- */
+.tema-caja {
+  position: relative;
+}
+nav .tema {
+  position: relative;
+  width: 2.6rem;
+  height: 2.6rem;
+  color: #fff;
+  background: var(--brasa);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--tinta), 3px 3px 0 2px var(--tinta);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+nav .tema:hover:not(:disabled) {
+  color: #fff;
+  background: var(--brasa-viva);
+  border-color: #fff;
+  box-shadow: 0 0 0 2px var(--tinta), 3px 3px 0 2px var(--tinta), 0 0 18px rgba(240, 138, 60, 0.8);
+  transform: rotate(18deg) scale(1.08);
+}
+nav .tema::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--llama);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: pulso-tema 1.8s ease-out 1.2s 3;
+}
+@keyframes pulso-tema {
+  0% { opacity: 0.9; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+:host-context(html[data-tema='oscuro']) nav .tema svg {
+  filter: drop-shadow(0 0 5px #fff3);
+}
+:host-context(html[data-tema='claro']) nav .tema {
+  color: #fff;
+  border-color: #fff;
+}
+
+/* Globito de bienvenida */
+.aviso-tema {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  color: #1c1311;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: #fff;
+  border: 2px solid #1c1311;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--brasa);
+  animation: rebote-aviso 500ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.aviso-tema::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-top: 2px solid #1c1311;
+  border-left: 2px solid #1c1311;
+  transform: rotate(45deg);
+}
+.cerrar-aviso {
+  all: unset;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  opacity: 0.6;
+}
+.cerrar-aviso:hover {
+  opacity: 1;
+}
+@keyframes rebote-aviso {
+  from { opacity: 0; transform: translateY(-8px) scale(0.9); }
+}
+@media (prefers-reduced-motion: reduce) {
+  nav .tema::after {
+    animation: none;
+  }
+}

@@ -8,7 +8,10 @@
   </a>
   <a routerLink="/catalogo" class="solo-pc">Catálogo</a>
   <a routerLink="/contacto">Contacto</a>
-  <button
+  
+  <div class="tema-caja">
+
+    <button
     type="button"
     class="tema"
     (click)="alternarTema()"
@@ -23,7 +26,14 @@
       }
     </svg>
   </button>
-</nav>
+
+    @if (avisoTema()) {
+      <div class="aviso-tema" role="status">
+        {{ tema() === 'oscuro' ? '¿Prefieres el modo claro? ☀️' : 'Prueba el modo oscuro 🌙' }}
+        <button type="button" class="cerrar-aviso" aria-label="Cerrar aviso" (click)="cerrarAviso()">×</button>
+      </div>
+    }
+  </div>
 
 <router-outlet />
 <app-pie />

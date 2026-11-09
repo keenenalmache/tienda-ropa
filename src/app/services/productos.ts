@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Producto } from '../models/producto';
 import { supabase } from '../supabase.client';
+
+export const DIAS_NUEVO = 14;
+
+function sigueNuevo(marcado: boolean, desde: string | null): boolean {
+  if (!marcado) return false;
+  if (!desde) return true;
+  return Date.now() - new Date(desde).getTime() < DIAS_NUEVO * 86400000;
+}
 // Categorías que tienen al menos un producto visible (no hace falta otra consulta)
 export function categoriasDe(lista: Producto[]): { slug: string; nombre: string }[] {
   const mapa = new Map<string, string>();
@@ -33,7 +41,7 @@ export class Productos {
       precioOferta: oferta,
       descuento: oferta === null ? 0 : Math.round((1 - oferta / precio) * 100),
       destacado: !!fila.destacado,
-      nuevo: !!fila.nuevo,
+      nuevo: sigueNuevo(!!fila.nuevo, fila.nuevo_desde ?? null),
       tallas: [...new Set(variantes.map((v) => v.talla))],
       colores: [...new Set(variantes.map((v) => v.color))],
       descripcion: fila.descripcion ?? '',
@@ -47,7 +55,7 @@ export class Productos {
     return this.supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, genero, categorias(slug, nombre), variantes(talla, color, stock), imagenes(url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, genero, categorias(slug, nombre), variantes(talla, color, stock), imagenes(url, orden)',
       )
       .eq('activo', true);
   }

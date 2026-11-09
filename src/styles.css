@@ -490,3 +490,148 @@ html[data-tema='claro'] app-inicio .franja strong {
     background-attachment: scroll;
   }
 }
+
+/* ================= BOTONES: taller de ropa urbana ================= */
+
+/* --- Secundario: parche bordado (puntadas) --- */
+:where(button) {
+  border: 2px solid var(--tinta);
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  outline: 1.5px dashed currentColor;
+  outline-offset: -6px;
+}
+/* Los botones con diseño propio no llevan puntadas */
+:is(.corazon, .tema, .mini, .chip, .dato, .opcion, .categorias button, .pestanas button, .fila-mini button, .cerrar-aviso, .enlace-nombre):not(:focus-visible) {
+  outline: none;
+}
+.boton-linea {
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 4px;
+  font-weight: 700;
+  outline: 1.5px dashed rgba(255, 255, 255, 0.55);
+  outline-offset: -6px;
+}
+html[data-tema='claro'] app-inicio .portada .boton-linea {
+  outline-color: rgba(28, 19, 17, 0.5);
+}
+
+/* --- Principal: sticker troquelado --- */
+.boton,
+.primario,
+.btn-whatsapp {
+  border: 3px solid #fff;
+  border-radius: 6px;
+  font-weight: 800;
+  font-stretch: 85%;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 0 2px var(--tinta), 5px 6px 0 2px var(--tinta);
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+/* Esquina que se despega */
+.boton::before,
+.primario::before,
+.btn-whatsapp::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, transparent 50%, #f3e9dd 50%);
+  border-top-left-radius: 6px;
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.25);
+  transition: width 220ms ease, height 220ms ease;
+}
+.boton:hover::before,
+.primario:hover:not(:disabled)::before,
+.btn-whatsapp:hover::before {
+  width: 26px;
+  height: 26px;
+}
+.boton:hover,
+.primario:hover:not(:disabled),
+.btn-whatsapp:hover {
+  transform: translate(-2px, -3px) rotate(-1deg);
+  box-shadow: 0 0 0 2px var(--tinta), 8px 10px 0 2px var(--tinta);
+}
+/* Al presionar: se pega de golpe y salpica */
+.boton:active,
+.primario:active:not(:disabled),
+.btn-whatsapp:active {
+  transform: translate(4px, 5px);
+  box-shadow: 0 0 0 2px var(--tinta), 1px 1px 0 2px var(--tinta);
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 20%, rgba(255, 255, 255, 0.8) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 70% 78%, rgba(255, 255, 255, 0.85) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.7) 0 1.5px, transparent 2.5px);
+}
+
+/* --- WhatsApp: globo de chat --- */
+.btn-whatsapp {
+  border-radius: 16px 16px 16px 2px;
+}
+.btn-whatsapp:hover {
+  animation: vibra 450ms ease;
+}
+@keyframes vibra {
+  0%, 100% { rotate: 0deg; }
+  20% { rotate: -3deg; }
+  40% { rotate: 3deg; }
+  60% { rotate: -2deg; }
+  80% { rotate: 2deg; }
+}
+
+/* --- Modo oscuro: bordes de neón --- */
+:root[data-tema='oscuro'] :is(.boton, .primario, .btn-whatsapp) {
+  border-color: #fff1e2;
+  box-shadow: 0 0 0 2px #000, 5px 6px 0 2px #000, 0 0 22px rgba(240, 138, 60, 0.4);
+}
+:root[data-tema='oscuro'] :is(.boton:hover, .primario:hover:not(:disabled), .btn-whatsapp:hover) {
+  box-shadow: 0 0 0 2px #000, 8px 10px 0 2px #000, 0 0 30px rgba(240, 138, 60, 0.7);
+}
+:root[data-tema='oscuro'] :is(.boton:active, .primario:active:not(:disabled), .btn-whatsapp:active) {
+  box-shadow: 0 0 0 2px #000, 1px 1px 0 2px #000, 0 0 14px rgba(240, 138, 60, 0.5);
+}
+
+/* --- Corazón: explota en chispas al guardarlo --- */
+.corazon.activo::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--brasa);
+  box-shadow:
+    0 -16px 0 var(--brasa), 14px -8px 0 var(--llama), 14px 8px 0 var(--brasa),
+    0 16px 0 var(--llama), -14px 8px 0 var(--brasa), -14px -8px 0 var(--llama);
+  opacity: 0;
+  pointer-events: none;
+  animation: explota 500ms ease-out;
+}
+@keyframes explota {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-whatsapp:hover,
+  .corazon.activo::after {
+    animation: none;
+  }
+}
+/* Que la página de Inicio nunca sea más ancha que la pantalla */
+app-inicio {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+app-root > * {
+  min-width: 0;
+}

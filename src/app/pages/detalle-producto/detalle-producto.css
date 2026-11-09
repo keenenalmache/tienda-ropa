@@ -210,6 +210,19 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
   .precio-mov span { font-size: 0.75rem; color: var(--suave); }
   .precio-mov strong { font-size: 1.5rem; color: var(--brasa); }
   .barra-movil .btn-whatsapp { flex: 1; margin: 0; text-align: center; }
+    /* Título y etiquetas arriba, luego la foto */
+  .detalle {
+    display: flex;
+    flex-direction: column;
+  }
+  .info {
+    display: contents;
+  }
+  .titulo-fila { order: 1; }
+  .etiquetas-fila { order: 2; }
+  .galeria { order: 3; }
+  .ficha { order: 4; }
+  .barra-movil { order: 5; }
 }
 
 /* La galería deslizable y los puntos solo existen en celular */
@@ -307,4 +320,62 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
     justify-content: center;
     min-height: 48px;
   }
+}
+
+/* Tallas y colores: etiquetas de ropa con agujero y sello */
+button.opcion {
+  position: relative;
+  padding-left: 1.7rem;
+  border: 2px solid var(--texto);
+  border-radius: 3px 12px 12px 3px;
+  font-weight: 700;
+  overflow: visible;
+}
+button.opcion::before {
+  content: '';
+  position: absolute;
+  left: 0.55rem;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+button.opcion.elegida {
+  background: color-mix(in srgb, var(--brasa) 14%, var(--papel));
+  border-color: var(--brasa);
+}
+button.opcion.elegida::after {
+  content: 'LISTO';
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  padding: 1px 5px;
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--brasa);
+  background: color-mix(in srgb, var(--papel) 90%, transparent);
+  border: 2px solid var(--brasa);
+  border-radius: 3px;
+  transform: rotate(-12deg);
+  animation: sellar 260ms cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes sellar {
+  from { transform: rotate(-12deg) scale(2.2); opacity: 0; }
+  to { transform: rotate(-12deg) scale(1); opacity: 1; }
+}
+/* Agotadas: tachadas con cinta */
+button.opcion:disabled {
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(128, 128, 128, 0.25) 6px 8px);
+  text-decoration: line-through;
+}
+
+/* Compartir: el ícono "despega" */
+.boton-compartir svg {
+  transition: transform 260ms ease;
+}
+.boton-compartir:hover svg {
+  transform: translate(3px, -4px) rotate(10deg);
 }

@@ -390,3 +390,43 @@ textarea {
     min-height: 46px;
   }
 }
+
+/* Nombre del producto: se nota que es clicable */
+.enlace-nombre {
+  all: unset;
+  cursor: pointer;
+  font-weight: 600;
+  border-bottom: 1px dashed transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.enlace-nombre:hover {
+  color: var(--brasa);
+  border-bottom-color: var(--brasa);
+}
+.enlace-nombre:focus-visible {
+  outline: 2px solid var(--llama);
+  outline-offset: 3px;
+}
+
+/* Botón de eliminar */
+button.peligro {
+  color: #1c1311;
+  border: 2px solid #1c1311;
+  font-weight: 800;
+  background:
+    linear-gradient(#f5c518, #f5c518) center / calc(100% - 10px) calc(100% - 8px) no-repeat,
+    repeating-linear-gradient(-45deg, #f5c518 0 8px, #1c1311 8px 16px);
+  outline: none;
+}
+button.peligro:hover:not(:disabled) {
+  color: #1c1311;
+  animation: cinta-mueve 600ms linear infinite, temblor 300ms ease 1;
+}
+@keyframes cinta-mueve {
+  to { background-position: center, 22.6px 0; }
+}
+@keyframes temblor {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -1.5deg; }
+  75% { rotate: 1.5deg; }
+}

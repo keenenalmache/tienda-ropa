@@ -12,6 +12,9 @@ import {
   crearSlug 
 } from '../../services/admin-productos';
 import { Dialogos } from '../../services/dialogos';
+import { DIAS_NUEVO } from '../../services/productos';
+
+
 type Vista = 'lista' | 'producto' | 'negocio' | 'categorias';
 type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
 type EstadoStock = 'agotado' | 'bajo' | 'ok';
@@ -299,6 +302,30 @@ export class Admin {
       },
       p.activo ? 'Producto oculto del catálogo.' : 'Producto visible en el catálogo.',
     );
+  }
+    async eliminarProducto(p: ProductoAdmin) {
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar producto',
+      mensaje: `¿Eliminar "${p.nombre}" para siempre? Se borrarán también sus fotos, tallas y colores y no se puede deshacer. Si solo quieres quitarlo del catálogo, usa "Ocultar".`,
+      confirmar: 'Eliminar',
+    });
+    if (!ok) return;
+    await this.ejecutar(async () => {
+      await this.api.eliminarProducto(p);
+      if (this.editandoId() === p.id) {
+        this.editandoId.set(null);
+        this.form.markAsPristine();
+        this.abrir('lista');
+      }
+      await this.recargar();
+    }, 'Producto eliminado.');
+  }
+
+  // Días que le quedan a la etiqueta "Nuevo" (para mostrarlo en la lista)
+  textoNuevo(p: ProductoAdmin): string {
+    if (!p.nuevo || !p.nuevo_desde) return '';
+    const restan = DIAS_NUEVO - Math.floor((Date.now() - new Date(p.nuevo_desde).getTime()) / 86400000);
+    return restan > 0 ? `${restan} d` : 'vencido';
   }
 
   async alternarMarca(p: ProductoAdmin, campo: 'destacado' | 'nuevo') {

@@ -115,7 +115,7 @@
           <tbody>
             @for (p of listaFiltrada(); track p.id) {
               <tr [class.oculto]="!p.activo">
-                <td class="nombre">{{ p.nombre }}</td>
+                <td class="nombre"><button type="button" class="enlace-nombre" (click)="editar(p)">{{ p.nombre }}</button></td>
 
                 <td data-label="Categoría">
                   {{ p.categorias?.nombre }}
@@ -150,13 +150,8 @@
 
                 <td class="etiquetas-celda" data-label="Etiquetas">
                   <span>
-                    <button
-                      type="button"
-                      class="chip"
-                      [class.on]="p.destacado"
-                      (click)="alternarMarca(p, 'destacado')"
-                    >
-                      Destacado
+                    <button type="button" class="chip" [class.on]="p.nuevo" (click)="alternarMarca(p, 'nuevo')">
+                    Nuevo @if (textoNuevo(p); as t) { <small>· {{ t }}</small> }
                     </button>
 
                     <button
@@ -180,6 +175,7 @@
                   <button type="button" (click)="alternarActivo(p)">
                     {{ p.activo ? 'Ocultar' : 'Mostrar' }}
                   </button>
+                  <button type="button" class="peligro" (click)="eliminarProducto(p)">Eliminar</button>
                 </td>
               </tr>
             } @empty {
@@ -468,6 +464,9 @@
         </button>
       </div>
     </section>
+            @if (productoEditado(); as p) {
+          <button type="button" class="peligro" (click)="eliminarProducto(p)">Eliminar producto</button>
+        }
   }
 
   <!-- ================= CATEGORÍAS ================= -->

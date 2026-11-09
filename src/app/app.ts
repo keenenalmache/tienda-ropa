@@ -40,6 +40,23 @@ export class App {
   );
   tema = signal<Tema>(this.temaInicial());
 
+    avisoTema = signal(this.avisoPendiente());
+
+  private avisoPendiente(): boolean {
+    try {
+      return localStorage.getItem('aviso-tema') !== '1';
+    } catch {
+      return true;
+    }
+  }
+
+  cerrarAviso() {
+    this.avisoTema.set(false);
+    try {
+      localStorage.setItem('aviso-tema', '1');
+    } catch {}
+  }
+
   constructor() {
     effect(() => this.titulo.setTitle(this.nombre()));
     effect(() => {
@@ -49,9 +66,11 @@ export class App {
         localStorage.setItem('tema', t);
       } catch {}
     });
+    if (this.avisoTema()) setTimeout(() => this.cerrarAviso(), 9000);
   }
 
   alternarTema() {
+    this.cerrarAviso();
     this.tema.update((t) => (t === 'oscuro' ? 'claro' : 'oscuro'));
   }
 

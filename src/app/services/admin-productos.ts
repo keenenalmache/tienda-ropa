@@ -24,6 +24,7 @@ export interface ProductoAdmin {
   genero: string;
   destacado: boolean;
   nuevo: boolean;
+  nuevo_desde: string | null;
   categoria_id: number;
   categorias: { nombre: string } | null;
   variantes: VarianteAdmin[];
@@ -62,7 +63,7 @@ export class AdminProductos {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
       )
       .order('id', { ascending: false });
     if (error) throw error;
@@ -165,6 +166,16 @@ export class AdminProductos {
 
   async eliminarCategoria(id: number) {
     const { error } = await supabase.from('categorias').delete().eq('id', id);
+    if (error) throw error;
+  }
+    // Borra el producto, sus fotos del almacenamiento y (por cascada) variantes e imágenes
+  async eliminarProducto(p: ProductoAdmin) {
+    const marca = '/productos/';
+    const rutas = p.imagenes.map((i) =>
+      decodeURIComponent(i.url.substring(i.url.indexOf(marca) + marca.length)),
+    );
+    if (rutas.length) await supabase.storage.from('productos').remove(rutas);
+    const { error } = await supabase.from('productos').delete().eq('id', p.id);
     if (error) throw error;
   }
 }
