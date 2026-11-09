@@ -260,9 +260,8 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
       0 0 0 1px var(--linea),
       6px 6px 0 -1px var(--ceniza);
   }
-  .deslizar::-webkit-scrollbar {
+   .deslizar::-webkit-scrollbar {
     display: none;
-    min-height: 220px;
   }
       .slide {
     position: relative;
