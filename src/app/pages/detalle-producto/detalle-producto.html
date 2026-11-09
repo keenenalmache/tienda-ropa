@@ -14,8 +14,7 @@
             @if (fotos().length) {
         <div class="deslizar" (scroll)="alDeslizar($event)">
           @for (f of fotos(); track f) {
-            <div class="slide"><img [src]="f" [alt]="producto.nombre" loading="lazy" /></div>
-          }
+         <div class="slide"><img [src]="f" [alt]="producto.nombre" /></div>          }
         </div>
         @if (fotos().length > 1) {
           <div class="puntos" aria-hidden="true">

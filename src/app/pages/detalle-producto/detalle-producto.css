@@ -204,19 +204,6 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
     background: var(--papel);
     border-top: 1px solid var(--linea);
     box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.18);
-      .slide {
-    flex: 0 0 100%;
-    min-width: 0;
-    scroll-snap-align: center;
-  }
-  .slide img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    max-height: 70vh;
-    object-fit: contain;
-  }
   }
   .precio-mov { display: grid; line-height: 1.1; }
   .precio-mov span { font-size: 0.75rem; color: var(--suave); }
@@ -275,6 +262,7 @@ button.opcion:disabled { opacity: 0.4; text-decoration: line-through; cursor: no
   }
   .deslizar::-webkit-scrollbar {
     display: none;
+    min-height: 220px;
   }
     .slide {
     flex: 0 0 100%;
