@@ -257,3 +257,75 @@ nav .tema::after {
     animation: none;
   }
 }
+
+/* ---------- Cuenta del cliente ---------- */
+nav .ingresar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+nav .ingresar svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+:host-context(html[data-tema='claro']) nav .ingresar {
+  color: #1c1311;
+  border-color: #1c1311;
+}
+.cuenta {
+  position: relative;
+}
+nav .avatar {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 800;
+  background: var(--brasa);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--tinta);
+}
+nav .avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.menu-cuenta {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 70;
+  display: grid;
+  gap: 0.5rem;
+  min-width: 180px;
+  padding: 0.8rem;
+  color: #1c1311;
+  background: #fff;
+  border: 2px solid #1c1311;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--brasa);
+}
+.menu-nombre {
+  margin: 0;
+  font-weight: 800;
+}
+.menu-cuenta button {
+  color: #1c1311;
+}
+@media (max-width: 800px) {
+  nav .ingresar .txt {
+    display: none;
+  }
+  nav .ingresar {
+    padding: 0.5rem;
+  }
+}

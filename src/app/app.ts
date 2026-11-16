@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { Negocio } from './services/negocio';
 import { Dialogo } from './components/dialogo/dialogo';
 import { Pie } from './components/pie/pie';
 import { Fondo } from './components/fondo/fondo';
+import { Auth } from './services/auth';
+
 type Tema = 'claro' | 'oscuro';
 
 @Component({
@@ -27,7 +29,21 @@ export class App {
     ),
     { initialValue: this.router.url },
   );
+  private auth = inject(Auth);
+  perfil = this.auth.perfil;
+  menuCuenta = signal(false);
 
+  ingresar() {
+    this.auth.entrarConGoogle();
+  }
+  async salirCuenta() {
+    this.menuCuenta.set(false);
+    await this.auth.salir();
+  }
+  @HostListener('document:click', ['$event'])
+  cerrarMenu(e: Event) {
+    if (!(e.target as HTMLElement).closest('.cuenta')) this.menuCuenta.set(false);
+  }
   barraVisible = computed(() => !/^\/(admin|login|recuperar|restablecer|producto)/.test(this.url()));
   activa = computed(() => {
     const u = this.url();

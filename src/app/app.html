@@ -9,6 +9,29 @@
   <a routerLink="/catalogo" class="solo-pc">Catálogo</a>
   <a routerLink="/contacto">Contacto</a>
   
+    @if (perfil(); as p) {
+    <div class="cuenta">
+      <button type="button" class="avatar" (click)="menuCuenta.update((v) => !v)" [attr.aria-label]="'Cuenta de ' + p.nombre">
+        @if (p.foto) {
+          <img [src]="p.foto" alt="" referrerpolicy="no-referrer" />
+        } @else {
+          {{ p.nombre.charAt(0).toUpperCase() }}
+        }
+      </button>
+      @if (menuCuenta()) {
+        <div class="menu-cuenta">
+          <p class="menu-nombre">{{ p.nombre }}</p>
+          <button type="button" (click)="salirCuenta()">Cerrar sesión</button>
+        </div>
+      }
+    </div>
+  } @else {
+    <button type="button" class="ingresar" (click)="ingresar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></svg>
+      <span class="txt">Ingresar</span>
+    </button>
+  }
+  
   <div class="tema-caja">
 
     <button
