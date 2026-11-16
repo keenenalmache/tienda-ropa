@@ -5,6 +5,6 @@ import { Auth } from '../services/auth';
 export const adminGuard: CanActivateFn = async () => {
   const auth = inject(Auth);
   const router = inject(Router);
-  if (await auth.haySesion()) return true;
-  return router.createUrlTree(['/login']);
+  if ((await auth.haySesion()) && (await auth.esAdmin())) return true;
+    return router.createUrlTree(['/login']);
 };

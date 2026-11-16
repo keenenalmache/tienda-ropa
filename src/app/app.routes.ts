@@ -8,6 +8,7 @@ import { Admin } from './pages/admin/admin';
 import { Recuperar } from './pages/recuperar/recuperar';
 import { Restablecer } from './pages/restablecer/restablecer';
 import { adminGuard } from './guards/admin-guard';
+import { Privacidad } from './pages/privacidad/privacidad';
 
 export const routes: Routes = [
   { path: '', component: Inicio },
@@ -19,4 +20,5 @@ export const routes: Routes = [
   { path: 'restablecer', component: Restablecer },
   { path: 'admin', component: Admin, canActivate: [adminGuard] },
   { path: '**', redirectTo: '' },
+    { path: 'privacidad', component: Privacidad },
 ];

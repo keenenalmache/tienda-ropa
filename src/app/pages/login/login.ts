@@ -34,6 +34,9 @@ export class Login {
     this.enviando.set(false);
     if (mensaje) {
       this.error.set('Correo o contraseña incorrectos.');
+        } else if (!(await this.auth.esAdmin())) {
+      await this.auth.salir();
+      this.error.set('Esta cuenta no tiene permisos de administrador.');
     } else {
       this.router.navigate(['/admin']);
     }

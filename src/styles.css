@@ -403,7 +403,8 @@ app-admin,
 app-catalogo,
 app-detalle-producto,
 app-contacto,
-app-login {
+app-login,
+app-privacidad {
   display: block;
   box-sizing: border-box;
   width: min(1200px, calc(100% - 2rem));
@@ -417,10 +418,11 @@ app-login {
 }
 @media (max-width: 700px) {
   app-admin,
-  app-catalogo,
-  app-detalle-producto,
-  app-contacto,
-  app-login {
+app-catalogo,
+app-detalle-producto,
+app-contacto,
+app-login,
+app-privacidad {
     width: calc(100% - 1rem);
     margin: 0.5rem auto;
     padding: 0.8rem;

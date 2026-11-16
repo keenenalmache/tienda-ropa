@@ -41,4 +41,9 @@ export class Auth {
     const { error } = await supabase.auth.updateUser({ password: clave });
     return error ? error.message : null;
   }
+    // ¿La cuenta actual es administradora? (lo decide la base de datos)
+  async esAdmin(): Promise<boolean> {
+    const { data, error } = await supabase.rpc('es_admin');
+    return !error && data === true;
+  }
 }
