@@ -19,6 +19,6 @@ export const routes: Routes = [
   { path: 'recuperar', component: Recuperar },
   { path: 'restablecer', component: Restablecer },
   { path: 'admin', component: Admin, canActivate: [adminGuard] },
-  { path: '**', redirectTo: '' },
   { path: 'privacidad', component: Privacidad },
+  { path: '**', redirectTo: '' },
 ];
