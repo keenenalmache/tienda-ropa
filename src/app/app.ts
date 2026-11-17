@@ -40,6 +40,10 @@ export class App {
     this.menuCuenta.set(false);
     await this.auth.salir();
   }
+    async cambiarCuenta() {
+    this.menuCuenta.set(false);
+    await this.auth.cambiarCuenta();
+  }
   @HostListener('document:click', ['$event'])
   cerrarMenu(e: Event) {
     if (!(e.target as HTMLElement).closest('.cuenta')) this.menuCuenta.set(false);

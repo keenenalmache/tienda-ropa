@@ -23,7 +23,13 @@
   >
     Categorías
   </button>
-
+  <button type="button" [class.activa]="vista() === 'resenas'" (click)="irA('resenas')">
+    Reseñas
+    @if (nuevasResenas() > 0) {
+      <span class="insignia">{{ nuevasResenas() }}</span>
+    }
+  </button>    Reseñas
+  
   <button
     type="button"
     [class.activa]="vista() === 'negocio'"
@@ -186,9 +192,13 @@
           </tbody>
         </table>
       </div>
+
+      
     }
   }
-
+  @case ('resenas') {
+    <app-admin-resenas />
+  }
   <!-- ================= PRODUCTO ================= -->
 
   @case ('producto') {

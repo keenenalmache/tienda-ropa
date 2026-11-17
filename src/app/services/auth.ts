@@ -37,11 +37,16 @@ export class Auth {
   }
 
   // Ingreso de clientes: te manda a Google y vuelve a la misma página
-  async entrarConGoogle() {
+   async entrarConGoogle() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: location.href },
+      options: { redirectTo: location.href, queryParams: { prompt: 'select_account' } },
     });
+  }
+
+  async cambiarCuenta() {
+    await supabase.auth.signOut();
+    await this.entrarConGoogle();
   }
   async entrar(correo: string, clave: string): Promise<string | null> {
     const { error } = await supabase.auth.signInWithPassword({

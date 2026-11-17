@@ -1,0 +1,29 @@
+.resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+.dato { display: grid; gap: 0.1rem; padding: 0.7rem; text-align: left; cursor: pointer; }
+.dato strong { font-size: 1.4rem; }
+.dato span { font-size: 0.8rem; opacity: 0.75; }
+.herramientas { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+.herramientas input { flex: 1 1 14rem; padding: 0.55rem 0.7rem; font: inherit; }
+.herramientas select { padding: 0.55rem 0.7rem; font: inherit; color: #fff; background: #1d1d1d; color-scheme: dark; }
+.herramientas select option { background: #1d1d1d; color: #fff; }
+.lista { display: grid; gap: 0.8rem; }
+.resena { padding: 0.9rem; border: 1px solid rgba(128, 128, 128, 0.4); border-radius: 6px; }
+.resena.oculta { opacity: 0.6; border-style: dashed; }
+.cab { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.est { color: #f5b301; }
+.est.baja { color: #ff6b4a; }
+.fecha { opacity: 0.65; font-size: 0.85rem; }
+.chip { font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; background: #888; color: #fff; }
+.producto { margin: 0.4rem 0 0; font-size: 0.85rem; opacity: 0.7; }
+.texto { margin: 0.4rem 0 0; }
+.texto.vacio { opacity: 0.5; font-style: italic; }
+.respuesta { margin-top: 0.6rem; padding: 0.5rem 0.8rem; border-left: 3px solid #d94a1e; background: rgba(128, 128, 128, 0.12); }
+.respuesta p { margin: 0.2rem 0 0; }
+textarea { width: 100%; box-sizing: border-box; margin-top: 0.6rem; padding: 0.6rem; font: inherit; }
+.acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.acciones button { padding: 0.5rem 0.9rem; font: inherit; cursor: pointer; }
+.acciones .peligro { margin-left: auto; }
+.aviso { padding: 0.6rem 0.8rem; background: rgba(255, 90, 60, 0.2); border-radius: 4px; }
+.pad { padding: 1rem 0; }
+.extremos { margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.9; }

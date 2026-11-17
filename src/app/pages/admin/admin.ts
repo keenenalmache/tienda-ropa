@@ -13,9 +13,9 @@ import {
 } from '../../services/admin-productos';
 import { Dialogos } from '../../services/dialogos';
 import { DIAS_NUEVO } from '../../services/productos';
-
-
-type Vista = 'lista' | 'producto' | 'negocio' | 'categorias';
+import { ResenasAdmin } from './resenas-admin/resenas-admin';
+import { AdminResenas } from '../../services/admin-resenas';
+type Vista = 'lista' | 'producto' | 'negocio' | 'categorias' | 'resenas';
 type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
 type EstadoStock = 'agotado' | 'bajo' | 'ok';
 
@@ -24,7 +24,7 @@ const STOCK_BAJO = 3;
 
 @Component({
   selector: 'app-admin',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ResenasAdmin],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -36,6 +36,7 @@ export class Admin {
   private negocio = inject(Negocio);
   private temporizador?: ReturnType<typeof setTimeout>;
   private dialogos = inject(Dialogos);
+  private resApi = inject(AdminResenas);
 
   correo = this.auth.usuario;
   productos = signal<ProductoAdmin[]>([]);
@@ -68,6 +69,20 @@ export class Admin {
       sinFotos: l.filter((p) => p.imagenes.length === 0).length,
     };
   });
+
+    nuevasResenas = signal(0);
+
+  private resenasVistoEn(): string {
+    try {
+      return localStorage.getItem('resenas-visto') ?? '1970-01-01T00:00:00Z';
+    } catch {
+      return '1970-01-01T00:00:00Z';
+    }
+  }
+
+  private async contarNuevasResenas() {
+    this.nuevasResenas.set(await this.resApi.contarDesde(this.resenasVistoEn()));
+  }
 
   listaFiltrada = computed(() => {
     const texto = this.busqueda().toLowerCase().trim();
@@ -122,6 +137,7 @@ export class Admin {
 
   constructor() {
     this.cargar();
+    this.contarNuevasResenas();
   }
 
   private async cargar() {
@@ -217,7 +233,15 @@ export class Admin {
     if (!(await this.confirmarSalida())) return;
     if (vista === 'negocio') this.formNegocio.reset(this.negocio.datos());
     if (vista !== 'producto') this.editandoId.set(null);
+        if (vista === 'resenas') {
+      try {
+        localStorage.setItem('resenas-visto', new Date().toISOString());
+      } catch { /* sin almacenamiento */ }
+      this.nuevasResenas.set(0);
+    }
+    
     this.abrir(vista);
+
   }
 
   async nuevo() {

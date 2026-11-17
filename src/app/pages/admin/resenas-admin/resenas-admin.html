@@ -1,0 +1,76 @@
+<section class="resumen">
+  <button type="button" class="dato" (click)="filtro.set('todas')">
+    <strong>{{ resumen().total }}</strong><span>Reseñas</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('visibles')">
+    <strong>{{ resumen().promedio.toFixed(1) }} ★</strong><span>Promedio</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('bajas')">
+    <strong>{{ resumen().bajas }}</strong><span>1–2 estrellas</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('sin-responder')">
+    <strong>{{ resumen().sinResponder }}</strong><span>Sin responder</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('ocultas')">
+    <strong>{{ resumen().ocultas }}</strong><span>Ocultas</span>
+  </button>
+</section>
+@if (extremos(); as e) {
+  <p class="extremos">
+    🏆 Mejor: <strong>{{ e.mejor.nombre }}</strong> ({{ e.mejor.prom.toFixed(1) }} ★, {{ e.mejor.n }})
+    · ⚠️ Más bajo: <strong>{{ e.peor.nombre }}</strong> ({{ e.peor.prom.toFixed(1) }} ★, {{ e.peor.n }})
+  </p>
+}
+<div class="herramientas">
+  <input type="search" placeholder="Buscar por autor, comentario o producto"
+    (input)="busqueda.set($any($event.target).value)" />
+  <select aria-label="Filtrar reseñas" (change)="filtro.set($any($event.target).value)">
+    @for (f of filtros; track f.valor) {
+      <option [value]="f.valor" [selected]="filtro() === f.valor">{{ f.etiqueta }}</option>
+    }
+  </select>
+</div>
+
+@if (error()) { <p class="aviso">{{ error() }}</p> }
+
+@if (cargando()) {
+  <p class="pad">Cargando...</p>
+} @else {
+  <div class="lista">
+    @for (r of vistas(); track r.id) {
+      <article class="resena" [class.oculta]="r.oculta">
+        <div class="cab">
+          @if (r.foto) { <img class="avatar" [src]="r.foto" alt="" referrerpolicy="no-referrer" /> }
+          <strong>{{ r.autor }}</strong>
+          <span class="est" [class.baja]="r.estrellas <= 2">{{ estrellasTexto(r.estrellas) }}</span>
+          <span class="fecha">{{ fecha(r.creada) }}@if (r.editada) { · editada }</span>
+          @if (r.oculta) { <span class="chip">Oculta</span> }
+        </div>
+        <p class="producto">En: {{ r.producto }}</p>
+        @if (r.comentario) { <p class="texto">{{ r.comentario }}</p> } @else { <p class="texto vacio">(solo estrellas)</p> }
+
+        @if (r.respuesta && respondiendoId() !== r.id) {
+          <div class="respuesta"><strong>Tu respuesta</strong><p>{{ r.respuesta }}</p></div>
+        }
+
+        @if (respondiendoId() === r.id) {
+          <textarea rows="3" maxlength="500" placeholder="Escribe tu respuesta pública"
+            [value]="textoRespuesta()" (input)="textoRespuesta.set($any($event.target).value)"></textarea>
+          <div class="acciones">
+            <button type="button" (click)="guardarRespuesta(r)">Guardar respuesta</button>
+            <button type="button" (click)="respondiendoId.set(null)">Cancelar</button>
+          </div>
+        } @else {
+          <div class="acciones">
+            <button type="button" (click)="empezarRespuesta(r)">{{ r.respuesta ? 'Editar respuesta' : 'Responder' }}</button>
+            @if (r.respuesta) { <button type="button" (click)="quitarRespuesta(r)">Quitar respuesta</button> }
+            <button type="button" (click)="alternarOculta(r)">{{ r.oculta ? 'Mostrar' : 'Ocultar' }}</button>
+            <button type="button" class="peligro" (click)="eliminar(r)">Eliminar</button>
+          </div>
+        }
+      </article>
+    } @empty {
+      <p class="pad">No hay reseñas con ese filtro.</p>
+    }
+  </div>
+}

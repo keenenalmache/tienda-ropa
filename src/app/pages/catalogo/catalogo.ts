@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Productos, categoriasDe } from '../../services/productos';
 import { Favoritos } from '../../services/favoritos';
 import { Producto } from '../../models/producto';
-
+import { Resenas } from '../../services/resenas';
 @Component({
   selector: 'app-catalogo',
   imports: [RouterLink],
@@ -16,6 +16,7 @@ export class Catalogo {
   private ruta = inject(ActivatedRoute);
   private router = inject(Router);
   favs = inject(Favoritos);
+  res = inject(Resenas);
 
   private todos = signal<Producto[]>([]);
   cargando = signal(true);

@@ -5,6 +5,7 @@ import { Producto } from '../../models/producto';
 import { Negocio } from '../../services/negocio';
 import { Personaje } from '../../components/personaje/personaje';
 import { Favoritos } from '../../services/favoritos';
+import { Resenas } from '../../services/resenas';
 @Component({
   selector: 'app-inicio',
   imports: [RouterLink, Personaje],
@@ -15,6 +16,7 @@ export class Inicio {
   private servicio = inject(Productos);
   private negocio = inject(Negocio);
   favs = inject(Favoritos);
+  res = inject(Resenas);
 
   datos = this.negocio.datos;
     listaFrases = computed(() =>

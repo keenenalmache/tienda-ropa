@@ -129,66 +129,111 @@
         </div>
       </div>
     </div>
+<section class="resenas">
+  <h2>Reseñas</h2>
 
-    <section class="resenas">
-      <h2>Reseñas</h2>
+  @if (resenas().length) {
+    <p class="resumen">
+      <span class="estrellas" aria-hidden="true">{{ estrellasTexto(promedio()) }}</span>
+      <strong>{{ promedio().toFixed(1) }}</strong>
+      · {{ resenas().length }} {{ resenas().length === 1 ? 'reseña' : 'reseñas' }}
+    </p>
+    <div class="barras">
+  @for (b of distribucion(); track b.n) {
+    <div class="barra-fila">
+      <span>{{ b.n }} ★</span>
+      <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div>
+      <span class="cuenta">{{ b.c }}</span>
+    </div>
+  }
+</div>
+  } @else {
+    <p class="vacio">Aún no hay reseñas. ¡Sé el primero!</p>
+  }
 
-      @if (resenas().length) {
-        <p class="resumen">
-          <span class="estrellas" aria-hidden="true">{{ estrellasTexto(promedio()) }}</span>
-          <strong>{{ promedio().toFixed(1) }}</strong>
-          · {{ resenas().length }} {{ resenas().length === 1 ? 'reseña' : 'reseñas' }}
-        </p>
-      } @else {
-        <p class="vacio">Aún no hay reseñas. ¡Sé el primero!</p>
-      }
+  @if (!auth.perfil()) {
+    <button type="button" class="btn-resena" (click)="auth.entrarConGoogle()">Ingresa con Google para opinar</button>
+  } @else if (!miResena()) {
+    <div class="resena-form">
+      <div class="selector" role="radiogroup" aria-label="Tu calificación">
+        @for (n of [1, 2, 3, 4, 5]; track n) {
+          <button type="button" class="estrella" [class.llena]="n <= estrellasForm()"
+            [attr.aria-label]="n + ' estrellas'" (click)="estrellasForm.set(n)">★</button>
+        }
+      </div>
+      <textarea maxlength="500" rows="3" placeholder="Cuéntanos qué tal te pareció (opcional, mínimo 10 caracteres)"
+        [value]="comentarioForm()" (input)="comentarioForm.set($any($event.target).value)"></textarea>
+      <div class="resena-acciones">
+        <button type="button" class="btn-resena" [disabled]="enviando()" (click)="enviarResena()">Publicar reseña</button>
+      </div>
+      @if (errorResena()) { <p class="error-resena">{{ errorResena() }}</p> }
+    </div>
+  }
 
-      @if (auth.perfil()) {
-        <div class="resena-form">
-          <div class="selector" role="radiogroup" aria-label="Tu calificación">
-            @for (n of [1, 2, 3, 4, 5]; track n) {
-              <button type="button" class="estrella" [class.llena]="n <= estrellasForm()"
-                [attr.aria-label]="n + ' estrellas'" (click)="estrellasForm.set(n)">★</button>
-            }
-          </div>
-          <textarea maxlength="500" rows="3" placeholder="Cuéntanos qué tal te pareció (opcional)"
-            [value]="comentarioForm()" (input)="comentarioForm.set($any($event.target).value)"></textarea>
-          <div class="resena-acciones">
-            <button type="button" class="btn-resena" [disabled]="enviando()" (click)="enviarResena()">
-              {{ miResena() ? 'Actualizar mi reseña' : 'Publicar reseña' }}
-            </button>
-            @if (miResena()) {
-              <button type="button" class="link-borrar" (click)="borrarMia()">Borrar mi reseña</button>
-            }
-          </div>
-          @if (errorResena()) {
-            <p class="error-resena">{{ errorResena() }}</p>
+  @if (resenas().length > 1) {
+    <div class="orden">
+      <select [value]="orden()" (change)="orden.set($any($event.target).value)" aria-label="Ordenar reseñas">
+        <option value="recientes">Más recientes</option>
+        <option value="mejores">Mejor calificadas</option>
+        <option value="peores">Peor calificadas</option>
+      </select>
+    </div>
+  }
+
+  <ul class="lista-resenas">
+    @for (r of lista(); track r.id) {
+      <li>
+        <div class="cab">
+          @if (r.foto) { <img class="avatar" [src]="r.foto" alt="" referrerpolicy="no-referrer" /> }
+          <strong>{{ r.autor }}</strong>
+          @if (r.userId === auth.perfil()?.id) { <span class="tu">Tú</span> }
+          <span class="fecha">{{ tiempo(r.creada) }}@if (r.editada) { · editado }</span>
+
+          @if (r.userId === auth.perfil()?.id && editandoId() !== r.id) {
+            <div class="menu-res">
+              <button type="button" class="tres" aria-label="Opciones"
+                (click)="menuId.set(menuId() === r.id ? null : r.id); $event.stopPropagation()">⋮</button>
+              @if (menuId() === r.id) {
+                <div class="desplegable">
+                  <button type="button" (click)="empezarEditar(r)">Editar</button>
+                  <button type="button" (click)="borrar(r)">Eliminar</button>
+                </div>
+              }
+            </div>
           }
         </div>
-      } @else {
-        <button type="button" class="btn-resena" (click)="auth.entrarConGoogle()">
-          Ingresa con Google para opinar
-        </button>
-      }
 
-      <ul class="lista-resenas">
-        @for (r of resenas(); track r.id) {
-          <li>
-            <div class="cab">
-              @if (r.foto) {
-                <img class="avatar" [src]="r.foto" alt="" referrerpolicy="no-referrer" />
+        @if (editandoId() === r.id) {
+          <div class="resena-form">
+            <div class="selector">
+              @for (n of [1, 2, 3, 4, 5]; track n) {
+                <button type="button" class="estrella" [class.llena]="n <= editEstrellas()"
+                  (click)="editEstrellas.set(n)">★</button>
               }
-              <strong>{{ r.autor }}</strong>
-              <span class="estrellas">{{ estrellasTexto(r.estrellas) }}</span>
             </div>
-            @if (r.comentario) {
-              <p>{{ r.comentario }}</p>
-            }
-          </li>
+            <textarea maxlength="500" rows="3" [value]="editComentario()"
+              (input)="editComentario.set($any($event.target).value)"></textarea>
+            <div class="resena-acciones">
+              <button type="button" class="btn-resena" (click)="guardarEdicion(r)">Guardar</button>
+              <button type="button" class="link-borrar" (click)="editandoId.set(null)">Cancelar</button>
+            </div>
+            @if (errorResena()) { <p class="error-resena">{{ errorResena() }}</p> }
+          </div>
+        } @else {
+          <span class="estrellas">{{ estrellasTexto(r.estrellas) }}</span>
+          @if (r.comentario) { <p>{{ r.comentario }}</p> }
+          @if (r.respuesta) {
+            <div class="respuesta"><strong>Respuesta de XP Tinoco</strong><p>{{ r.respuesta }}</p></div>
+          }
+          <button type="button" class="util" [class.on]="r.utiles.includes(auth.perfil()?.id ?? '')"
+            (click)="alternarUtil(r)">
+            👍 Útil @if (r.utiles.length) { · {{ r.utiles.length }} }
+          </button>
         }
-      </ul>
-    </section>
-
+      </li>
+    }
+  </ul>
+</section>
     <!-- Barra fija solo en el celular -->
     <div class="barra-movil">
       <div class="precio-mov">

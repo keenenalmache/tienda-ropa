@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
@@ -6,6 +6,7 @@ import { Negocio } from '../../services/negocio';
 import { Favoritos } from '../../services/favoritos';
 import { Resenas, Resena } from '../../services/resenas';
 import { Auth } from '../../services/auth';
+import { Dialogos } from '../../services/dialogos';
 // Con este stock o menos se avisa "quedan pocas unidades"
 const STOCK_POCO = 3;
 
@@ -24,11 +25,18 @@ export class DetalleProducto {
   auth = inject(Auth);
   private id = Number(this.ruta.snapshot.paramMap.get('id'));
 
+    private dlg = inject(Dialogos);
+
   resenas = signal<Resena[]>([]);
+  orden = signal<'recientes' | 'mejores' | 'peores'>('recientes');
   estrellasForm = signal(0);
   comentarioForm = signal('');
   enviando = signal(false);
   errorResena = signal('');
+  menuId = signal<number | null>(null);
+  editandoId = signal<number | null>(null);
+  editEstrellas = signal(0);
+  editComentario = signal('');
 
   promedio = computed(() => {
     const l = this.resenas();
@@ -36,17 +44,72 @@ export class DetalleProducto {
   });
   miResena = computed(() => this.resenas().find((r) => r.userId === this.auth.perfil()?.id));
 
+    distribucion = computed(() => {
+    const l = this.resenas();
+    return [5, 4, 3, 2, 1].map((n) => {
+      const c = l.filter((r) => r.estrellas === n).length;
+      return { n, c, pct: l.length ? (c * 100) / l.length : 0 };
+      
+    });
+  });
+  
+  // Tu reseña primero; el resto según el orden elegido
+  lista = computed(() => {
+    const mi = this.auth.perfil()?.id;
+    const o = this.orden();
+    return [...this.resenas()].sort((a, b) => {
+      if (a.userId === mi) return -1;
+      if (b.userId === mi) return 1;
+      if (o === 'mejores') return b.estrellas - a.estrellas || b.creada.localeCompare(a.creada);
+      if (o === 'peores') return a.estrellas - b.estrellas || b.creada.localeCompare(a.creada);
+      return b.creada.localeCompare(a.creada);
+    });
+  });
+
+  @HostListener('document:click')
+  cerrarMenu() {
+    this.menuId.set(null);
+  }
+
   estrellasTexto(n: number): string {
     const r = Math.round(n);
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   }
 
+  tiempo(f: string): string {
+    const s = (Date.now() - new Date(f).getTime()) / 1000;
+    if (s < 60) return 'justo ahora';
+    const m = s / 60;
+    if (m < 60) return `hace ${Math.floor(m)} min`;
+    const h = m / 60;
+    if (h < 24) return `hace ${Math.floor(h)} h`;
+    const d = h / 24;
+    if (d < 30) return `hace ${Math.floor(d)} ${Math.floor(d) === 1 ? 'día' : 'días'}`;
+    const mo = d / 30;
+    if (mo < 12) return `hace ${Math.floor(mo)} ${Math.floor(mo) === 1 ? 'mes' : 'meses'}`;
+    const a = Math.floor(d / 365);
+    return `hace ${a} ${a === 1 ? 'año' : 'años'}`;
+  }
+
   async cargarResenas() {
     this.resenas.set(await this.resSrv.deProducto(this.id));
+    this.resSrv.cargarResumenes()
+  }
+    private validarComentario(texto: string): string | null {
+    const c = texto.trim();
+    if (!c) return null; // vacío está permitido
+    if (c.length < 10) return 'Escribe al menos 10 caracteres, o deja el comentario vacío.';
+    if (new Set(c.toLowerCase().replace(/\s/g, '')).size < 4) return 'Escribe un comentario real, por favor.';
+    return null;
   }
 
   async enviarResena() {
     if (this.estrellasForm() < 1) {
+          const e = this.validarComentario(this.comentarioForm());
+    if (e) {
+      this.errorResena.set(e);
+      return;
+    }
       this.errorResena.set('Elige de 1 a 5 estrellas.');
       return;
     }
@@ -58,16 +121,59 @@ export class DetalleProducto {
       this.errorResena.set('No se pudo guardar tu reseña. Intenta de nuevo.');
       return;
     }
-    await this.cargarResenas();
-  }
-
-  async borrarMia() {
-    const m = this.miResena();
-    if (!m) return;
-    await this.resSrv.borrar(m.id);
     this.estrellasForm.set(0);
     this.comentarioForm.set('');
     await this.cargarResenas();
+  }
+
+  empezarEditar(r: Resena) {
+    this.menuId.set(null);
+    this.errorResena.set('');
+    this.editandoId.set(r.id);
+    this.editEstrellas.set(r.estrellas);
+    this.editComentario.set(r.comentario);
+  }
+
+  async guardarEdicion(r: Resena) {
+    if (this.editEstrellas() < 1) return;
+        const e = this.validarComentario(this.editComentario());
+    if (e) {
+      this.errorResena.set(e);
+      return;
+    }
+    const err = await this.resSrv.editar(r.id, this.editEstrellas(), this.editComentario());
+    if (err) {
+      this.errorResena.set('No se pudo guardar el cambio.');
+      return;
+    }
+    this.editandoId.set(null);
+    await this.cargarResenas();
+  }
+
+  async borrar(r: Resena) {
+    this.menuId.set(null);
+    const ok = await this.dlg.preguntar({
+      titulo: 'Eliminar reseña',
+      mensaje: '¿Seguro que quieres eliminar tu reseña? No se puede deshacer.',
+      confirmar: 'Eliminar',
+      cancelar: 'Cancelar',
+    });
+    if (!ok) return;
+    await this.resSrv.borrar(r.id);
+    await this.cargarResenas();
+  }
+
+  async alternarUtil(r: Resena) {
+    const yo = this.auth.perfil()?.id;
+    if (!yo) {
+      this.auth.entrarConGoogle();
+      return;
+    }
+    const ya = r.utiles.includes(yo);
+    this.resenas.update((l) =>
+      l.map((x) => (x.id === r.id ? { ...x, utiles: ya ? x.utiles.filter((u) => u !== yo) : [...x.utiles, yo] } : x)),
+    );
+    await this.resSrv.alternarUtil(r.id, ya);
   }
 
   producto = signal<Producto | undefined>(undefined);
@@ -119,15 +225,7 @@ export class DetalleProducto {
     this.servicio.obtenerPorId(this.id).then((p) => {
       this.producto.set(p);
       this.cargando.set(false);
-    });
-    this.cargarResenas();
-    // Si ya opinaste, el formulario se llena con tu reseña
-    effect(() => {
-      const m = this.miResena();
-      if (m) {
-        this.estrellasForm.set(m.estrellas);
-        this.comentarioForm.set(m.comentario);
-      }
+      this.cargarResenas();
     });
   }
 
