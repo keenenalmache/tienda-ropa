@@ -1,10 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
 import { Negocio } from '../../services/negocio';
 import { Favoritos } from '../../services/favoritos';
-
+import { Resenas, Resena } from '../../services/resenas';
+import { Auth } from '../../services/auth';
 // Con este stock o menos se avisa "quedan pocas unidades"
 const STOCK_POCO = 3;
 
@@ -19,6 +20,55 @@ export class DetalleProducto {
   private servicio = inject(Productos);
   private negocio = inject(Negocio);
   favs = inject(Favoritos);
+    private resSrv = inject(Resenas);
+  auth = inject(Auth);
+  private id = Number(this.ruta.snapshot.paramMap.get('id'));
+
+  resenas = signal<Resena[]>([]);
+  estrellasForm = signal(0);
+  comentarioForm = signal('');
+  enviando = signal(false);
+  errorResena = signal('');
+
+  promedio = computed(() => {
+    const l = this.resenas();
+    return l.length ? l.reduce((s, r) => s + r.estrellas, 0) / l.length : 0;
+  });
+  miResena = computed(() => this.resenas().find((r) => r.userId === this.auth.perfil()?.id));
+
+  estrellasTexto(n: number): string {
+    const r = Math.round(n);
+    return '★'.repeat(r) + '☆'.repeat(5 - r);
+  }
+
+  async cargarResenas() {
+    this.resenas.set(await this.resSrv.deProducto(this.id));
+  }
+
+  async enviarResena() {
+    if (this.estrellasForm() < 1) {
+      this.errorResena.set('Elige de 1 a 5 estrellas.');
+      return;
+    }
+    this.enviando.set(true);
+    this.errorResena.set('');
+    const err = await this.resSrv.guardar(this.id, this.estrellasForm(), this.comentarioForm());
+    this.enviando.set(false);
+    if (err) {
+      this.errorResena.set('No se pudo guardar tu reseña. Intenta de nuevo.');
+      return;
+    }
+    await this.cargarResenas();
+  }
+
+  async borrarMia() {
+    const m = this.miResena();
+    if (!m) return;
+    await this.resSrv.borrar(m.id);
+    this.estrellasForm.set(0);
+    this.comentarioForm.set('');
+    await this.cargarResenas();
+  }
 
   producto = signal<Producto | undefined>(undefined);
   cargando = signal(true);
@@ -65,11 +115,19 @@ export class DetalleProducto {
     return { texto: 'Disponible.', tono: 'ok' };
   });
 
-  constructor() {
-    const id = Number(this.ruta.snapshot.paramMap.get('id'));
-    this.servicio.obtenerPorId(id).then((p) => {
+    constructor() {
+    this.servicio.obtenerPorId(this.id).then((p) => {
       this.producto.set(p);
       this.cargando.set(false);
+    });
+    this.cargarResenas();
+    // Si ya opinaste, el formulario se llena con tu reseña
+    effect(() => {
+      const m = this.miResena();
+      if (m) {
+        this.estrellasForm.set(m.estrellas);
+        this.comentarioForm.set(m.comentario);
+      }
     });
   }
 
