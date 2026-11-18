@@ -135,6 +135,29 @@ export class Admin {
     frases: [''],
   });
 
+    frasesLista = signal<string[]>(['']);
+
+  private frasesDe(texto: string): string[] {
+    const l = texto.split('\n').map((f) => f.trim()).filter(Boolean);
+    return l.length ? l : [''];
+  }
+
+  cambiarFrase(i: number, texto: string) {
+    this.frasesLista.update((l) => l.map((f, j) => (j === i ? texto : f)));
+    this.formNegocio.markAsDirty();
+  }
+
+  agregarFrase() {
+    if (this.frasesLista().length >= 8) return;
+    this.frasesLista.update((l) => [...l, '']);
+    this.formNegocio.markAsDirty();
+  }
+
+  quitarFrase(i: number) {
+    this.frasesLista.update((l) => (l.length > 1 ? l.filter((_, j) => j !== i) : ['']));
+    this.formNegocio.markAsDirty();
+  }
+
   constructor() {
     this.cargar();
     this.contarNuevasResenas();
@@ -231,8 +254,10 @@ export class Admin {
 
     async irA(vista: Vista) {
     if (!(await this.confirmarSalida())) return;
-    if (vista === 'negocio') this.formNegocio.reset(this.negocio.datos());
-    if (vista !== 'producto') this.editandoId.set(null);
+    if (vista === 'negocio') {
+      this.formNegocio.reset(this.negocio.datos());
+      this.frasesLista.set(this.frasesDe(this.negocio.datos().frases));
+    }    if (vista !== 'producto') this.editandoId.set(null);
         if (vista === 'resenas') {
       try {
         localStorage.setItem('resenas-visto', new Date().toISOString());
@@ -631,8 +656,8 @@ export class Admin {
     if (!v.nombre.trim()) faltan.push('El nombre del negocio');
     if (whatsapp.length < 8) faltan.push('El WhatsApp (solo números y con código de país, ej. 593991234567)');
     if (faltan.length) {
-      await this.dialogos.avisar('Falta completar', 'Revisa lo siguiente antes de guardar:', faltan);
-      return;
+      const frases = this.frasesLista().map((f) => f.trim()).filter(Boolean).join('\n');
+      await this.negocio.guardar({ ...v, frases, nombre: v.nombre.trim(), whatsapp });      return;
     }
     await this.ejecutar(async () => {
       await this.negocio.guardar({ ...v, nombre: v.nombre.trim(), whatsapp });

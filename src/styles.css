@@ -641,3 +641,17 @@ app-root > * {
 a.tarjeta p.valoracion { margin: 0.15rem 0 0; font-size: 0.85rem; opacity: 0.9; }
 a.tarjeta p.valoracion .est { color: #f5b301; }
 a.tarjeta p.valoracion small { opacity: 0.7; }
+
+/* Botones de acción por color (mantienen el estilo parche) */
+:root button.b-azul { --c: #2f7de1; }
+:root button.b-turq { --c: #14a3a3; }
+:root button.b-ambar { --c: #d99200; }
+:root button.b-rojo { --c: #d93a2b; }
+:root :is(button.b-azul, button.b-turq, button.b-ambar, button.b-rojo) {
+  border-color: var(--c);
+  color: var(--c);
+  background-image: linear-gradient(var(--c), var(--c));
+}
+:root :is(button.b-azul, button.b-turq, button.b-ambar, button.b-rojo):hover:not(:disabled) {
+  color: #fff;
+}

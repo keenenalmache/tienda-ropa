@@ -57,15 +57,15 @@
           <textarea rows="3" maxlength="500" placeholder="Escribe tu respuesta pública"
             [value]="textoRespuesta()" (input)="textoRespuesta.set($any($event.target).value)"></textarea>
           <div class="acciones">
-            <button type="button" (click)="guardarRespuesta(r)">Guardar respuesta</button>
+            <button type="button" (click)="guardarRespuesta(r)">Guardar respuesta </button>
             <button type="button" (click)="respondiendoId.set(null)">Cancelar</button>
           </div>
         } @else {
           <div class="acciones">
-            <button type="button" (click)="empezarRespuesta(r)">{{ r.respuesta ? 'Editar respuesta' : 'Responder' }}</button>
-            @if (r.respuesta) { <button type="button" (click)="quitarRespuesta(r)">Quitar respuesta</button> }
-            <button type="button" (click)="alternarOculta(r)">{{ r.oculta ? 'Mostrar' : 'Ocultar' }}</button>
-            <button type="button" class="peligro" (click)="eliminar(r)">Eliminar</button>
+            <button type="button" class="b-azul" (click)="empezarRespuesta(r)">{{ r.respuesta ? 'Editar respuesta' : 'Responder' }}</button>
+            @if (r.respuesta) { <button type="button" class="b-turq" (click)="quitarRespuesta(r)">Quitar respuesta</button> }
+            <button type="button" class="b-ambar" (click)="alternarOculta(r)">{{ r.oculta ? 'Mostrar' : 'Ocultar' }}</button>
+            <button type="button" class="b-rojo" (click)="eliminar(r)">Eliminar</button>
           </div>
         }
       </article>

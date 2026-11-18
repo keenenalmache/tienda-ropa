@@ -176,12 +176,12 @@
                 </td>
 
                 <td class="acciones">
-                  <button type="button" (click)="editar(p)">Editar</button>
-                  <button type="button" (click)="duplicar(p)">Duplicar</button>
-                  <button type="button" (click)="alternarActivo(p)">
+                  <button type="button" class="b-azul" (click)="editar(p)">Editar</button>
+                  <button type="button" class="b-turq" (click)="duplicar(p)">Duplicar</button>
+                  <button type="button" class="b-ambar" (click)="alternarActivo(p)">
                     {{ p.activo ? 'Ocultar' : 'Mostrar' }}
                   </button>
-                  <button type="button" class="peligro" (click)="eliminarProducto(p)">Eliminar</button>
+                  <button type="button" class="b-rojo" (click)="eliminarProducto(p)">Eliminar</button>
                 </td>
               </tr>
             } @empty {
@@ -412,6 +412,7 @@
                           (click)="editarVariante(v)"
                         >
                           Editar
+                          class="b-azul"
                         </button>
 
                         <button
@@ -634,10 +635,25 @@
           <input formControlName="instagram" />
         </label>
 
-        <label>
-          Frases del globo de la portada (una por línea)
-          <textarea formControlName="frases" rows="4"></textarea>
-        </label>
+              <fieldset class="frases">
+          <legend>Frases del globo de la portada</legend>
+          @for (f of frasesLista(); track $index; let i = $index) {
+            <div class="fila-frase">
+              <input
+                type="text"
+                maxlength="80"
+                placeholder="Escribe una frase"
+                [value]="f"
+                [attr.aria-label]="'Frase ' + (i + 1)"
+                (input)="cambiarFrase(i, $any($event.target).value)"
+              />
+              <button type="button" class="b-rojo quitar-frase" aria-label="Quitar frase" (click)="quitarFrase(i)">✕</button>
+            </div>
+          }
+          @if (frasesLista().length < 8) {
+            <button type="button" class="b-azul" (click)="agregarFrase()">+ Añadir frase</button>
+          }
+        </fieldset>
 
         <div class="barra-acciones">
           <button type="submit" class="primario">Guardar</button>
