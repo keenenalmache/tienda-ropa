@@ -105,11 +105,10 @@
       <p class="pad">Cargando...</p>
     } @else {
       <div class="tabla-caja">
-        <table class="tabla">
+        <        <table class="tabla">
           <thead>
             <tr>
               <th>Producto</th>
-              <th>Categoría</th>
               <th>Precio</th>
               <th>Stock</th>
               <th>Etiquetas</th>
@@ -121,72 +120,70 @@
           <tbody>
             @for (p of listaFiltrada(); track p.id) {
               <tr [class.oculto]="!p.activo">
-                <td class="nombre"><button type="button" class="enlace-nombre" (click)="editar(p)">{{ p.nombre }}</button></td>
-
-                <td data-label="Categoría">
-                  {{ p.categorias?.nombre }}
-                  <small class="para">{{ p.genero }}</small>
+                <td class="nombre">
+                  <div class="prod">
+                    @if (fotosOrdenadas(p)[0]; as f) {
+                      <img class="mini-foto" [src]="f.url" alt="" loading="lazy" />
+                    } @else {
+                      <span class="mini-foto sin">Sin foto</span>
+                    }
+                    <div class="prod-datos">
+                      <button type="button" class="enlace-nombre" (click)="editar(p)">{{ p.nombre }}</button>
+                      <small class="sub">{{ p.categorias?.nombre }} · {{ p.genero }}</small>
+                    </div>
+                  </div>
                 </td>
 
                 <td data-label="Precio">
                   @if (p.precio_oferta !== null) {
-                    <span>
-                      <s>${{ p.precio }}</s>
-                      ${{ p.precio_oferta }}
-                    </span>
+                    <span><s>${{ p.precio }}</s> <strong>${{ p.precio_oferta }}</strong></span>
                   } @else {
-                    ${{ p.precio }}
+                    <strong>${{ p.precio }}</strong>
                   }
                 </td>
 
                 <td data-label="Stock">
-                  <span>
-                    {{ stockTotal(p) }}
-
-                    @switch (estadoStock(p)) {
-                      @case ('agotado') {
-                        <span class="badge rojo">Sin stock</span>
-                      }
-                      @case ('bajo') {
-                        <span class="badge ambar">Últimas unidades</span>
-                      }
-                    }
-                  </span>
+                  @switch (estadoStock(p)) {
+                    @case ('agotado') { <span class="stock agotado">Agotado</span> }
+                    @case ('bajo') { <span class="stock bajo">{{ stockTotal(p) }} · Últimas</span> }
+                    @default { <span class="stock ok">{{ stockTotal(p) }}</span> }
+                  }
                 </td>
 
                 <td class="etiquetas-celda" data-label="Etiquetas">
                   <span>
                     <button type="button" class="chip" [class.on]="p.nuevo" (click)="alternarMarca(p, 'nuevo')">
-                    Nuevo @if (textoNuevo(p); as t) { <small>· {{ t }}</small> }
+                      Nuevo @if (textoNuevo(p); as t) { <small>· {{ t }}</small> }
                     </button>
-
-                    <button
-                      type="button"
-                      class="chip"
-                      [class.on]="p.nuevo"
-                      (click)="alternarMarca(p, 'nuevo')"
-                    >
-                      Nuevo
+                    <button type="button" class="chip" [class.on]="p.destacado" (click)="alternarMarca(p, 'destacado')">
+                      Destacado
                     </button>
                   </span>
                 </td>
 
                 <td data-label="Estado">
-                  {{ p.activo ? 'Visible' : 'Oculto' }}
+                  <span class="estado" [class.visible]="p.activo">{{ p.activo ? 'Visible' : 'Oculto' }}</span>
                 </td>
 
                 <td class="acciones">
                   <button type="button" class="b-azul" (click)="editar(p)">Editar</button>
-                  <button type="button" class="b-turq" (click)="duplicar(p)">Duplicar</button>
-                  <button type="button" class="b-ambar" (click)="alternarActivo(p)">
-                    {{ p.activo ? 'Ocultar' : 'Mostrar' }}
+                  <button type="button" [attr.aria-expanded]="masId() === p.id" (click)="alternarMas(p.id)">
+                    Más {{ masId() === p.id ? '▴' : '▾' }}
                   </button>
-                  <button type="button" class="b-rojo" (click)="eliminarProducto(p)">Eliminar</button>
+                  @if (masId() === p.id) {
+                    <div class="mas">
+                      <button type="button" class="b-turq" (click)="duplicar(p)">Duplicar</button>
+                      <button type="button" class="b-ambar" (click)="alternarActivo(p)">
+                        {{ p.activo ? 'Ocultar' : 'Mostrar' }}
+                      </button>
+                      <button type="button" class="peligro" (click)="eliminarProducto(p)">Eliminar</button>
+                    </div>
+                  }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="7">No hay productos que coincidan.</td>
+                <td colspan="6">No hay productos que coincidan.</td>
               </tr>
             }
           </tbody>
@@ -412,7 +409,6 @@
                           (click)="editarVariante(v)"
                         >
                           Editar
-                          class="b-azul"
                         </button>
 
                         <button

@@ -31,6 +31,7 @@ export class App {
   );
   private auth = inject(Auth);
   perfil = this.auth.perfil;
+  esAdmin = this.auth.esAdminSesion;
   menuCuenta = signal(false);
 
   ingresar() {
@@ -49,6 +50,7 @@ export class App {
     if (!(e.target as HTMLElement).closest('.cuenta')) this.menuCuenta.set(false);
   }
   barraVisible = computed(() => !/^\/(admin|login|recuperar|restablecer|producto)/.test(this.url()));
+    franjaAdmin = computed(() => this.esAdmin() && !/^\/(admin|login|recuperar|restablecer)/.test(this.url()));
   activa = computed(() => {
     const u = this.url();
     if (u === '/' || u === '') return 'inicio';

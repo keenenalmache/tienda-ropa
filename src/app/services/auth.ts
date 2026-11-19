@@ -15,6 +15,7 @@ export class Auth {
   usuario = signal<string | null>(null);
 
   perfil = signal<Perfil | null>(null);
+  esAdminSesion = signal(false);
 
   private aplicar(u: User | null) {
     this.usuario.set(u?.email ?? null);
@@ -79,5 +80,8 @@ export class Auth {
   async esAdmin(): Promise<boolean> {
     const { data, error } = await supabase.rpc('es_admin');
     return !error && data === true;
+  }
+    private async verificarAdmin(u: User | null) {
+    this.esAdminSesion.set(u ? await this.esAdmin() : false);
   }
 }

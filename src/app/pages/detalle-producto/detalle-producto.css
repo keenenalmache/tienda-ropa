@@ -477,3 +477,7 @@ button.opcion:disabled {
 .barra-fila .pista { height: 8px; background: rgba(128, 128, 128, 0.3); border-radius: 999px; overflow: hidden; }
 .barra-fila .relleno { height: 100%; background: #f5b301; border-radius: 999px; }
 .barra-fila .cuenta { text-align: right; opacity: 0.7; }
+.editar-admin {
+  display: inline-block; margin-top: 0.4rem; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 800;
+  color: #1c1311; background: #f5c518; border-radius: 999px; text-decoration: none;
+}

@@ -328,4 +328,21 @@ nav .avatar img {
   nav .ingresar {
     padding: 0.5rem;
   }
+  .franja-admin {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.2rem 0.9rem;
+  padding: 0.3rem 1rem; font-size: 0.8rem; font-weight: 700; color: #1c1311;
+  background: repeating-linear-gradient(-45deg, #f5c518 0 14px, #e8b800 14px 28px);
+}
+.franja-admin a { color: #1c1311; font-weight: 800; text-decoration: underline; }
+
+.insignia-admin {
+  position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%);
+  padding: 0 0.4rem; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1.5;
+  color: #1c1311; background: #f5c518; border-radius: 999px; pointer-events: none;
+}
+.menu-cuenta a.item-admin {
+  display: block; margin-bottom: 0.4rem; padding: 0.55rem 0.8rem; text-align: center;
+  font-weight: 800; text-decoration: none; border-radius: 4px;
+  color: #1c1311 !important; background: #f5c518;
+}
 }

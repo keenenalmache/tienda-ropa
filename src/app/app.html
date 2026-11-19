@@ -1,5 +1,10 @@
 <app-fondo />
-
+@if (franjaAdmin()) {
+  <div class="franja-admin">
+    <span>🛠 Modo administrador</span>
+    <a routerLink="/admin">Ir al panel</a>
+  </div>
+}
 <nav>
   <div class="franja-nav" aria-hidden="true"></div>
     <a routerLink="/" class="marca">
@@ -18,9 +23,13 @@
           {{ p.nombre.charAt(0).toUpperCase() }}
         }
       </button>
+      @if (esAdmin()) { <span class="insignia-admin">ADMIN</span> }
       @if (menuCuenta()) {
         <div class="menu-cuenta">
           <p class="menu-nombre">{{ p.nombre }}</p>
+            @if (esAdmin()) {
+            <a routerLink="/admin" class="item-admin" (click)="menuCuenta.set(false)">Panel de administración</a>
+          }
           <button type="button" (click)="salirCuenta()">Cerrar sesión</button>
           <button type="button" (click)="cambiarCuenta()">Cambiar de cuenta</button>
         </div>

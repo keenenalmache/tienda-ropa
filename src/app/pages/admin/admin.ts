@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { Negocio } from '../../services/negocio';
 import {
@@ -37,7 +37,7 @@ export class Admin {
   private temporizador?: ReturnType<typeof setTimeout>;
   private dialogos = inject(Dialogos);
   private resApi = inject(AdminResenas);
-
+  private ruta = inject(ActivatedRoute);
   correo = this.auth.usuario;
   productos = signal<ProductoAdmin[]>([]);
   categorias = signal<Categoria[]>([]);
@@ -159,10 +159,15 @@ export class Admin {
   }
 
   constructor() {
-    this.cargar();
+    this.cargar().then(() => this.abrirDesdeEnlace());
     this.contarNuevasResenas();
   }
-
+  private async abrirDesdeEnlace() {
+    const id = Number(this.ruta.snapshot.queryParamMap.get('editar'));
+    if (!id) return;
+    const p = this.productos().find((x) => x.id === id);
+    if (p) await this.editar(p);
+  }
   private async cargar() {
     try {
       const [productos, categorias] = await Promise.all([this.api.listar(), this.api.categorias()]);
@@ -369,7 +374,11 @@ export class Admin {
       await this.recargar();
     }, 'Producto eliminado.');
   }
+  masId = signal<number | null>(null);
 
+  alternarMas(id: number) {
+    this.masId.update((actual) => (actual === id ? null : id));
+  }
   // Días que le quedan a la etiqueta "Nuevo" (para mostrarlo en la lista)
   textoNuevo(p: ProductoAdmin): string {
     if (!p.nuevo || !p.nuevo_desde) return '';
