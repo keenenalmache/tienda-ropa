@@ -47,6 +47,7 @@ export class Productos {
 
     return {
       id: fila.id,
+      activo: fila.activo !== false,
       nombre: fila.nombre,
       categoria: fila.categorias?.slug ?? '',
       categoriaNombre: fila.categorias?.nombre ?? '',
@@ -71,7 +72,7 @@ export class Productos {
     };
   }
 
-    private consultaBase() {
+   private consultaBase() {
     return this.supabase
       .from('productos')
       .select(

@@ -68,11 +68,6 @@ export class Catalogo {
       this.filtroUrl.set(params.get('filtro') ?? 'todas');
       this.paraUrl.set(params.get('para') ?? 'todos');
     });
-
-    this.servicio.consulta().then((res) => {
-      this.todos.set(res.data?.map((f) => this.servicio.convertir(f)) ?? []);
-      this.cargando.set(false);
-    });
   }
 
   elegirCategoria(valor: string) {
