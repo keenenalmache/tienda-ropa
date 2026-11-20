@@ -1,0 +1,64 @@
+<app-ayuda clave="inventario">
+  Cuando vendas algo, toca <strong>−</strong> en esa talla y color. Para corregir un conteo, escribe el número y presiona Enter. Rojo = agotado; ámbar = quedan 3 o menos.
+</app-ayuda>
+
+<section class="resumen">
+  <button type="button" class="dato" (click)="filtro.set('con-stock')">
+    <strong>{{ resumen().unidades }}</strong><span>Unidades en total</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('agotado')">
+    <strong>{{ resumen().agotadas }}</strong><span>Agotadas</span>
+  </button>
+  <button type="button" class="dato" (click)="filtro.set('bajo')">
+    <strong>{{ resumen().bajas }}</strong><span>Stock bajo</span>
+  </button>
+</section>
+
+<div class="herramientas">
+  <input type="search" placeholder="Buscar producto, talla o color" (input)="busqueda.set($any($event.target).value)" />
+  <select aria-label="Filtrar inventario" (change)="filtro.set($any($event.target).value)">
+    @for (f of filtros; track f.valor) {
+      <option [value]="f.valor" [selected]="filtro() === f.valor">{{ f.etiqueta }}</option>
+    }
+  </select>
+</div>
+
+@if (error()) { <p class="aviso">{{ error() }}</p> }
+
+@if (cargando()) {
+  <p class="pad">Cargando...</p>
+} @else {
+  <div class="grupos">
+    @for (g of grupos(); track g.p.id) {
+      <article class="grupo" [class.oculto]="!g.p.activo">
+        <header class="grupo-cab">
+          @if (foto(g.p); as f) {
+            <img class="mini-foto" [src]="f" alt="" loading="lazy" />
+          } @else {
+            <span class="mini-foto sin">Sin foto</span>
+          }
+          <div class="grupo-datos">
+            <strong>{{ g.p.nombre }}</strong>
+            <small>{{ total(g.p) }} unidades @if (!g.p.activo) { · Oculto }</small>
+          </div>
+        </header>
+
+        <ul class="filas">
+          @for (v of g.vars; track v.id) {
+            <li class="fila" [class.agotado]="v.stock === 0" [class.bajo]="bajo(v.stock)">
+              <span class="etq">{{ v.talla }} · {{ v.color }}</span>
+              <div class="paso">
+                <button type="button" class="menos" aria-label="Restar uno" [disabled]="v.stock === 0" (click)="fijar(v, v.stock - 1)">−</button>
+                <input type="number" min="0" inputmode="numeric" [value]="v.stock"
+                  [attr.aria-label]="'Stock de ' + v.talla + ' ' + v.color" (change)="desdeInput(v, $event)" />
+                <button type="button" class="mas" aria-label="Sumar uno" (click)="fijar(v, v.stock + 1)">+</button>
+              </div>
+            </li>
+          }
+        </ul>
+      </article>
+    } @empty {
+      <p class="pad">No hay variantes con ese filtro.</p>
+    }
+  </div>
+}

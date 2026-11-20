@@ -2,10 +2,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { AdminResenas, ResenaAdmin } from '../../../services/admin-resenas';
 import { Dialogos } from '../../../services/dialogos';
 import { supabase } from '../../../supabase.client';
+import { Ayuda } from '../../../components/ayuda/ayuda';
 
 type Filtro = 'todas' | 'visibles' | 'ocultas' | 'bajas' | 'sin-responder';
 
 @Component({
+  imports: [Ayuda],
   selector: 'app-admin-resenas',
   templateUrl: './resenas-admin.html',
   styleUrl: './resenas-admin.css',

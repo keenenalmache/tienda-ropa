@@ -30,6 +30,7 @@ export class Auth {
           }
         : null,
     );
+        setTimeout(() => this.verificarAdmin(u), 0);
   }
 
   constructor() {

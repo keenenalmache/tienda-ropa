@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase.client';
+import { puntajeNovedad, sigueNuevo } from './productos';
 
 export interface VarianteAdmin {
   id: number;
@@ -29,6 +30,7 @@ export interface ProductoAdmin {
   categorias: { nombre: string } | null;
   variantes: VarianteAdmin[];
   imagenes: ImagenAdmin[];
+  creado_en: string | null;
 }
 
 export interface Categoria {
@@ -59,17 +61,20 @@ export function crearSlug(texto: string): string {
 }
 @Injectable({ providedIn: 'root' })
 export class AdminProductos {
-  async listar(): Promise<ProductoAdmin[]> {
+    async listar(): Promise<ProductoAdmin[]> {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, creado_en, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
       )
       .order('id', { ascending: false });
     if (error) throw error;
-    return (data ?? []) as any;
-  }
 
+    const puntaje = (p: ProductoAdmin) =>
+      puntajeNovedad(p.creado_en, p.destacado, sigueNuevo(p.nuevo, p.nuevo_desde), p.precio_oferta !== null);
+
+    return ((data ?? []) as any as ProductoAdmin[]).sort((a, b) => puntaje(b) - puntaje(a));
+  }
   async categorias(): Promise<Categoria[]> {
     const { data, error } = await supabase
       .from('categorias')
@@ -142,6 +147,10 @@ export class AdminProductos {
   }
     async actualizarParcial(id: number, campos: Partial<DatosProducto>) {
     const { error } = await supabase.from('productos').update(campos).eq('id', id);
+    if (error) throw error;
+  }
+    async actualizarVarios(ids: number[], campos: Partial<DatosProducto>) {
+    const { error } = await supabase.from('productos').update(campos).in('id', ids);
     if (error) throw error;
   }
 

@@ -3,6 +3,9 @@
 
   <div class="usuario">
     <span>{{ correo() }}</span>
+    @if (ayudas.hayCerradas()) {
+      <button type="button" class="btn-ayuda" (click)="ayudas.restablecer()">? Ayuda</button>
+    }
     <button type="button" (click)="salir()">Cerrar sesión</button>
   </div>
 </header>
@@ -16,6 +19,10 @@
     Productos
   </button>
 
+    <button type="button" [class.activa]="vista() === 'inventario'" (click)="irA('inventario')">
+    Inventario
+  </button>
+
   <button
     type="button"
     [class.activa]="vista() === 'categorias'"
@@ -23,13 +30,14 @@
   >
     Categorías
   </button>
+
   <button type="button" [class.activa]="vista() === 'resenas'" (click)="irA('resenas')">
     Reseñas
     @if (nuevasResenas() > 0) {
       <span class="insignia">{{ nuevasResenas() }}</span>
     }
-  </button>    Reseñas
-  
+  </button>
+
   <button
     type="button"
     [class.activa]="vista() === 'negocio'"
@@ -58,6 +66,10 @@
   <!-- ================= LISTA ================= -->
 
   @case ('lista') {
+    <app-ayuda clave="lista">
+      <strong>Bienvenido al panel.</strong> Toca el nombre de un producto para editarlo. Los chips <em>Nuevo</em> y <em>Destacado</em> se activan con un toque. "Más ▾" abre Duplicar, Ocultar y Eliminar. Los productos ocultos no los ve el cliente. Cierra las ayudas con ✕; con el botón "? Ayuda" vuelven a salir.
+    </app-ayuda>
+
     <section class="resumen">
       <button type="button" class="dato" (click)="filtro.set('todos')">
         <strong>{{ resumen().total }}</strong>
@@ -87,6 +99,13 @@
         (input)="busqueda.set($any($event.target).value)"
       />
 
+      <select aria-label="Filtrar por categoría" (change)="categoriaFiltro.set(+$any($event.target).value)">
+        <option value="0" [selected]="categoriaFiltro() === 0">Todas las categorías</option>
+        @for (c of categorias(); track c.id) {
+          <option [value]="c.id" [selected]="categoriaFiltro() === c.id">{{ c.nombre }}</option>
+        }
+      </select>
+
       <select
         aria-label="Filtrar productos"
         (change)="filtro.set($any($event.target).value)"
@@ -98,6 +117,17 @@
         }
       </select>
 
+      <button type="button" class="b-azul" (click)="alternarModoSel()">
+        {{ modoSeleccion() ? 'Cancelar selección' : 'Seleccionar' }}
+      </button>
+
+      @if (modoSeleccion()) {
+        <label class="sel-todos">
+          <input type="checkbox" [checked]="todosSel()" (change)="alternarTodos()" />
+          Todos ({{ listaFiltrada().length }})
+        </label>
+      }
+
       <button type="button" (click)="exportar()">Exportar a CSV</button>
     </div>
 
@@ -105,9 +135,10 @@
       <p class="pad">Cargando...</p>
     } @else {
       <div class="tabla-caja">
-        <        <table class="tabla">
+        <table class="tabla">
           <thead>
             <tr>
+              @if (modoSeleccion()) { <th class="col-sel"></th> }
               <th>Producto</th>
               <th>Precio</th>
               <th>Stock</th>
@@ -119,7 +150,18 @@
 
           <tbody>
             @for (p of listaFiltrada(); track p.id) {
-              <tr [class.oculto]="!p.activo">
+              <tr [class.oculto]="!p.activo" [class.sel]="estaSel(p.id)">
+                @if (modoSeleccion()) {
+                  <td class="col-sel">
+                    <input
+                      type="checkbox"
+                      [checked]="estaSel(p.id)"
+                      (change)="alternarSel(p.id)"
+                      [attr.aria-label]="'Seleccionar ' + p.nombre"
+                    />
+                  </td>
+                }
+
                 <td class="nombre">
                   <div class="prod">
                     @if (fotosOrdenadas(p)[0]; as f) {
@@ -172,6 +214,7 @@
                   </button>
                   @if (masId() === p.id) {
                     <div class="mas">
+                      <button type="button" class="b-azul" (click)="verComoCliente(p.id)">Ver como cliente</button>
                       <button type="button" class="b-turq" (click)="duplicar(p)">Duplicar</button>
                       <button type="button" class="b-ambar" (click)="alternarActivo(p)">
                         {{ p.activo ? 'Ocultar' : 'Mostrar' }}
@@ -183,27 +226,62 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="6">No hay productos que coincidan.</td>
+                <td [attr.colspan]="modoSeleccion() ? 7 : 6">No hay productos que coincidan.</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
 
-      
+      @if (modoSeleccion() && seleccion().length > 0) {
+        <div class="barra-masiva" role="region" aria-label="Acciones en bloque">
+          <strong class="cuenta-sel">{{ seleccion().length }} seleccionado{{ seleccion().length === 1 ? '' : 's' }}</strong>
+
+          <select aria-label="Mover a categoría" (change)="moverSeleccion($any($event.target).value); $any($event.target).value = ''">
+            <option value="">Mover a categoría…</option>
+            @for (c of categorias(); track c.id) {
+              <option [value]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+
+          <select aria-label="Cambiar etiqueta" (change)="etiquetaSeleccion($any($event.target).value); $any($event.target).value = ''">
+            <option value="">Etiqueta…</option>
+            <option value="nuevo+">Marcar Nuevo</option>
+            <option value="nuevo-">Quitar Nuevo</option>
+            <option value="dest+">Marcar Destacado</option>
+            <option value="dest-">Quitar Destacado</option>
+          </select>
+
+          <button type="button" class="b-turq" (click)="masivo({ activo: true }, 'Productos visibles.')">Mostrar</button>
+          <button type="button" class="b-ambar" (click)="masivo({ activo: false }, 'Productos ocultos.')">Ocultar</button>
+          <button type="button" class="peligro" (click)="eliminarSeleccion()">Eliminar</button>
+          <button type="button" class="limpiar" (click)="limpiarSel()" aria-label="Quitar selección">✕</button>
+        </div>
+      }
     }
   }
+
+
+  <!-- ================= RESEÑAS ================= -->
+
   @case ('resenas') {
     <app-admin-resenas />
   }
+
   <!-- ================= PRODUCTO ================= -->
 
   @case ('producto') {
+    <app-ayuda clave="producto">
+      Sube las fotos (varias a la vez): la primera es la portada y puedes reordenarlas. Agrega al menos una variante (talla, color y stock) para mostrar disponibilidad. Si el precio de oferta es menor al precio, el cliente ve la etiqueta de descuento.
+    </app-ayuda>
+
     <section class="panel">
       <button type="button" class="volver" (click)="irA('lista')">
         ← Volver a productos
       </button>
-
+        @if (editandoId() !== null) {
+          <button type="button" class="b-azul" (click)="verComoCliente(editandoId()!)">Ver como cliente</button>
+        }
       <h2>
         {{ editandoId() === null ? 'Nuevo producto' : 'Editar producto' }}
       </h2>
@@ -248,19 +326,11 @@
           </select>
         </label>
 
-        <        <label>
+        <label>
           Para
           <select formControlName="genero">
             @for (g of generos; track g.valor) {
               <option [value]="g.valor">{{ g.etiqueta }}</option>
-            }
-          </select>
-        </label>
-        <label>
-          Categoría
-          <select formControlName="categoria_id">
-            @for (c of categorias(); track c.id) {
-              <option [ngValue]="c.id">{{ c.nombre }}</option>
             }
           </select>
         </label>
@@ -327,13 +397,8 @@
         </div>
 
         <label class="subir">
-          Agregar foto (se reduce y optimiza sola)
-          <input
-            type="file"
-            accept="image/*"
-            [disabled]="subiendo()"
-            (change)="subirFoto($event)"
-          />
+          Agregar fotos (puedes elegir varias a la vez; se reducen y optimizan solas)
+          <input type="file" accept="image/*" multiple [disabled]="subiendo()" (change)="subirFoto($event)" />
         </label>
 
         <h3>Tallas, colores y stock</h3>
@@ -361,11 +426,11 @@
                 @if (editandoVarianteId() === v.id) {
                   <tr [formGroup]="formEditVariante">
                     <td data-label="Talla">
-                      <input formControlName="talla" aria-label="Talla" />
+                      <input formControlName="talla" aria-label="Talla" formato="mayusculas" />
                     </td>
 
                     <td data-label="Color">
-                      <input formControlName="color" aria-label="Color" />
+                      <input formControlName="color" aria-label="Color" formato="capitalizar" />
                     </td>
 
                     <td data-label="Stock">
@@ -439,12 +504,12 @@
         >
           <label>
             Talla
-            <input formControlName="talla" placeholder="Ej: M" />
+            <input formControlName="talla" placeholder="Ej: M" formato="mayusculas" />
           </label>
 
           <label>
             Color
-            <input formControlName="color" placeholder="Ej: Negro" />
+            <input formControlName="color" placeholder="Ej: Negro" formato="capitalizar" />
           </label>
 
           <label>
@@ -469,16 +534,21 @@
         <button type="button" (click)="irA('lista')">
           Volver a productos
         </button>
-      </div>
-    </section>
-            @if (productoEditado(); as p) {
+
+        @if (productoEditado(); as p) {
           <button type="button" class="peligro" (click)="eliminarProducto(p)">Eliminar producto</button>
         }
+      </div>
+    </section>
   }
 
   <!-- ================= CATEGORÍAS ================= -->
 
   @case ('categorias') {
+    <app-ayuda clave="categorias">
+      Aquí creas y renombras las categorías del catálogo. Antes de eliminar una, revisa cuántos productos tiene.
+    </app-ayuda>
+
     <section class="panel">
       <h2>Categorías</h2>
 
@@ -580,6 +650,10 @@
   <!-- ================= NEGOCIO ================= -->
 
   @case ('negocio') {
+    <app-ayuda clave="negocio">
+      Estos datos salen en la tienda: nombre, WhatsApp (solo números), horario y las frases del globo de la portada.
+    </app-ayuda>
+
     <section class="panel">
       <button type="button" class="volver" (click)="irA('lista')">
         ← Volver a productos
@@ -608,12 +682,13 @@
             formControlName="whatsapp"
             placeholder="593991234567"
             inputmode="numeric"
+            formato="whatsapp"
           />
         </label>
 
         <label>
           Teléfono que se muestra
-          <input formControlName="telefono" />
+          <input formControlName="telefono" formato="telefono" />
         </label>
 
         <label>
@@ -631,7 +706,7 @@
           <input formControlName="instagram" />
         </label>
 
-              <fieldset class="frases">
+        <fieldset class="frases">
           <legend>Frases del globo de la portada</legend>
           @for (f of frasesLista(); track $index; let i = $index) {
             <div class="fila-frase">
@@ -661,4 +736,9 @@
       </form>
     </section>
   }
+    <!-- ================= INVENTARIO ================= -->
+    @case ('inventario') {
+    <app-admin-inventario />
+  }
+
 }

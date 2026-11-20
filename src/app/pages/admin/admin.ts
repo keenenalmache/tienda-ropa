@@ -15,7 +15,12 @@ import { Dialogos } from '../../services/dialogos';
 import { DIAS_NUEVO } from '../../services/productos';
 import { ResenasAdmin } from './resenas-admin/resenas-admin';
 import { AdminResenas } from '../../services/admin-resenas';
-type Vista = 'lista' | 'producto' | 'negocio' | 'categorias' | 'resenas';
+import { Formato } from '../../utils/formato';
+import { Ayuda } from '../../components/ayuda/ayuda';
+import { Ayudas } from '../../services/ayudas';
+import { InventarioAdmin } from './inventario-admin/inventario-admin';
+
+type Vista = 'lista' | 'producto' | 'negocio' | 'categorias' | 'resenas' | 'inventario';
 type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
 type EstadoStock = 'agotado' | 'bajo' | 'ok';
 
@@ -24,7 +29,7 @@ const STOCK_BAJO = 3;
 
 @Component({
   selector: 'app-admin',
-  imports: [ReactiveFormsModule, ResenasAdmin],
+  imports: [ReactiveFormsModule, ResenasAdmin, Formato, Ayuda, InventarioAdmin],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -38,6 +43,7 @@ export class Admin {
   private dialogos = inject(Dialogos);
   private resApi = inject(AdminResenas);
   private ruta = inject(ActivatedRoute);
+  ayudas = inject(Ayudas);
   correo = this.auth.usuario;
   productos = signal<ProductoAdmin[]>([]);
   categorias = signal<Categoria[]>([]);
@@ -89,6 +95,7 @@ export class Admin {
     const f = this.filtro();
     return this.productos().filter((p) => {
       if (texto && !p.nombre.toLowerCase().includes(texto)) return false;
+      if (this.categoriaFiltro() && p.categoria_id !== this.categoriaFiltro()) return false;
       switch (f) {
         case 'visibles':
           return p.activo;
@@ -161,6 +168,86 @@ export class Admin {
   constructor() {
     this.cargar().then(() => this.abrirDesdeEnlace());
     this.contarNuevasResenas();
+  }
+
+    categoriaFiltro = signal(0);
+  seleccion = signal<number[]>([]);
+    modoSeleccion = signal(false);
+
+  alternarModoSel() {
+    this.modoSeleccion.update((v) => !v);
+    if (!this.modoSeleccion()) this.seleccion.set([]);
+  }
+
+  estaSel(id: number): boolean {
+    return this.seleccion().includes(id);
+  }
+
+  alternarSel(id: number) {
+    this.seleccion.update((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  }
+
+  todosSel = computed(() => {
+    const l = this.listaFiltrada();
+    return l.length > 0 && l.every((p) => this.seleccion().includes(p.id));
+  });
+
+  alternarTodos() {
+    const ids = this.listaFiltrada().map((p) => p.id);
+    if (this.todosSel()) this.seleccion.update((s) => s.filter((id) => !ids.includes(id)));
+    else this.seleccion.update((s) => [...new Set([...s, ...ids])]);
+  }
+
+  limpiarSel() {
+    this.seleccion.set([]);
+  }
+
+  async masivo(cambio: { categoria_id?: number; activo?: boolean; nuevo?: boolean; destacado?: boolean }, ok: string) {
+    const ids = this.seleccion();
+    if (!ids.length) return;
+    await this.ejecutar(async () => {
+      await this.api.actualizarVarios(ids, cambio);
+      this.seleccion.set([]);
+      await this.recargar();
+    }, ok);
+  }
+
+  async moverSeleccion(valor: string) {
+    const id = Number(valor);
+    if (!id) return;
+    const nombre = this.categorias().find((c) => c.id === id)?.nombre ?? '';
+    await this.masivo({ categoria_id: id }, `Productos movidos a "${nombre}".`);
+  }
+
+  async etiquetaSeleccion(valor: string) {
+    const mapa: Record<string, [{ nuevo?: boolean; destacado?: boolean }, string]> = {
+      'nuevo+': [{ nuevo: true }, 'Productos marcados como Nuevo.'],
+      'nuevo-': [{ nuevo: false }, 'Se quitó la etiqueta Nuevo.'],
+      'dest+': [{ destacado: true }, 'Productos marcados como Destacado.'],
+      'dest-': [{ destacado: false }, 'Se quitó la etiqueta Destacado.'],
+    };
+    const m = mapa[valor];
+    if (m) await this.masivo(m[0], m[1]);
+  }
+
+  async eliminarSeleccion() {
+    const sel = this.productos().filter((p) => this.seleccion().includes(p.id));
+    if (!sel.length) return;
+    const nombres = sel.slice(0, 8).map((p) => p.nombre);
+    if (sel.length > 8) nombres.push(`… y ${sel.length - 8} más`);
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar productos',
+      mensaje: `Vas a eliminar ${sel.length} producto(s) con sus fotos, tallas y stock. No se puede deshacer.`,
+      lista: nombres,
+      confirmar: 'Eliminar',
+      cancelar: 'Cancelar',
+    });
+    if (!ok) return;
+    await this.ejecutar(async () => {
+      for (const p of sel) await this.api.eliminarProducto(p);
+      this.seleccion.set([]);
+      await this.recargar();
+    }, `${sel.length} producto(s) eliminado(s).`);
   }
   private async abrirDesdeEnlace() {
     const id = Number(this.ruta.snapshot.queryParamMap.get('editar'));
@@ -614,30 +701,36 @@ export class Admin {
     });
   }
 
-  async subirFoto(evento: Event) {
+    async subirFoto(evento: Event) {
     const input = evento.target as HTMLInputElement;
-    const archivo = input.files?.[0];
+    const archivos = Array.from(input.files ?? []);
     const p = this.productoEditado();
-    if (!archivo || !p) return;
+    if (!archivos.length || !p) return;
 
-    if (!archivo.type.startsWith('image/')) {
-      this.error.set('El archivo debe ser una imagen.');
-      input.value = '';
-      return;
-    }
-    if (archivo.size > 15 * 1024 * 1024) {
-      this.error.set('La imagen pesa más de 15 MB.');
+    const validos = archivos.filter((a) => a.type.startsWith('image/') && a.size <= 15 * 1024 * 1024);
+    const omitidos = archivos.length - validos.length;
+    if (!validos.length) {
+      this.error.set('Los archivos deben ser imágenes de máximo 15 MB.');
       input.value = '';
       return;
     }
 
-    const orden = Math.max(0, ...p.imagenes.map((i) => i.orden)) + 1;
+    let orden = Math.max(0, ...p.imagenes.map((i) => i.orden));
+    const base = validos.length === 1 ? 'Foto subida.' : `${validos.length} fotos subidas.`;
+    const aviso = omitidos ? ` (${omitidos} se omitieron: no eran imágenes o pesaban más de 15 MB)` : '';
+
     this.subiendo.set(true);
     await this.ejecutar(async () => {
-      const lista = await this.optimizarImagen(archivo);
-      await this.api.subirImagen(p.id, lista, orden);
-      await this.recargar();
-    }, 'Foto subida.');
+      try {
+        for (const archivo of validos) {
+          const lista = await this.optimizarImagen(archivo);
+          orden++;
+          await this.api.subirImagen(p.id, lista, orden);
+        }
+      } finally {
+        await this.recargar();
+      }
+    }, base + aviso);
     this.subiendo.set(false);
     input.value = '';
   }
@@ -654,6 +747,10 @@ export class Admin {
       }
       await this.recargar();
     }, 'Orden de las fotos actualizado.');
+  }
+
+    verComoCliente(id: number) {
+    window.open(`/producto/${id}`, '_blank', 'noopener');
   }
 
   // ---------- Datos del negocio ----------

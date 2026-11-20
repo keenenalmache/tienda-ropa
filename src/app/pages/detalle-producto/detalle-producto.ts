@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, computed, inject, signal, viewChild, effect, untracked} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { Producto } from '../../models/producto';
@@ -181,6 +181,16 @@ export class DetalleProducto {
   tallaElegida = signal<string | null>(null);
   colorElegido = signal<string | null>(null);
   fotoActiva = signal(0);
+  carril = viewChild<ElementRef<HTMLElement>>('carril');
+
+  ir(delta: number) {
+    const n = this.fotos().length;
+    if (n < 2) return;
+    const i = (this.fotoActiva() + delta + n) % n;
+    this.fotoActiva.set(i);
+    const el = this.carril()?.nativeElement;
+    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
+  }
 
   private mapaColores: Record<string, string> = {
     negro: '#111111', blanco: '#ffffff', gris: '#9ca3af', rojo: '#dc2626', azul: '#2563eb',
@@ -221,14 +231,22 @@ export class DetalleProducto {
     return { texto: 'Disponible.', tono: 'ok' };
   });
 
-    constructor() {
-    this.servicio.obtenerPorId(this.id).then((p) => {
+   constructor() {
+  this.cargarProducto(false);
+
+  // Si eres admin, también ves los productos ocultos
+  effect(() => {
+    if (this.auth.esAdminSesion()) {
+      untracked(() => this.cargarProducto(true));
+    }
+  });
+}
+  private cargarProducto(verOculto: boolean) {
+    this.servicio.obtenerPorId(this.id, verOculto).then((p) => {
       this.producto.set(p);
       this.cargando.set(false);
-      this.cargarResenas();
     });
   }
-
   // Stock de las variantes que coinciden (null = cualquiera)
   stockDe(talla: string | null, color: string | null): number {
     return (this.producto()?.variantes ?? [])

@@ -69,8 +69,8 @@ export class Catalogo {
       this.paraUrl.set(params.get('para') ?? 'todos');
     });
 
-    this.servicio.obtenerTodos().then((lista) => {
-      this.todos.set(lista);
+    this.servicio.consulta().then((res) => {
+      this.todos.set(res.data?.map((f) => this.servicio.convertir(f)) ?? []);
       this.cargando.set(false);
     });
   }

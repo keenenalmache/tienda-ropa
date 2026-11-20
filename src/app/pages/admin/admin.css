@@ -458,3 +458,97 @@ button.peligro:hover:not(:disabled) {
   .mini-foto { width: 64px; height: 64px; }
   .acciones .mas { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
 }
+
+/* ===== Oro 3D en el panel ===== */
+.barra { position: relative; padding-bottom: 1.1rem; }
+.barra::after {
+  content: ''; position: absolute; left: clamp(1rem, 4vw, 2rem); right: clamp(1rem, 4vw, 2rem); bottom: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #b9820d 12%, #fff2b0 50%, #b9820d 88%, transparent);
+  box-shadow: 0 1px 6px rgba(245, 200, 66, 0.35);
+}
+.barra h1 {
+  font-size: 1.5rem; letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #fff2b0, #f5c842 45%, #b9820d);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6));
+}
+:host-context(html[data-tema='claro']) .barra h1 {
+  background: linear-gradient(180deg, #a87400, #7a5200);
+  -webkit-background-clip: text; background-clip: text; filter: none;
+}
+
+.pestanas { border-bottom-color: rgba(217, 162, 27, 0.35); }
+.pestanas button:not(.nuevo) { border: 1px solid rgba(217, 162, 27, 0.55); border-radius: 999px; }
+.pestanas button:not(.nuevo):hover:not(.activa):not(:disabled) { border-color: #f5c842; color: #f8d86a; }
+.pestanas button.activa:not(.nuevo) {
+  font-weight: 800; color: #2b1c00 !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(180deg, #fff2b0, #f5c842 40%, #d9a21b 75%, #b9820d) !important;
+  background-size: 100% 100% !important;
+  border-color: #6e4a00;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 0 #5a3d00, 0 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+.dato {
+  border-color: rgba(217, 162, 27, 0.35); border-top: 3px solid #d9a21b;
+  box-shadow: inset 0 1px 0 rgba(255, 236, 160, 0.18), 0 3px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.dato:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 236, 160, 0.3), 0 8px 14px rgba(0, 0, 0, 0.35); }
+.dato strong {
+  background: linear-gradient(180deg, #fff2b0, #f5c842 50%, #b9820d);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:host-context(html[data-tema='claro']) .dato strong {
+  background: linear-gradient(180deg, #b88300, #7a5200);
+  -webkit-background-clip: text; background-clip: text;
+}
+
+.btn-ayuda {
+  padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 800; outline: none; border-radius: 999px;
+  color: #2b1c00 !important; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(180deg, #fff2b0, #e7b93a 55%, #b9820d) !important; background-size: 100% 100% !important;
+  border: 1px solid #6e4a00 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 0 #5a3d00;
+}
+.pestanas .nuevo {
+  position: relative;
+  top: 5px;
+}
+
+.col-sel { width: 2.2rem; text-align: center; }
+.col-sel input { width: 1.1rem; height: 1.1rem; accent-color: #d9a21b; cursor: pointer; }
+.tabla tr.sel { background: rgba(245, 200, 66, 0.12); box-shadow: inset 3px 0 0 #d9a21b; }
+select option { background: #1d1d1d; color: #fff; }
+
+.barra-masiva {
+  position: sticky; bottom: 0.8rem; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.6rem;
+  margin: 1rem clamp(1rem, 4vw, 2rem) 0; padding: 0.7rem 0.9rem;
+  color: #fff1e2;
+  background: linear-gradient(180deg, #2c2013, #150e0a);
+  border: 1px solid #d9a21b; border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 236, 160, 0.25);
+}
+.cuenta-sel { margin-right: auto; color: #f8d86a; }
+.barra-masiva select {
+  padding: 0.4rem 0.6rem; font: inherit; color: #fff; background: #1d1d1d; color-scheme: dark;
+  border: 1px solid rgba(217, 162, 27, 0.6); border-radius: 4px;
+}
+.barra-masiva .limpiar { padding: 0.3rem 0.7rem; outline: none; }
+
+@media (max-width: 720px) {
+  .tabla tr { position: relative; }
+  .tabla td.col-sel { position: absolute; top: 0.6rem; right: 0.6rem; width: auto; padding: 0; display: block; }
+  .tabla td.nombre { padding-right: 2rem; }
+  .barra-masiva { bottom: 0.5rem; }
+  .barra-masiva .cuenta-sel { flex: 1 1 100%; }
+  .barra-masiva select, .barra-masiva button { flex: 1 1 45%; }
+}
+
+.sel-todos {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 0.85rem; font-size: 0.9rem; font-weight: 700; color: #f8d86a; cursor: pointer;
+  border: 1px solid rgba(217, 162, 27, 0.6); border-radius: 4px;
+  background: rgba(245, 200, 66, 0.08);
+}
+.sel-todos input { width: 1.1rem; height: 1.1rem; accent-color: #d9a21b; }

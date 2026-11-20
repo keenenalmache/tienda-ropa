@@ -15,4 +15,6 @@ export interface Producto {
   genero: string;
   variantes: { talla: string; color: string; stock: number }[];
   imagenes: string[];
+  orden: number;
+  activo: boolean;
 }
