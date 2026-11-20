@@ -1,11 +1,13 @@
+
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink} from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Productos, categoriasDe } from '../../services/productos';
 import { Producto } from '../../models/producto';
 import { Negocio } from '../../services/negocio';
 import { Personaje } from '../../components/personaje/personaje';
 import { Favoritos } from '../../services/favoritos';
 import { Resenas } from '../../services/resenas';
+
 @Component({
   selector: 'app-inicio',
   imports: [RouterLink, Personaje],
@@ -15,30 +17,48 @@ import { Resenas } from '../../services/resenas';
 export class Inicio {
   private servicio = inject(Productos);
   private negocio = inject(Negocio);
+
   favs = inject(Favoritos);
   res = inject(Resenas);
 
   datos = this.negocio.datos;
-    listaFrases = computed(() =>
-    this.datos().frases.split('\n').map((f) => f.trim()).filter(Boolean),
+
+  listaFrases = computed(() =>
+    this.datos().frases
+      .split('\n')
+      .map((f) => f.trim())
+      .filter(Boolean),
   );
+
   productos = signal<Producto[]>([]);
 
-  destacados = computed(() => this.productos().filter((p) => p.destacado).slice(0, 10));
+  destacados = computed(() =>
+    this.productos()
+      .filter((p) => p.destacado)
+      .slice(0, 10),
+  );
+
   categorias = computed(() => categoriasDe(this.productos()));
 
   enlaceWhatsapp = computed(() => {
     const mensaje = encodeURIComponent('Hola, quisiera más información.');
+
     return `https://wa.me/${this.datos().whatsapp}?text=${mensaje}`;
   });
 
   constructor() {
-    this.servicio.obtenerTodos().then((lista) => this.productos.set(lista));
+    this.servicio
+      .obtenerTodos()
+      .then((lista) => this.productos.set(lista));
   }
 
-  // Usa la foto de un producto destacado de la categoría; si no hay, la del primero con foto
-   fotoDe(categoria: string): string {
-    const lista = this.productos().filter((p) => p.categoria === categoria && p.imagen);
+  // Usa la foto de un producto destacado de la categoría;
+  // si no hay, utiliza la del primero con foto.
+  fotoDe(categoria: string): string {
+    const lista = this.productos().filter(
+      (p) => p.categoria === categoria && p.imagen,
+    );
+
     return (lista.find((p) => p.destacado) ?? lista[0])?.imagen ?? '';
   }
 }
