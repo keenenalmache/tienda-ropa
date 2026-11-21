@@ -17,4 +17,5 @@ export interface Producto {
   imagenes: string[];
   orden: number;
   activo: boolean;
+  fotosInfo: { titulo: string; descripcion: string }[];
 }

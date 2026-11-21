@@ -57,7 +57,7 @@
 
     <div class="info">
       <div class="titulo-fila">
-        <h1>{{ producto.nombre }}</h1>
+        <h1>{{ infoFoto().titulo }}</h1>
         <button type="button" class="corazon corazon-fijo" [class.activo]="favs.esFavorito(producto.id)"
           [attr.aria-pressed]="favs.esFavorito(producto.id)" aria-label="Guardar en favoritos"
           (click)="favs.alternar(producto.id)">
@@ -93,7 +93,7 @@
 
         <div class="bloque">
           <p class="etq">Descripción</p>
-          <p class="descripcion">{{ producto.descripcion || 'Sin descripción por ahora.' }}</p>
+          <p class="descripcion">{{ infoFoto().descripcion || 'Sin descripción por ahora.' }}</p>
         </div>
 
         <div class="bloque">

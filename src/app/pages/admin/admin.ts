@@ -19,6 +19,8 @@ import { Formato } from '../../utils/formato';
 import { Ayuda } from '../../components/ayuda/ayuda';
 import { Ayudas } from '../../services/ayudas';
 import { InventarioAdmin } from './inventario-admin/inventario-admin';
+import { Generos } from '../../services/generos';
+
 
 type Vista = 'lista' | 'producto' | 'negocio' | 'categorias' | 'resenas' | 'inventario';
 type Filtro = 'todos' | 'visibles' | 'ocultos' | 'stock-bajo' | 'sin-fotos';
@@ -44,6 +46,7 @@ export class Admin {
   private resApi = inject(AdminResenas);
   private ruta = inject(ActivatedRoute);
   ayudas = inject(Ayudas);
+  private gen = inject(Generos);
   correo = this.auth.usuario;
   productos = signal<ProductoAdmin[]>([]);
   categorias = signal<Categoria[]>([]);
@@ -140,6 +143,9 @@ export class Admin {
     horario: [''],
     instagram: [''],
     frases: [''],
+    anuncio_activo: [false],
+    anuncio_texto: [''],
+    anuncio_mensaje: [''],
   });
 
     frasesLista = signal<string[]>(['']);
@@ -256,6 +262,7 @@ export class Admin {
     if (p) await this.editar(p);
   }
   private async cargar() {
+    await this.gen.cargar();
     try {
       const [productos, categorias] = await Promise.all([this.api.listar(), this.api.categorias()]);
       this.productos.set(productos);
@@ -291,11 +298,70 @@ export class Admin {
       );
     }
   }
-    generos = [
-    { valor: 'unisex', etiqueta: 'Unisex' },
-    { valor: 'hombre', etiqueta: 'Hombre' },
-    { valor: 'mujer', etiqueta: 'Mujer' },
-  ];
+    generos = this.gen.lista;
+  formGenero = this.fb.nonNullable.group({ nombre: [''] });
+  formEditGenero = this.fb.nonNullable.group({ nombre: [''] });
+  editandoGenero = signal<string | null>(null);
+
+  generosConConteo = computed(() =>
+    this.generos().map((g) => ({
+      ...g,
+      total: this.productos().filter((p) => (p.genero ?? 'unisex') === g.valor).length,
+    })),
+  );
+
+  async agregarGenero() {
+    const nombre = this.formGenero.getRawValue().nombre.trim();
+    const valor = crearSlug(nombre);
+    if (!nombre || !valor) {
+      await this.dialogos.avisar('Revisa el nombre', 'Escribe un nombre para el género.', []);
+      return;
+    }
+    if (this.generos().some((g) => g.valor === valor)) {
+      await this.dialogos.avisar('Ya existe', `Ya hay un género llamado "${nombre}".`, []);
+      return;
+    }
+    await this.ejecutar(async () => {
+      await this.gen.crear(valor, nombre);
+      this.formGenero.reset({ nombre: '' });
+    }, 'Género agregado.');
+  }
+
+  editarGenero(g: { valor: string; etiqueta: string }) {
+    this.formEditGenero.reset({ nombre: g.etiqueta });
+    this.editandoGenero.set(g.valor);
+  }
+
+  async guardarGenero(valor: string) {
+    const nombre = this.formEditGenero.getRawValue().nombre.trim();
+    if (!nombre) return;
+    await this.ejecutar(async () => {
+      await this.gen.renombrar(valor, nombre);
+      this.editandoGenero.set(null);
+    }, 'Género actualizado.');
+  }
+
+  async quitarGenero(g: { valor: string; etiqueta: string; total: number }) {
+    if (g.valor === 'unisex') {
+      await this.dialogos.avisar('No se puede eliminar', '"Unisex" es el género base.', []);
+      return;
+    }
+    if (g.total > 0) {
+      await this.dialogos.avisar(
+        'No se puede eliminar',
+        `"${g.etiqueta}" lo usan ${g.total} producto(s).`,
+        ['Cámbialos a otro género y vuelve a intentarlo.'],
+      );
+      return;
+    }
+    const ok = await this.dialogos.preguntar({
+      titulo: 'Eliminar género',
+      mensaje: `¿Eliminar "${g.etiqueta}"?`,
+      confirmar: 'Eliminar',
+    });
+    if (!ok) return;
+    await this.ejecutar(() => this.gen.eliminar(g.valor), 'Género eliminado.');
+  }
 
   formCategoria = this.fb.nonNullable.group({ nombre: [''] });
   formEditCategoria = this.fb.nonNullable.group({ nombre: [''] });
@@ -748,25 +814,40 @@ export class Admin {
       await this.recargar();
     }, 'Orden de las fotos actualizado.');
   }
+    async guardarTextoFoto(img: ImagenAdmin, titulo: string, descripcion: string) {
+    if ((img.titulo ?? '') === titulo.trim() && (img.descripcion ?? '') === descripcion.trim()) return;
+    await this.ejecutar(async () => {
+      await this.api.actualizarTextoImagen(img.id, titulo, descripcion);
+      await this.recargar();
+    }, 'Texto de la foto guardado.');
+  }
 
     verComoCliente(id: number) {
     window.open(`/producto/${id}`, '_blank', 'noopener');
   }
 
   // ---------- Datos del negocio ----------
-  async guardarNegocio() {
-    
+    async guardarNegocio() {
     const v = this.formNegocio.getRawValue();
     const whatsapp = v.whatsapp.replace(/\D/g, '');
-        const faltan: string[] = [];
+    const faltan: string[] = [];
     if (!v.nombre.trim()) faltan.push('El nombre del negocio');
     if (whatsapp.length < 8) faltan.push('El WhatsApp (solo números y con código de país, ej. 593991234567)');
+    if (v.anuncio_activo && !v.anuncio_texto.trim()) faltan.push('El texto del anuncio (o desactívalo)');
     if (faltan.length) {
-      const frases = this.frasesLista().map((f) => f.trim()).filter(Boolean).join('\n');
-      await this.negocio.guardar({ ...v, frases, nombre: v.nombre.trim(), whatsapp });      return;
+      await this.dialogos.avisar('Revisa los datos', 'No se puede guardar todavía:', faltan);
+      return;
     }
+    const frases = this.frasesLista().map((f) => f.trim()).filter(Boolean).join('\n');
     await this.ejecutar(async () => {
-      await this.negocio.guardar({ ...v, nombre: v.nombre.trim(), whatsapp });
+      await this.negocio.guardar({
+        ...v,
+        frases,
+        nombre: v.nombre.trim(),
+        whatsapp,
+        anuncio_texto: v.anuncio_texto.trim(),
+        anuncio_mensaje: v.anuncio_mensaje.trim(),
+      });
     }, 'Datos del negocio guardados correctamente.');
     if (!this.error()) this.formNegocio.markAsPristine();
     this.irArriba();

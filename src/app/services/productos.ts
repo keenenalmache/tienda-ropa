@@ -91,6 +91,7 @@ export class Productos {
         stock: Number(v.stock),
       })),
       imagenes: imagenes.map((i) => i.url),
+      fotosInfo: imagenes.map((i) => ({ titulo: i.titulo ?? '', descripcion: i.descripcion ?? '' })),
     };
   }
 
@@ -98,7 +99,7 @@ export class Productos {
     return this.supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, creado_en, activo, genero, categorias(slug, nombre), variantes(talla, color, stock), imagenes(url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, creado_en, activo, genero, categorias(slug, nombre), variantes(talla, color, stock), imagenes(url, orden, titulo, descripcion)',
       );
   }
 

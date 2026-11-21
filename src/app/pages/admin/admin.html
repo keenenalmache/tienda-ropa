@@ -171,8 +171,7 @@
                     }
                     <div class="prod-datos">
                       <button type="button" class="enlace-nombre" (click)="editar(p)">{{ p.nombre }}</button>
-                      <small class="sub">{{ p.categorias?.nombre }} · {{ p.genero }}</small>
-                    </div>
+                      @if (generos().length > 1) { · {{ p.genero }} }                    </div>
                   </div>
                 </td>
 
@@ -272,8 +271,7 @@
 
   @case ('producto') {
     <app-ayuda clave="producto">
-      Sube las fotos (varias a la vez): la primera es la portada y puedes reordenarlas. Agrega al menos una variante (talla, color y stock) para mostrar disponibilidad. Si el precio de oferta es menor al precio, el cliente ve la etiqueta de descuento.
-    </app-ayuda>
+      Sube las fotos (varias a la vez): la primera es la portada y puedes reordenarlas. Agrega al menos una variante (talla, color y stock) para mostrar disponibilidad. Si el precio de oferta es menor al precio, el cliente ve la etiqueta de descuento. Cada foto puede tener su propio título y descripción (útil si un producto trae varios diseños).    </app-ayuda>
 
     <section class="panel">
       <button type="button" class="volver" (click)="irA('lista')">
@@ -325,15 +323,15 @@
             }
           </select>
         </label>
-
-        <label>
-          Para
-          <select formControlName="genero">
-            @for (g of generos; track g.valor) {
-              <option [value]="g.valor">{{ g.etiqueta }}</option>
-            }
-          </select>
-        </label>
+      @if (generos().length > 1) {
+      <label>
+       Para
+        <select formControlName="genero">
+         @for (g of generos(); track g.valor) {
+         <option [value]="g.valor">{{ g.etiqueta }}</option> }
+         </select>
+      </label>
+    }
 
         <label class="check">
           <input type="checkbox" formControlName="destacado" />
@@ -389,6 +387,24 @@
                 <button type="button" (click)="quitarFoto(img)">
                   Eliminar
                 </button>
+              </div>
+                            <div class="texto-foto">
+                <input
+                  #tit
+                  type="text"
+                  placeholder="Título (opcional)"
+                  maxlength="80"
+                  [value]="img.titulo ?? ''"
+                  (blur)="guardarTextoFoto(img, tit.value, desc.value)"
+                />
+                <textarea
+                  #desc
+                  rows="2"
+                  placeholder="Descripción (opcional)"
+                  maxlength="400"
+                  [value]="img.descripcion ?? ''"
+                  (blur)="guardarTextoFoto(img, tit.value, desc.value)"
+                ></textarea>
               </div>
             </figure>
           } @empty {
@@ -645,6 +661,57 @@
         </table>
       </div>
     </section>
+        <section class="panel">
+      <h2>Géneros</h2>
+      <p class="nota">
+        Arranca solo con "Unisex". Mientras haya uno solo, no se muestra ningún
+        selector ni filtro de género. Al agregar otro (Hombre, Mujer, Niños...)
+        aparecen solos.
+      </p>
+
+      <form [formGroup]="formGenero" (ngSubmit)="agregarGenero()" class="form-categoria">
+        <label>
+          Nuevo género
+          <input formControlName="nombre" placeholder="Ej: Mujer" />
+        </label>
+        <button type="submit" class="primario">Agregar</button>
+      </form>
+
+      <div class="tabla-caja">
+        <table class="tabla tabla-categorias">
+          <thead>
+            <tr><th>Nombre</th><th>Productos</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (g of generosConConteo(); track g.valor) {
+              @if (editandoGenero() === g.valor) {
+                <tr [formGroup]="formEditGenero">
+                  <td data-label="Nombre"><input formControlName="nombre" aria-label="Nombre" /></td>
+                  <td data-label="Productos">{{ g.total }}</td>
+                  <td>
+                    <div class="acciones">
+                      <button type="button" class="primario" (click)="guardarGenero(g.valor)">Guardar</button>
+                      <button type="button" (click)="editandoGenero.set(null)">Cancelar</button>
+                    </div>
+                  </td>
+                </tr>
+              } @else {
+                <tr>
+                  <td class="nombre">{{ g.etiqueta }}</td>
+                  <td data-label="Productos">{{ g.total }}</td>
+                  <td>
+                    <div class="acciones">
+                      <button type="button" (click)="editarGenero(g)">Renombrar</button>
+                      <button type="button" (click)="quitarGenero(g)">Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
   }
 
   <!-- ================= NEGOCIO ================= -->
@@ -725,7 +792,21 @@
             <button type="button" class="b-azul" (click)="agregarFrase()">+ Añadir frase</button>
           }
         </fieldset>
-
+        <fieldset class="frases">
+          <legend>Anuncio con el personaje</legend>
+          <label class="check">
+            <input type="checkbox" formControlName="anuncio_activo" />
+            Mostrar el anuncio en la tienda
+          </label>
+          <label>
+            Texto del globo
+            <input formControlName="anuncio_texto" maxlength="90" placeholder="Ej: ¡20% en camisetas esta semana!" />
+          </label>
+          <label>
+            Mensaje de WhatsApp al tocarlo
+            <input formControlName="anuncio_mensaje" maxlength="200" placeholder="Ej: Hola, quiero la oferta de camisetas" />
+          </label>
+        </fieldset>
         <div class="barra-acciones">
           <button type="submit" class="primario">Guardar</button>
 

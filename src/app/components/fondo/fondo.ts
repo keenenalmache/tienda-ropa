@@ -23,7 +23,7 @@ const COMPOSICION: Record<Seccion, Pieza[]> = {
     { img: 'letras-graffiti-1', x: 1, y: 12, w: 26, r: -6, v: 0.08, d: 0.9 },
     { img: 'dibujo-lata-spray', x: 88, y: 16, w: 9, r: 18, v: 0.12, d: 1.2 },
     { img: 'mancha-roja', x: 45, y: 22, w: 11, r: 0, v: 0.05, d: 1.4, movil: false },
-    { img: 'mancha-rosada', x: 78, y: 29, w: 26, r: 20, v: 0.07 },
+    { img: 'mancha-rosada', x: 80, y: 28, w: 26, r: 15, v: 0.07 },
     { img: 'dibujo-spray-con-boca', x: 67, y: 37, w: 15, r: -8, v: 0.1 },
     { img: 'letras-graffiti-2', x: 40, y: 28, w: 27, r: 5, v: 0.08 },
     { img: 'cartel-alto-manchado', x: 42, y: 58, w: 11, r: -5, v: 0.12, movil: false },

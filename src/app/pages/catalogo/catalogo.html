@@ -9,14 +9,16 @@
     }
   </div>
 
-  <label class="combo">
-    Para
-    <select (change)="elegirPara($any($event.target).value)">
-      @for (o of paraOpciones; track o.valor) {
-        <option [value]="o.valor" [selected]="paraActivo() === o.valor">{{ o.etiqueta }}</option>
-      }
-    </select>
-  </label>
+    @if (gen.lista().length > 1) {
+    <label class="combo">
+      Para
+      <select (change)="elegirPara($any($event.target).value)">
+        @for (o of paraOpciones(); track o.valor) {
+          <option [value]="o.valor" [selected]="paraActivo() === o.valor">{{ o.etiqueta }}</option>
+        }
+      </select>
+    </label>
+  }
 
   <input type="search" placeholder="Buscar producto" (input)="buscar($event)" />
 </div>

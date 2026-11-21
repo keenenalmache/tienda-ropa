@@ -5,6 +5,8 @@ import { Productos, categoriasDe } from '../../services/productos';
 import { Favoritos } from '../../services/favoritos';
 import { Producto } from '../../models/producto';
 import { Resenas } from '../../services/resenas';
+import { Generos } from '../../services/generos';
+
 @Component({
   selector: 'app-catalogo',
   imports: [RouterLink],
@@ -17,6 +19,7 @@ export class Catalogo {
   private router = inject(Router);
   favs = inject(Favoritos);
   res = inject(Resenas);
+  private gen = inject(Generos);
 
   private todos = signal<Producto[]>([]);
   cargando = signal(true);
@@ -24,12 +27,10 @@ export class Catalogo {
   private filtroUrl = signal('todas');
   private paraUrl = signal('todos');
 
-  paraOpciones = [
+    paraOpciones = computed(() => [
     { valor: 'todos', etiqueta: 'Todos' },
-    { valor: 'hombre', etiqueta: 'Hombre' },
-    { valor: 'mujer', etiqueta: 'Mujer' },
-    { valor: 'unisex', etiqueta: 'Unisex' },
-  ];
+    ...this.gen.lista().map((g) => ({ valor: g.valor, etiqueta: g.etiqueta })),
+  ]);
 
   // Categorías reales (solo las que tienen productos) + Ofertas y Favoritos
   categorias = computed(() => [
@@ -43,7 +44,7 @@ export class Catalogo {
     this.categorias().some((c) => c.valor === this.filtroUrl()) ? this.filtroUrl() : 'todas',
   );
   paraActivo = computed(() =>
-    this.paraOpciones.some((o) => o.valor === this.paraUrl()) ? this.paraUrl() : 'todos',
+    this.paraOpciones().some((o) => o.valor === this.paraUrl()) ? this.paraUrl() : 'todos',
   );
 
   productos = computed(() => {
@@ -73,6 +74,7 @@ export class Catalogo {
       this.filtroUrl.set(params.get('filtro') ?? 'todas');
       this.paraUrl.set(params.get('para') ?? 'todos');
     });
+    this.gen.cargar();
   }
 
   elegirCategoria(valor: string) {

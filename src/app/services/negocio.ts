@@ -12,12 +12,18 @@ export interface DatosNegocio {
   instagram: string;
   // Frases del globo de la portada, una por línea
   frases: string;
+  anuncio_activo: boolean;
+  anuncio_texto: string;
+  anuncio_mensaje: string;
 }
 
 const BASE: DatosNegocio = {
   nombre: NEGOCIO.nombre,
   lema: 'La ropa mas cómoda y chévere del Ecuador.',
   frases: '¡Nueva colección!\nMira las ofertas de la semana\n¿Dudas con la talla? ¡Escríbenos!',
+  anuncio_activo: false,
+  anuncio_texto: '',
+  anuncio_mensaje: 'Hola, me gustaria saber mas información acerca de camisas personalizadas y estampados propios.',
   whatsapp: NEGOCIO.whatsapp,
   telefono: NEGOCIO.telefono,
   direccion: NEGOCIO.direccion,
@@ -64,6 +70,9 @@ export class Negocio {
       horario: data.horario || '',
       instagram: data.instagram || '',
       frases: data.frases ?? BASE.frases,
+            anuncio_activo: data.anuncio_activo ?? false,
+      anuncio_texto: data.anuncio_texto ?? '',
+      anuncio_mensaje: data.anuncio_mensaje || BASE.anuncio_mensaje,
     };
     this.datos.set(nuevos);
     guardarCache(nuevos);

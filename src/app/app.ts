@@ -8,11 +8,12 @@ import { Dialogo } from './components/dialogo/dialogo';
 import { Pie } from './components/pie/pie';
 import { Fondo } from './components/fondo/fondo';
 import { Auth } from './services/auth';
+import { Anuncio } from './components/anuncio/anuncio';
 
 type Tema = 'claro' | 'oscuro';
 
 @Component({
-  imports: [RouterOutlet, RouterLink, Fondo, Dialogo, Pie],
+  imports: [RouterOutlet, RouterLink, Fondo, Dialogo, Pie, Anuncio],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

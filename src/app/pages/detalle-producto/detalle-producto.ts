@@ -205,6 +205,14 @@ export class DetalleProducto {
     return p.imagenes.length ? p.imagenes : p.imagen ? [p.imagen] : [];
   });
   fotoPrincipal = computed(() => this.fotos()[this.fotoActiva()] ?? '');
+    infoFoto = computed(() => {
+    const p = this.producto();
+    const f = p?.fotosInfo?.[this.fotoActiva()];
+    return {
+      titulo: f?.titulo || p?.nombre || '',
+      descripcion: f?.descripcion || p?.descripcion || '',
+    };
+  });
 
     // Galería deslizable (celular): marca qué foto está a la vista
   alDeslizar(e: Event) {

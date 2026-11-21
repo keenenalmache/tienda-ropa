@@ -2,7 +2,7 @@
   <div class="pila">
     @if (frase()) {
       <div class="globo" role="status">
-        @for (f of [frase()]; track f) {
+        @for (f of [frase()]; track $index) {
           <span>{{ f }}</span>
         }
       </div>

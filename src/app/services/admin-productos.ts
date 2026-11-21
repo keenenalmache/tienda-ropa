@@ -13,8 +13,9 @@ export interface ImagenAdmin {
   id: number;
   url: string;
   orden: number;
+  titulo: string | null;
+  descripcion: string | null;
 }
-
 export interface ProductoAdmin {
   id: number;
   nombre: string;
@@ -65,7 +66,7 @@ export class AdminProductos {
     const { data, error } = await supabase
       .from('productos')
       .select(
-        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, creado_en, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden)',
+        'id, nombre, descripcion, precio, precio_oferta, destacado, nuevo, nuevo_desde, creado_en, activo, genero, categoria_id, categorias(nombre), variantes(id, talla, color, stock), imagenes(id, url, orden, titulo, descripcion)',
       )
       .order('id', { ascending: false });
     if (error) throw error;
@@ -156,6 +157,13 @@ export class AdminProductos {
 
   async cambiarOrdenImagen(id: number, orden: number) {
     const { error } = await supabase.from('imagenes').update({ orden }).eq('id', id);
+    if (error) throw error;
+  }
+    async actualizarTextoImagen(id: number, titulo: string, descripcion: string) {
+    const { error } = await supabase
+      .from('imagenes')
+      .update({ titulo: titulo.trim() || null, descripcion: descripcion.trim() || null })
+      .eq('id', id);
     if (error) throw error;
   }
 
