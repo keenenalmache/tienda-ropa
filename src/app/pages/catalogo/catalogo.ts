@@ -58,13 +58,18 @@ export class Catalogo {
         if (cat !== 'todas' && cat !== 'ofertas' && cat !== 'favoritos' && p.categoria !== cat) return false;
         // Hombre y Mujer incluyen también lo unisex
         if (para === 'unisex' && p.genero !== 'unisex') return false;
-        if ((para === 'hombre' || para === 'mujer') && p.genero !== para && p.genero !== 'unisex') return false;        return p.nombre.toLowerCase().includes(texto);
+        if ((para === 'hombre' || para === 'mujer') && p.genero !== para && p.genero !== 'unisex') return false;
+        return p.nombre.toLowerCase().includes(texto);
       })
-      .sort((a, b) => Number(b.destacado) - Number(a.destacado));
+      .sort((a, b) => b.orden - a.orden);
   });
 
   constructor() {
     this.ruta.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+          this.servicio.obtenerTodos().then((lista) => {
+      this.todos.set(lista);
+      this.cargando.set(false);
+    });
       this.filtroUrl.set(params.get('filtro') ?? 'todas');
       this.paraUrl.set(params.get('para') ?? 'todos');
     });

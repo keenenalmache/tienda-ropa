@@ -115,8 +115,7 @@ export class Productos {
       return [];
     }
 
-    return data.map((fila) => this.convertir(fila));
-  }
+    return data.map((fila) => this.convertir(fila)).sort((a, b) => b.orden - a.orden);  }
 
   // Obtener un producto por su ID
   async obtenerPorId(
