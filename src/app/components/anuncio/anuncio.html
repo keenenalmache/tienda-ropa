@@ -1,0 +1,14 @@
+@if (visible()) {
+  <aside class="anuncio" aria-label="Anuncio">
+    <button type="button" class="cerrar" aria-label="Cerrar anuncio" (click)="cerrar()">✕</button>
+    <a class="globo" [href]="enlace()" target="_blank" rel="noopener">
+      <span class="nube" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </span>
+      <span class="texto">{{ texto() }}</span>
+    </a>
+    <a class="personaje" [href]="enlace()" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+      <img src="personaje/anuncio.png" alt="" (error)="$any($event.target).style.display = 'none'" />
+    </a>
+  </aside>
+}

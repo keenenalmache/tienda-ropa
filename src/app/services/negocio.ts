@@ -70,7 +70,7 @@ export class Negocio {
       horario: data.horario || '',
       instagram: data.instagram || '',
       frases: data.frases ?? BASE.frases,
-            anuncio_activo: data.anuncio_activo ?? false,
+      anuncio_activo: data.anuncio_activo ?? false,
       anuncio_texto: data.anuncio_texto ?? '',
       anuncio_mensaje: data.anuncio_mensaje || BASE.anuncio_mensaje,
     };

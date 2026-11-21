@@ -33,8 +33,7 @@ export class Anuncio {
   );
 
   private listo = signal(false);
-  private cerrado = signal<string | null>(leerCerrado());
-
+private cerrado = signal<string | null>(null);
   constructor() {
     setTimeout(() => this.listo.set(true), 2500);
   }
@@ -58,13 +57,7 @@ export class Anuncio {
     return `https://wa.me/${d.whatsapp}?text=${encodeURIComponent(msg)}`;
   });
 
-  cerrar() {
+    cerrar() {
     this.cerrado.set(this.texto());
-    try {
-      localStorage.setItem(
-        CLAVE,
-        JSON.stringify({ texto: this.texto(), hasta: Date.now() + DIAS * 86400000 }),
-      );
-    } catch { /* sin almacenamiento */ }
   }
 }
