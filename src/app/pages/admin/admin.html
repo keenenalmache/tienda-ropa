@@ -6,7 +6,7 @@
     @if (ayudas.hayCerradas()) {
       <button type="button" class="btn-ayuda" (click)="ayudas.restablecer()">? Ayuda</button>
     }
-    <button type="button" (click)="salir()">Cerrar sesión</button>
+    <button type="button" class="b-rojo" (click)="salir()">Cerrar sesión</button>
   </div>
 </header>
 
@@ -128,7 +128,7 @@
         </label>
       }
 
-      <button type="button" (click)="exportar()">Exportar a CSV</button>
+      <button type="button"class="b-turq" (click)="exportar()">Exportar a CSV</button>
     </div>
 
     @if (cargando()) {
@@ -208,7 +208,7 @@
 
                 <td class="acciones">
                   <button type="button" class="b-azul" (click)="editar(p)">Editar</button>
-                  <button type="button" [attr.aria-expanded]="masId() === p.id" (click)="alternarMas(p.id)">
+                  <button type="button" class="b-turq" [attr.aria-expanded]="masId() === p.id" (click)="alternarMas(p.id)">
                     Más {{ masId() === p.id ? '▴' : '▾' }}
                   </button>
                   @if (masId() === p.id) {
@@ -367,7 +367,7 @@
 
               <div class="fila-mini">
                 <button
-                  type="button"
+                  type="button"class="b-turq"
                   [disabled]="primera"
                   (click)="moverFoto(p, img, -1)"
                   aria-label="Mover a la izquierda"
@@ -376,7 +376,7 @@
                 </button>
 
                 <button
-                  type="button"
+                  type="button"class="b-turq"
                   [disabled]="ultima"
                   (click)="moverFoto(p, img, 1)"
                   aria-label="Mover a la derecha"
@@ -384,7 +384,7 @@
                   →
                 </button>
 
-                <button type="button" (click)="quitarFoto(img)">
+                <button type="button" class="b-rojo" (click)="quitarFoto(img)">
                   Eliminar
                 </button>
               </div>
@@ -469,7 +469,7 @@
                         </button>
 
                         <button
-                          type="button"
+                          type="button"class="b-ambar"
                           (click)="cancelarEdicionVariante()"
                         >
                           Cancelar
@@ -486,14 +486,14 @@
                     <td>
                       <div class="acciones">
                         <button
-                          type="button"
+                          type="button" class="b-azul"
                           (click)="editarVariante(v)"
                         >
                           Editar
                         </button>
 
                         <button
-                          type="button"
+                          type="button" class="b-rojo"
                           (click)="quitarVariante(v)"
                         >
                           Eliminar
@@ -533,7 +533,7 @@
             <input type="number" min="0" formControlName="stock" />
           </label>
 
-          <button type="submit">Agregar</button>
+         <button type="submit" class="b-turq">Agregar</button>
         </form>
       } @else {
         <p class="nota">
@@ -620,7 +620,7 @@
                       </button>
 
                       <button
-                        type="button"
+                        type="button" class="b-ambar"
                         (click)="cancelarEdicionCategoria()"
                       >
                         Cancelar
@@ -636,14 +636,14 @@
                   <td>
                     <div class="acciones">
                       <button
-                        type="button"
+                        type="button" class="b-azul"
                         (click)="editarCategoria(c)"
                       >
                         Renombrar
                       </button>
 
                       <button
-                        type="button"
+                        type="button" class="b-rojo"
                         (click)="quitarCategoria(c)"
                       >
                         Eliminar
@@ -691,7 +691,7 @@
                   <td>
                     <div class="acciones">
                       <button type="button" class="primario" (click)="guardarGenero(g.valor)">Guardar</button>
-                      <button type="button" (click)="editandoGenero.set(null)">Cancelar</button>
+                      <button type="button" class="b-ambar" (click)="editandoGenero.set(null)">Cancelar</button>
                     </div>
                   </td>
                 </tr>
@@ -701,8 +701,8 @@
                   <td data-label="Productos">{{ g.total }}</td>
                   <td>
                     <div class="acciones">
-                      <button type="button" (click)="editarGenero(g)">Renombrar</button>
-                      <button type="button" (click)="quitarGenero(g)">Eliminar</button>
+                      <button type="button" class="b-azul" (click)="editarGenero(g)">Renombrar</button>
+                      <button type="button" class="b-rojo" (click)="quitarGenero(g)">Eliminar</button>
                     </div>
                   </td>
                 </tr>

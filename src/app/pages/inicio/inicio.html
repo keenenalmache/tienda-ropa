@@ -44,7 +44,7 @@
         @for (c of categorias(); track c.slug) {
       <a routerLink="/catalogo" [queryParams]="{ filtro: c.slug }" class="categoria">
         @if (fotoDe(c.slug); as foto) {
-          <img [src]="foto" alt="" />
+        <img [src]="foto" [alt]="c.nombre" />
         } @else {
           <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
             <path d="M22 8 8 15l4 10 6-3v34h28V22l6 3 4-10-14-7c-1 4-5 7-10 7s-9-3-10-7Z" />

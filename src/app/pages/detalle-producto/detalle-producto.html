@@ -48,7 +48,7 @@
           @for (f of fotos(); track f; let i = $index) {
             <button type="button" class="mini" [class.activa]="fotoActiva() === i"
               [attr.aria-label]="'Ver foto ' + (i + 1)" (click)="fotoActiva.set(i)">
-              <img [src]="f" alt="" />
+             <img [src]="f" [alt]="'Foto ' + (i + 1) + ' de ' + producto.nombre" />
             </button>
           }
         </div>

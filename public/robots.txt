@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /recuperar
+Disallow: /restablecer
+
+Sitemap: https://xptinoco.pages.dev/sitemap.xml
