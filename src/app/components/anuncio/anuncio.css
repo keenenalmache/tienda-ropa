@@ -36,8 +36,8 @@
   inset: 0;
   /* borde dorado alrededor de toda la nube + sombra */
   filter:
-    drop-shadow(3px 0 0 #d9a21b) drop-shadow(-3px 0 0 #d9a21b)
-    drop-shadow(0 3px 0 #d9a21b) drop-shadow(0 -3px 0 #d9a21b)
+    drop-shadow(3px 0 0 #14a3a3) drop-shadow(-3px 0 0 #14a3a3)
+    drop-shadow(0 3px 0 #14a3a3) drop-shadow(0 -3px 0 #14a3a3)
     drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
 }
 .nube::before {
@@ -96,9 +96,9 @@
   border-radius: 50%;
   font-size: 0.8rem;
   cursor: pointer;
-  background: linear-gradient(#fff2b0, #f5c842 55%, #d9a21b) !important;
-  color: #2b1c00 !important;
-  border: 1px solid #b9820d !important;
+  background: linear-gradient(#7ff0e3, #35d3c4 55%, #14a3a3) !important;
+  color: #032b2b !important;
+  border: 1px solid #0b7070 !important;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
 }
 

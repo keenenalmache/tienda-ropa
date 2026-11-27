@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { Ayuda } from '../../../components/ayuda/ayuda';
 import { AdminProductos, ProductoAdmin, VarianteAdmin } from '../../../services/admin-productos';
-
+import { Generos } from '../../../services/generos';
 const STOCK_BAJO = 3;
 type Filtro = 'todo' | 'agotado' | 'bajo' | 'con-stock';
 
@@ -13,12 +13,16 @@ type Filtro = 'todo' | 'agotado' | 'bajo' | 'con-stock';
 })
 export class InventarioAdmin {
   private api = inject(AdminProductos);
+  private gen = inject(Generos);
+  generos = this.gen.lista;
+  generoFiltro = signal('');
 
   productos = signal<ProductoAdmin[]>([]);
   cargando = signal(true);
   error = signal('');
   busqueda = signal('');
   filtro = signal<Filtro>('todo');
+  editar = output<number>();
 
   filtros: { valor: Filtro; etiqueta: string }[] = [
     { valor: 'todo', etiqueta: 'Todo' },
@@ -39,8 +43,9 @@ export class InventarioAdmin {
   grupos = computed(() => {
     const q = this.busqueda().trim().toLowerCase();
     const f = this.filtro();
+    const gf = this.generoFiltro();
     return this.productos()
-      .map((p) => {
+      .filter((p) => !gf || (p.genero ?? 'unisex') === gf)      .map((p) => {
         const nombreOk = !q || p.nombre.toLowerCase().includes(q);
         const vars = p.variantes.filter((v) => {
           if (q && !nombreOk && !`${v.talla} ${v.color}`.toLowerCase().includes(q)) return false;

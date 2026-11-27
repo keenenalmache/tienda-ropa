@@ -38,3 +38,16 @@
 .paso button:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
 .paso button:disabled { opacity: 0.4; }
 .paso input { width: 4rem; height: 44px; box-sizing: border-box; text-align: center; font: inherit; font-size: 1.1rem; font-weight: 800; }
+.enlace-nombre {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  font: inherit;
+  font-weight: 700;
+  color: inherit !important;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.enlace-nombre:hover { color: #d9a21b !important; }

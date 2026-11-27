@@ -518,3 +518,37 @@ button.opcion:disabled {
   background: repeating-linear-gradient(-45deg, #f5c842 0 14px, #e7b93a 14px 28px);
   border: 1px solid #6e4a00; border-radius: 6px;
 }
+
+.ficha .acciones { align-items: center; }
+.btn-carrito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 46px;
+  padding: 0 1.1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(#35d3c4, #14a3a3 60%, #0d8585) !important;
+  color: #032b2b !important;
+  border: 1px solid #0b7070 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+.btn-carrito svg { width: 20px; height: 20px; }
+.btn-carrito:hover { filter: brightness(1.08); }
+.ficha .acciones .btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding-block: 0;
+}
+.boton-compartir { height: 46px; }
+.aviso-carrito { margin: 0.5rem 0 0; font-size: 0.9rem; font-weight: 700; color: #16a34a; }
+.aviso-carrito.error { color: #d93a2b; }
+.aviso-carrito a { margin-left: 0.5rem; text-decoration: underline; color: inherit; }
+@media (max-width: 760px) {
+  .btn-carrito { flex: 1; }
+}

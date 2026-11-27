@@ -434,5 +434,24 @@ nav .avatar img {
   .admin-etiqueta .punto { animation: none; }
 }
 
+.nav-carrito { position: relative; display: inline-flex; align-items: center; margin-right: 12px; }
+.nav-carrito svg { width: 22px; height: 22px; }
+.nav-carrito .contador {
+  position: absolute;
+  top: -6px;
+  right: -13px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 0.62rem !important;
+  line-height: 1;
+  font-weight: 800;
+  color: #032b2b;
+  background: linear-gradient(#35d3c4, #14a3a3);
+  border: 1px solid #0b7070;
+}
 
 

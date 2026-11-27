@@ -1,0 +1,63 @@
+<section class="carrito">
+  <h1>Tu carrito</h1>
+
+  @if (!carrito.items().length) {
+    <div class="vacio">
+      <p>Todavía no agregaste productos.</p>
+      <a routerLink="/catalogo" class="boton">Ver catálogo</a>
+    </div>
+  } @else {
+    <ul class="lista">
+      @for (i of carrito.items(); track i.productoId + '|' + i.talla + '|' + i.color) {
+        <li class="item" [class.agotado]="i.stock === 0">
+          <a [routerLink]="['/producto', i.productoId]" class="foto">
+            @if (i.foto) { <img [src]="i.foto" [alt]="i.nombre" loading="lazy" /> }
+          </a>
+          <div class="datos">
+            <a [routerLink]="['/producto', i.productoId]" class="nombre">{{ i.nombre }}</a>
+            <small>Talla {{ i.talla }} · {{ i.color }}</small>
+            @if (i.stock === 0) {
+              <small class="alerta">Sin stock ahora. No se incluye en el mensaje.</small>
+            } @else {
+              <strong>${{ dinero(i.precio) }}</strong>
+            }
+          </div>
+          <div class="cant">
+            <button type="button" class="b-azul" aria-label="Quitar una unidad" [disabled]="i.stock === 0 || i.cantidad <= 1" (click)="menos(i)">−</button>
+            <span>{{ i.cantidad }}</span>
+            <button type="button" class="b-azul" aria-label="Agregar una unidad" [disabled]="i.stock === 0 || i.cantidad >= i.stock" (click)="mas(i)">+</button>
+          </div>
+          <button type="button" class="b-rojo quitar" (click)="quitar(i)">Quitar</button>
+        </li>
+      }
+    </ul>
+
+    <div class="resumen">
+      <div class="campos">
+        <label>
+          Tu nombre (opcional)
+          <input type="text" maxlength="40" placeholder="Ej: María" (input)="nombre.set($any($event.target).value)" />
+        </label>
+        <label>
+          ¿Cómo lo quieres?
+          <select (change)="entrega.set($any($event.target).value)">
+            <option value="Retiro en tienda">Retiro en tienda</option>
+            <option value="Envío">Envío</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="total">
+        Total estimado: <strong>${{ dinero(total()) }}</strong>
+      </p>
+      <p class="nota">El precio final y la disponibilidad se confirman por WhatsApp.</p>
+
+      <div class="acciones">
+        @if (disponibles().length) {
+          <a [href]="enlaceWhatsapp()" target="_blank" rel="noopener" class="btn-wa">Preguntar por WhatsApp</a>
+        }
+        <button type="button" class="b-ambar" (click)="vaciar()">Vaciar carrito</button>
+      </div>
+    </div>
+  }
+</section>

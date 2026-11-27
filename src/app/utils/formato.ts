@@ -7,6 +7,11 @@ export function capitalizar(t: string): string {
   const s = t.toLowerCase();
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+export function primeraMayuscula(t: string): string {
+  const i = t.search(/[^\s¿¡]/);
+  if (i === -1) return t;
+  return t.slice(0, i) + t.charAt(i).toUpperCase() + t.slice(i + 1);
+}
 export function soloNumeros(t: string): string {
   return t.replace(/\D/g, '').slice(0, 15);
 }
@@ -18,7 +23,7 @@ export function whatsappEc(t: string): string {
   return n.slice(0, 15);
 }
 
-type Modo = 'mayusculas' | 'capitalizar' | 'telefono' | 'whatsapp';
+type Modo = 'mayusculas' | 'capitalizar' | 'telefono' | 'whatsapp' | 'frase';
 
 @Directive({ selector: 'input[formato]' })
 export class Formato {
@@ -43,6 +48,7 @@ export class Formato {
       case 'capitalizar': return capitalizar(t);
       case 'telefono': return soloNumeros(t);
       case 'whatsapp': return whatsappEc(t);
+      case 'frase': return primeraMayuscula(t);
     }
   }
 }

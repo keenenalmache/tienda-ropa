@@ -98,7 +98,7 @@ export class Admin {
     const f = this.filtro();
     return this.productos().filter((p) => {
       if (texto && !p.nombre.toLowerCase().includes(texto)) return false;
-      if (this.categoriaFiltro() && p.categoria_id !== this.categoriaFiltro()) return false;
+      if (this.generoFiltro() && (p.genero ?? 'unisex') !== this.generoFiltro()) return false;
       switch (f) {
         case 'visibles':
           return p.activo;
@@ -179,6 +179,7 @@ export class Admin {
     categoriaFiltro = signal(0);
   seleccion = signal<number[]>([]);
     modoSeleccion = signal(false);
+    generoFiltro = signal('');
 
   alternarModoSel() {
     this.modoSeleccion.update((v) => !v);
@@ -851,6 +852,11 @@ export class Admin {
     }, 'Datos del negocio guardados correctamente.');
     if (!this.error()) this.formNegocio.markAsPristine();
     this.irArriba();
+  }
+
+    editarDesdeInventario(id: number) {
+    const p = this.productos().find((x) => x.id === id);
+    if (p) this.editar(p);
   }
 
   async salir() {

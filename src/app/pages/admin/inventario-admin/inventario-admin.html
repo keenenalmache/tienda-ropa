@@ -21,6 +21,14 @@
       <option [value]="f.valor" [selected]="filtro() === f.valor">{{ f.etiqueta }}</option>
     }
   </select>
+    @if (generos().length > 1) {
+    <select aria-label="Filtrar por género" (change)="generoFiltro.set($any($event.target).value)">
+      <option value="" [selected]="!generoFiltro()">Todos los géneros</option>
+      @for (g of generos(); track g.valor) {
+        <option [value]="g.valor" [selected]="generoFiltro() === g.valor">{{ g.etiqueta }}</option>
+      }
+    </select>
+  }
 </div>
 
 @if (error()) { <p class="aviso">{{ error() }}</p> }
@@ -38,7 +46,7 @@
             <span class="mini-foto sin">Sin foto</span>
           }
           <div class="grupo-datos">
-            <strong>{{ g.p.nombre }}</strong>
+            <button type="button" class="enlace-nombre" (click)="editar.emit(g.p.id)" title="Editar este producto">{{ g.p.nombre }}</button>
             <small>{{ total(g.p) }} unidades @if (!g.p.activo) { · Oculto }</small>
           </div>
         </header>

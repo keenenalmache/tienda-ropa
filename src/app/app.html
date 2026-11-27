@@ -14,7 +14,12 @@
   </a>
   <a routerLink="/catalogo" class="solo-pc">Catálogo</a>
   <a routerLink="/contacto">Contacto</a>
-  
+    <a routerLink="/carrito" class="nav-carrito" aria-label="Carrito">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6" /></svg>
+    @if (carrito.unidades() > 0) {
+      <span class="contador">{{ carrito.unidades() }}</span>
+    }
+  </a>
     @if (perfil(); as p) {
     <div class="cuenta">
       <button type="button" class="avatar" (click)="menuCuenta.update((v) => !v)" [attr.aria-label]="'Cuenta de ' + p.nombre">

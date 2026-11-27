@@ -24,7 +24,15 @@
 </div>
 
 @if (cargando()) {
-  <p>Cargando productos...</p>
+  <div class="cuadricula" aria-busy="true" aria-label="Cargando productos">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+      <div class="esqueleto">
+        <div class="e-foto"></div>
+        <div class="e-linea"></div>
+        <div class="e-linea corta"></div>
+      </div>
+    }
+  </div>
 } @else {
   <div class="cuadricula">
     @for (p of productos(); track p.id) {
@@ -36,9 +44,6 @@
             @if (p.nuevo) {
               <span class="etiqueta etiqueta-nuevo">Nuevo</span>
             }
-            @if (p.precioOferta !== null) {
-              <span class="etiqueta etiqueta-oferta">-{{ p.descuento }}%</span>
-            }
           </div>
           <button type="button" class="corazon" [class.activo]="favs.esFavorito(p.id)"
             [attr.aria-pressed]="favs.esFavorito(p.id)" aria-label="Guardar en favoritos"
@@ -47,16 +52,27 @@
           </button>
         </div>
         <h2>{{ p.nombre }}</h2>
+
         @if (res.resumen(p.id); as r) {
-  <p class="valoracion"><span class="est">★</span> {{ r.promedio }} <small>({{ r.total }})</small></p>
-}
+          <p class="valoracion">
+            <span class="num">{{ r.promedio }}</span>
+            <span class="estrellas" [style.--p]="(r.promedio / 5 * 100) + '%'" aria-hidden="true">★★★★★</span>
+            <small>({{ r.total }})</small>
+          </p>
+        }
+
+        @if (p.descripcion) {
+          <p class="desc">{{ p.descripcion }}</p>
+        }
+
         @if (p.precioOferta !== null) {
-          <p>
-            <span class="precio-viejo">${{ p.precio }}</span>
+          <p class="precios">
+            <span class="descuento">-{{ p.descuento }}%</span>
             <span class="precio-oferta">${{ p.precioOferta }}</span>
           </p>
+          <p class="tipico">Antes: <span class="precio-viejo">${{ p.precio }}</span></p>
         } @else {
-          <p>${{ p.precio }}</p>
+          <p class="precios"><span class="precio-normal">${{ p.precio }}</span></p>
         }
       </a>
     } @empty {

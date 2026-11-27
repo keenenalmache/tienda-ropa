@@ -9,7 +9,7 @@ import { Pie } from './components/pie/pie';
 import { Fondo } from './components/fondo/fondo';
 import { Auth } from './services/auth';
 import { Anuncio } from './components/anuncio/anuncio';
-
+import { Carrito } from './services/carrito';
 type Tema = 'claro' | 'oscuro';
 
 @Component({
@@ -33,6 +33,7 @@ export class App {
   private auth = inject(Auth);
   perfil = this.auth.perfil;
   esAdmin = this.auth.esAdminSesion;
+  carrito = inject(Carrito);
   menuCuenta = signal(false);
 
   ingresar() {

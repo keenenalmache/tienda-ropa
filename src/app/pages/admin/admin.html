@@ -106,6 +106,15 @@
         }
       </select>
 
+            @if (generos().length > 1) {
+        <select aria-label="Filtrar por género" (change)="generoFiltro.set($any($event.target).value)">
+          <option value="" [selected]="!generoFiltro()">Todos los géneros</option>
+          @for (g of generos(); track g.valor) {
+            <option [value]="g.valor" [selected]="generoFiltro() === g.valor">{{ g.etiqueta }}</option>
+          }
+        </select>
+      }
+
       <select
         aria-label="Filtrar productos"
         (change)="filtro.set($any($event.target).value)"
@@ -779,6 +788,7 @@
             <div class="fila-frase">
               <input
                 type="text"
+                formato="frase"
                 maxlength="80"
                 placeholder="Escribe una frase"
                 [value]="f"
@@ -800,8 +810,7 @@
           </label>
           <label>
             Texto del globo
-            <input formControlName="anuncio_texto" maxlength="90" placeholder="Ej: ¡20% en camisetas esta semana!" />
-          </label>
+<input formControlName="anuncio_texto" formato="frase" maxlength="90" placeholder="Ej: ¡20% en camisetas esta semana!" />          </label>
           <label>
             Mensaje de WhatsApp al tocarlo
             <input formControlName="anuncio_mensaje" maxlength="200" placeholder="Ej: Hola, quiero la oferta de camisetas" />
@@ -819,7 +828,7 @@
   }
     <!-- ================= INVENTARIO ================= -->
     @case ('inventario') {
-    <app-admin-inventario />
+    <app-admin-inventario (editar)="editarDesdeInventario($event)" />
   }
 
 }

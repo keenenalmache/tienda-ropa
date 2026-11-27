@@ -208,8 +208,100 @@ h1 {
   50% { rotate: -5deg; }
   75% { rotate: 3deg; }
 }
+/* ---------- Tarjeta estilo tienda ---------- */
+a.tarjeta h2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+    line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+a.tarjeta p.valoracion {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}
+.valoracion .num { font-weight: 700; }
+.valoracion .estrellas {
+  --p: 0%;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #f5b301 var(--p), rgba(128, 128, 128, 0.4) var(--p));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.valoracion small { opacity: 0.7; }
+a.tarjeta p.desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+    line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  opacity: 0.75;
+}
+a.tarjeta p.precios {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.4rem 0 0;
+}
+.descuento {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  background: #d93a2b;
+}
+.precio-normal,
+a.tarjeta p.precios .precio-oferta {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+a.tarjeta p.tipico {
+  margin: 0.1rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ---------- Esqueletos de carga ---------- */
+.esqueleto { display: grid; gap: 0.6rem; }
+.e-foto,
+.e-linea {
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(128, 128, 128, 0.15) 25%, rgba(128, 128, 128, 0.3) 50%, rgba(128, 128, 128, 0.15) 75%);
+  background-size: 200% 100%;
+  animation: brillo 1.2s linear infinite;
+}
+.e-foto { aspect-ratio: 4 / 5; }
+.e-linea { height: 14px; }
+.e-linea.corta { width: 55%; }
+@keyframes brillo {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-foto, .e-linea { animation: none; }
+}
+
+@media (max-width: 800px) {
+  a.tarjeta h2 { font-size: 0.9rem; }
+  a.tarjeta p.desc { font-size: 0.78rem; }
+  .precio-normal,
+  a.tarjeta p.precios .precio-oferta { font-size: 1.1rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   .categorias button:hover:not(:disabled) {
     animation: none;
   }
 }
+

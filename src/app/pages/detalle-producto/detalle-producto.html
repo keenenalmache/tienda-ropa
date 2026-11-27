@@ -129,9 +129,20 @@
             [class.poco]="mensajeStock().tono === 'poco'" [class.cero]="mensajeStock().tono === 'cero'">
             {{ mensajeStock().texto }}
           </p>
+           @if (avisoCarrito(); as a) {
+          <p class="aviso-carrito" [class.error]="a.tono === 'error'" role="status">
+            {{ a.texto }}
+            @if (a.tono === 'ok') { <a routerLink="/carrito">Ver carrito</a> }
+          </p>
+        }
+
         </div>
 
         <div class="acciones">
+            <button type="button" class="btn-carrito" (click)="agregarAlCarrito(producto)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6" /><path d="M13 8v5M10.5 10.5h5" /></svg>
+            Agregar
+          </button>
           <a [href]="enlaceWhatsapp(producto)" target="_blank" rel="noopener" class="btn-whatsapp">
             Preguntar por WhatsApp
           </a>

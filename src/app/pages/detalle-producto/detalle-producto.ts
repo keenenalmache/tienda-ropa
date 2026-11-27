@@ -7,6 +7,7 @@ import { Favoritos } from '../../services/favoritos';
 import { Resenas, Resena } from '../../services/resenas';
 import { Auth } from '../../services/auth';
 import { Dialogos } from '../../services/dialogos';
+import { Carrito } from '../../services/carrito';
 // Con este stock o menos se avisa "quedan pocas unidades"
 const STOCK_POCO = 3;
 
@@ -21,6 +22,8 @@ export class DetalleProducto {
   private servicio = inject(Productos);
   private negocio = inject(Negocio);
   favs = inject(Favoritos);
+    carrito = inject(Carrito);
+  avisoCarrito = signal<{ texto: string; tono: 'ok' | 'error' } | null>(null);
     private resSrv = inject(Resenas);
   auth = inject(Auth);
   private id = Number(this.ruta.snapshot.paramMap.get('id'));
@@ -239,16 +242,17 @@ export class DetalleProducto {
     return { texto: 'Disponible.', tono: 'ok' };
   });
 
-   constructor() {
-  this.cargarProducto(false);
+     constructor() {
+    this.cargarProducto(false);
+    this.cargarResenas(); // ← agregar
 
-  // Si eres admin, también ves los productos ocultos
-  effect(() => {
-    if (this.auth.esAdminSesion()) {
-      untracked(() => this.cargarProducto(true));
-    }
-  });
-}
+    // Si eres admin, también ves los productos ocultos
+    effect(() => {
+      if (this.auth.esAdminSesion()) {
+        untracked(() => this.cargarProducto(true));
+      }
+    });
+  }
   private cargarProducto(verOculto: boolean) {
     this.servicio.obtenerPorId(this.id, verOculto).then((p) => {
       this.producto.set(p);
@@ -287,7 +291,39 @@ export class DetalleProducto {
   dinero(n: number): string {
     return Number.isInteger(n) ? String(n) : n.toFixed(2);
   }
-
+  agregarAlCarrito(p: Producto) {
+    const t = this.tallaElegida();
+    const c = this.colorElegido();
+    if (!p.variantes.length) {
+      this.avisoCarrito.set({ texto: 'Este producto se consulta por WhatsApp.', tono: 'error' });
+      return;
+    }
+    if (t === null || c === null) {
+      this.avisoCarrito.set({ texto: 'Elige talla y color primero.', tono: 'error' });
+      return;
+    }
+    const stock = this.stockDe(t, c);
+    if (stock === 0) {
+      this.avisoCarrito.set({ texto: 'Sin stock en esta combinación.', tono: 'error' });
+      return;
+    }
+    const r = this.carrito.agregar({
+      productoId: p.id,
+      nombre: p.nombre,
+      talla: t,
+      color: c,
+      precio: this.precioFinal(p),
+      foto: p.imagen,
+      stock,
+    });
+    this.avisoCarrito.set(
+      r === 'ok'
+        ? { texto: 'Agregado al carrito ✓', tono: 'ok' }
+        : r === 'tope'
+          ? { texto: `Ya tienes el máximo disponible (${stock}) en el carrito.`, tono: 'error' }
+          : { texto: 'El carrito está lleno (30 artículos).', tono: 'error' },
+    );
+  }
   // El mensaje de WhatsApp incluye la talla y el color elegidos
   enlaceWhatsapp(p: Producto): string {
     const partes = [`Hola, me interesa: ${p.nombre}`];
